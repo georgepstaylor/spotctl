@@ -1,0 +1,2 @@
+# rackspace-spot-cli
+
