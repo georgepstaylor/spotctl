@@ -1,11 +1,11 @@
-# Makefile for rackspace-spot-cli
+# Makefile for spotctl
 
 # Variables
-BINARY_NAME=rackspace-spot
+BINARY_NAME=spotctl
 VERSION?=dev
 COMMIT?=$(shell git rev-parse --short HEAD)
 DATE?=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-LDFLAGS=-ldflags "-X github.com/georgetaylor/rackspace-spot-cli/cmd.version=${VERSION} -X github.com/georgetaylor/rackspace-spot-cli/cmd.commit=${COMMIT} -X github.com/georgetaylor/rackspace-spot-cli/cmd.date=${DATE}"
+LDFLAGS=-ldflags "-X github.com/georgetaylor/spotctl/cmd.version=${VERSION} -X github.com/georgetaylor/spotctl/cmd.commit=${COMMIT} -X github.com/georgetaylor/spotctl/cmd.date=${DATE}"
 
 # Default target
 .PHONY: help

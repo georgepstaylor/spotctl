@@ -23,7 +23,7 @@ func GetConfig() (*Config, error) {
 	// Set defaults
 	viper.SetDefault("base-url", "https://spot.rackspace.com/apis/ngpc.rxt.io/v1")
 	viper.SetDefault("timeout", 30)
-	viper.SetDefault("region", "us-east-1")
+	viper.SetDefault("region", "uk-lon-1")
 
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
@@ -31,7 +31,7 @@ func GetConfig() (*Config, error) {
 
 	// Validate required fields
 	if cfg.RefreshToken == "" {
-		return nil, fmt.Errorf("refresh token is required. Set it via --refresh-token flag, config file, or RACKSPACE_SPOT_REFRESH_TOKEN environment variable")
+		return nil, fmt.Errorf("refresh token is required. Set it via --refresh-token flag, config file, or SPOTCTL_REFRESH_TOKEN environment variable")
 	}
 
 	return &cfg, nil
@@ -64,6 +64,13 @@ func SaveConfig(cfg *Config) error {
 	viper.Set("debug", cfg.Debug)
 	viper.Set("timeout", cfg.Timeout)
 
-	configPath := fmt.Sprintf("%s/.rackspace-spot.yaml", home)
+	configDir := fmt.Sprintf("%s/.spot", home)
+	configPath := fmt.Sprintf("%s/config.yaml", configDir)
+
+	// Create config directory if it doesn't exist
+	if err := os.MkdirAll(configDir, 0755); err != nil {
+		return fmt.Errorf("failed to create config directory: %w", err)
+	}
+
 	return viper.WriteConfigAs(configPath)
 }

@@ -46,7 +46,7 @@ func TestFormatter_OutputJSON(t *testing.T) {
 				APIVersion: "v1",
 				Kind:       "Region",
 				Metadata: TestMetadata{
-					Name: "us-east-1",
+					Name: "uk-lon-1",
 				},
 				Spec: TestSpec{
 					Country: "United States",
@@ -79,7 +79,7 @@ func TestFormatter_OutputJSON(t *testing.T) {
 	if !strings.Contains(output, `"apiVersion": "v1"`) {
 		t.Error("JSON output should contain apiVersion")
 	}
-	if !strings.Contains(output, `"us-east-1"`) {
+	if !strings.Contains(output, `"uk-lon-1"`) {
 		t.Error("JSON output should contain region name")
 	}
 }
@@ -89,7 +89,7 @@ func TestFormatter_OutputTable(t *testing.T) {
 		Items: []TestRegion{
 			{
 				Metadata: TestMetadata{
-					Name: "us-east-1",
+					Name: "uk-lon-1",
 					UID:  "12345",
 				},
 				Spec: TestSpec{
@@ -97,7 +97,7 @@ func TestFormatter_OutputTable(t *testing.T) {
 					Description: "US East Region",
 					Provider: TestProvider{
 						ProviderType:       "aws",
-						ProviderRegionName: "us-east-1",
+						ProviderRegionName: "uk-lon-1",
 					},
 				},
 			},
@@ -148,7 +148,7 @@ func TestFormatter_OutputTable(t *testing.T) {
 	output := buf.String()
 
 	// Verify table output
-	if !strings.Contains(output, "us-east-1") {
+	if !strings.Contains(output, "uk-lon-1") {
 		t.Error("Table should contain region name")
 	}
 	if !strings.Contains(output, "United States") {

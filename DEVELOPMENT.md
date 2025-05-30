@@ -1,4 +1,4 @@
-# Development Guide
+# Spotctl Development Guide
 
 ## Project Structure
 
@@ -134,7 +134,7 @@ The CLI supports multiple configuration methods:
 
 1. Command-line flags (highest priority)
 2. Environment variables (RACKSPACE*SPOT*\*)
-3. Configuration file (~/.rackspace-spot.yaml)
+3. Configuration file (~/.spot/config.yaml)
 4. Defaults (lowest priority)
 
 ## Error Handling

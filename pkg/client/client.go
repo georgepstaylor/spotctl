@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/georgetaylor/rackspace-spot-cli/pkg/config"
+	"github.com/georgetaylor/spotctl/pkg/config"
 )
 
 // Client represents the Rackspace Spot API client
@@ -75,7 +75,7 @@ func (c *Client) makeRequest(ctx context.Context, method, endpoint string, body 
 	// Set headers
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
-	req.Header.Set("User-Agent", "rackspace-spot-cli/1.0.0")
+	req.Header.Set("User-Agent", "spotctl/0.0.1")
 
 	if c.config.Debug {
 		fmt.Printf("Making %s request to %s\n", method, url)

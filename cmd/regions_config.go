@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"github.com/georgetaylor/rackspace-spot-cli/pkg/output"
+	"github.com/georgetaylor/spotctl/pkg/output"
 )
 
 // getRegionsTableConfig returns the table configuration for regions

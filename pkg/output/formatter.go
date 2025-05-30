@@ -3,12 +3,15 @@ package output
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"reflect"
 	"strings"
 	"text/tabwriter"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/georgetaylor/spotctl/pkg/pager"
 )
 
 // OutputFormat represents supported output formats
@@ -45,25 +48,45 @@ type TableConfig struct {
 // Formatter handles output formatting for CLI commands
 type Formatter struct {
 	options OutputOptions
+	pager   *pager.Pager
 }
 
 // NewFormatter creates a new formatter with the given options
 func NewFormatter(options OutputOptions) *Formatter {
-	return &Formatter{options: options}
+	return &Formatter{
+		options: options,
+		pager:   pager.NewPager(),
+	}
+}
+
+// NewFormatterWithPager creates a new formatter with custom pager settings
+func NewFormatterWithPager(options OutputOptions, p *pager.Pager) *Formatter {
+	return &Formatter{
+		options: options,
+		pager:   p,
+	}
 }
 
 // Output formats and outputs the given data according to the formatter's options
+// This method uses the pager for long output
 func (f *Formatter) Output(data interface{}, tableConfig *TableConfig) error {
+	return f.pager.WriteToWriter(func(w io.Writer) error {
+		return f.OutputToWriter(w, data, tableConfig)
+	})
+}
+
+// OutputToWriter formats and outputs data to the specified writer
+func (f *Formatter) OutputToWriter(w io.Writer, data interface{}, tableConfig *TableConfig) error {
 	switch f.options.Format {
 	case JSONFormat:
-		return f.outputJSON(data)
+		return f.outputJSONToWriter(w, data)
 	case YAMLFormat:
-		return f.outputYAML(data)
+		return f.outputYAMLToWriter(w, data)
 	case TableFormat:
 		if tableConfig == nil {
 			return fmt.Errorf("table configuration required for table output")
 		}
-		return f.outputTable(data, tableConfig)
+		return f.outputTableToWriter(w, data, tableConfig)
 	default:
 		return fmt.Errorf("unsupported output format: %s", f.options.Format)
 	}
@@ -71,14 +94,24 @@ func (f *Formatter) Output(data interface{}, tableConfig *TableConfig) error {
 
 // outputJSON outputs data as formatted JSON
 func (f *Formatter) outputJSON(data interface{}) error {
-	encoder := json.NewEncoder(os.Stdout)
+	return f.outputJSONToWriter(os.Stdout, data)
+}
+
+// outputJSONToWriter outputs data as formatted JSON to the specified writer
+func (f *Formatter) outputJSONToWriter(w io.Writer, data interface{}) error {
+	encoder := json.NewEncoder(w)
 	encoder.SetIndent("", "  ")
 	return encoder.Encode(data)
 }
 
 // outputYAML outputs data as formatted YAML
 func (f *Formatter) outputYAML(data interface{}) error {
-	encoder := yaml.NewEncoder(os.Stdout)
+	return f.outputYAMLToWriter(os.Stdout, data)
+}
+
+// outputYAMLToWriter outputs data as formatted YAML to the specified writer
+func (f *Formatter) outputYAMLToWriter(w io.Writer, data interface{}) error {
+	encoder := yaml.NewEncoder(w)
 	encoder.SetIndent(2)
 	defer encoder.Close()
 	return encoder.Encode(data)
@@ -86,6 +119,11 @@ func (f *Formatter) outputYAML(data interface{}) error {
 
 // outputTable outputs data as a formatted table
 func (f *Formatter) outputTable(data interface{}, config *TableConfig) error {
+	return f.outputTableToWriter(os.Stdout, data, config)
+}
+
+// outputTableToWriter outputs data as a formatted table to the specified writer
+func (f *Formatter) outputTableToWriter(w io.Writer, data interface{}, config *TableConfig) error {
 	// Extract items from the data (handle both single items and lists)
 	items, err := f.extractItems(data)
 	if err != nil {
@@ -93,7 +131,7 @@ func (f *Formatter) outputTable(data interface{}, config *TableConfig) error {
 	}
 
 	if len(items) == 0 {
-		fmt.Println("No items found.")
+		fmt.Fprintln(w, "No items found.")
 		return nil
 	}
 
@@ -106,8 +144,8 @@ func (f *Formatter) outputTable(data interface{}, config *TableConfig) error {
 	}
 
 	// Create tabwriter with good formatting
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, 3, ' ', tabwriter.TabIndent)
-	defer w.Flush()
+	tw := tabwriter.NewWriter(w, 0, 0, 3, ' ', tabwriter.TabIndent)
+	defer tw.Flush()
 
 	// Write headers
 	headers := make([]string, len(columns))
@@ -116,8 +154,8 @@ func (f *Formatter) outputTable(data interface{}, config *TableConfig) error {
 		headers[i] = col.Header
 		separators[i] = strings.Repeat("-", len(col.Header))
 	}
-	fmt.Fprintf(w, "%s\n", strings.Join(headers, "\t"))
-	fmt.Fprintf(w, "%s\n", strings.Join(separators, "\t"))
+	fmt.Fprintf(tw, "%s\n", strings.Join(headers, "\t"))
+	fmt.Fprintf(tw, "%s\n", strings.Join(separators, "\t"))
 
 	// Write data rows
 	for _, item := range items {
@@ -135,7 +173,7 @@ func (f *Formatter) outputTable(data interface{}, config *TableConfig) error {
 
 			row[i] = value
 		}
-		fmt.Fprintf(w, "%s\n", strings.Join(row, "\t"))
+		fmt.Fprintf(tw, "%s\n", strings.Join(row, "\t"))
 	}
 
 	return nil

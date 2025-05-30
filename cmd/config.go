@@ -3,8 +3,8 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/georgetaylor/rackspace-spot-cli/internal/utils"
-	"github.com/georgetaylor/rackspace-spot-cli/pkg/config"
+	"github.com/georgetaylor/spotctl/internal/utils"
+	"github.com/georgetaylor/spotctl/pkg/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -13,7 +13,7 @@ import (
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Manage configuration settings",
-	Long:  `Manage configuration settings for the rackspace-spot CLI.`,
+	Long:  `Manage configuration settings for spotctl.`,
 }
 
 // configShowCmd shows the current configuration
@@ -47,7 +47,7 @@ var configShowCmd = &cobra.Command{
 		if viper.ConfigFileUsed() != "" {
 			fmt.Printf("\nConfig file: %s\n", viper.ConfigFileUsed())
 		} else {
-			fmt.Printf("\nNo config file found. You can create one at ~/.rackspace-spot.yaml\n")
+			fmt.Printf("\nNo config file found. You can create one at ~/.spot/config.yaml\n")
 		}
 	},
 }
@@ -94,7 +94,7 @@ var configInitCmd = &cobra.Command{
 	Short: "Initialize configuration with interactive prompts",
 	Long:  `Initialize the configuration file by prompting for required values.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Initializing rackspace-spot CLI configuration...")
+		fmt.Println("Initializing spotctl configuration...")
 		fmt.Println()
 
 		// Prompt for refresh token
@@ -107,11 +107,11 @@ var configInitCmd = &cobra.Command{
 		}
 
 		// Prompt for region with default
-		fmt.Print("Enter your default region [us-east-1]: ")
+		fmt.Print("Enter your default region [uk-lon-1]: ")
 		var region string
 		fmt.Scanln(&region)
 		if region == "" {
-			region = "us-east-1"
+			region = "uk-lon-1"
 		}
 
 		// Set values
@@ -136,7 +136,7 @@ var configInitCmd = &cobra.Command{
 
 		fmt.Println()
 		fmt.Println("Configuration saved successfully!")
-		fmt.Println("You can now use the rackspace-spot CLI.")
+		fmt.Println("You can now use spotctl.")
 	},
 }
 

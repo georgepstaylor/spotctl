@@ -1,4 +1,5 @@
-# Example configuration file for rackspace-spot CLI
+# Example configuration file for spotctl
+# Copy this to ~/.spot/config.yaml and update with your valuesExample configuration file for rackspace-spot CLI
 # Copy this to ~/.rackspace-spot.yaml and update with your values
 
 # Your Rackspace Spot refresh token (required)
@@ -6,7 +7,7 @@
 refresh-token: "your-refresh-token-here"
 
 # Default region to use
-region: "us-east-1"
+region: "uk-lon-1"
 
 # API base URL (default should work for most users)
 base-url: "https://api.rackspacecloud.com/spot/v1"

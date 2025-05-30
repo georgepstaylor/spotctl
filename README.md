@@ -1,4 +1,4 @@
-# Rackspace Spot CLI
+# Spotctl
 
 A command-line interface for managing and interacting with Rackspace Spot resources through their public API.
 
@@ -15,16 +15,16 @@ A command-line interface for managing and interacting with Rackspace Spot resour
 ### From Source
 
 ```bash
-git clone https://github.com/georgetaylor/rackspace-spot-cli.git
-cd rackspace-spot-cli
+git clone https://github.com/georgetaylor/spotctl.git
+cd spotctl
 make build
-# Binary will be available in bin/rackspace-spot
+# Binary will be available in bin/spotctl
 ```
 
 ### Using Go Install
 
 ```bash
-go install github.com/georgetaylor/rackspace-spot-cli@latest
+go install github.com/georgetaylor/spotctl@latest
 ```
 
 ## Configuration
@@ -41,24 +41,24 @@ Before using the CLI, you need to configure your Rackspace Spot refresh token.
 ### Using Command Line Flags
 
 ```bash
-rackspace-spot --refresh-token your-refresh-token --region us-east-1 instances list
+spotctl --refresh-token your-refresh-token --region uk-lon-1 instances list
 ```
 
 ### Using Environment Variables
 
 ```bash
-export RACKSPACE_SPOT_REFRESH_TOKEN=your-refresh-token
-export RACKSPACE_SPOT_REGION=us-east-1
-rackspace-spot instances list
+export SPOTCTL_REFRESH_TOKEN=your-refresh-token
+export SPOTCTL_REGION=uk-lon-1
+spotctl instances list
 ```
 
 ### Using Configuration File
 
-Create a configuration file at `~/.rackspace-spot.yaml`:
+Create a configuration file at `~/.spot/config.yaml`:
 
 ```yaml
 refresh-token: your-refresh-token
-region: us-east-1
+region: uk-lon-1
 base-url: https://spot.rackspace.com/apis/ngpc.rxt.io/v1
 debug: false
 timeout: 30
@@ -69,21 +69,80 @@ timeout: 30
 Initialize your configuration interactively:
 
 ```bash
-rackspace-spot config init
+spotctl config init
 ```
 
 Or use the config command to set individual values:
 
 ```bash
-rackspace-spot config set refresh-token your-refresh-token
-rackspace-spot config set region us-east-1
+spotctl config set refresh-token your-refresh-token
+spotctl config set region uk-lon-1
 ```
 
 View current configuration:
 
 ```bash
-rackspace-spot config show
+spotctl config show
 ```
+
+## Output Formatting and Paging
+
+The CLI supports multiple output formats and includes intelligent paging for long output, similar to AWS CLI.
+
+### Output Formats
+
+- **Table** (default): Human-readable tabular output
+- **JSON**: Machine-readable JSON format
+- **YAML**: YAML format for configuration files
+
+```bash
+# Table format (default)
+spotctl regions list
+
+# JSON format
+spotctl regions list --output json
+
+# YAML format
+spotctl regions list --output yaml
+```
+
+### Table Display Options
+
+```bash
+# Basic table (default)
+spotctl regions list
+
+# Detailed table with additional columns
+spotctl regions list --details
+
+# Wide table with all available columns
+spotctl regions list --wide
+```
+
+### Automatic Paging
+
+For long output, the CLI automatically uses a pager (like `less` or `more`) when:
+
+- Output is longer than the terminal height
+- Output is going to a terminal (not piped to a file)
+
+#### Pager Configuration
+
+```bash
+# Disable pager with flag
+spotctl regions list --no-pager
+
+# Disable pager with environment variable
+export SPOTCTL_NO_PAGER=true
+spotctl regions list
+
+# Configure custom pager
+export PAGER="less -R"  # Color-preserving pager
+export PAGER="more"     # Simple pager
+export PAGER="cat"      # No paging (direct output)
+```
+
+The pager respects your `$PAGER` environment variable. If the configured pager is not available, the CLI will display a warning and output directly to the terminal. The CLI does not fall back to other pagers automatically.
 
 ## Usage
 
@@ -91,42 +150,42 @@ rackspace-spot config show
 
 ```bash
 # List all available regions
-rackspace-spot regions list
+spotctl regions list
 
 # List regions with detailed information
-rackspace-spot regions list --details
+spotctl regions list --details
 
 # List regions with JSON output
-rackspace-spot regions list --output json
+spotctl regions list --output json
 ```
 
 ### Instance Management
 
 ```bash
 # List all instances (implementation pending API docs)
-rackspace-spot instances list
+spotctl instances list
 
 # List instances with JSON output
-rackspace-spot instances list --output json
+spotctl instances list --output json
 
 # Create a new instance (implementation pending API docs)
-rackspace-spot instances create
+spotctl instances create
 
 # Delete an instance
-rackspace-spot instances delete instance-id
+spotctl instances delete instance-id
 ```
 
 ### Pricing Information
 
 ```bash
 # Get current pricing
-rackspace-spot pricing current
+spotctl pricing current
 
 # Get pricing for specific region
-rackspace-spot pricing current --region us-west-2
+spotctl pricing current --region us-west-2
 
 # Get pricing history
-rackspace-spot pricing history --start-date 2024-01-01 --end-date 2024-01-31
+spotctl pricing history --start-date 2024-01-01 --end-date 2024-01-31
 ```
 
 ### Global Options

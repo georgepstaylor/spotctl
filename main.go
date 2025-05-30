@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/georgetaylor/rackspace-spot-cli/cmd"
+	"github.com/georgetaylor/spotctl/cmd"
 )
 
 func main() {

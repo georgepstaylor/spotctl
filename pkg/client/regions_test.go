@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/georgetaylor/rackspace-spot-cli/pkg/config"
+	"github.com/georgetaylor/spotctl/pkg/config"
 )
 
 // MockTokenManager implements a token manager for testing
@@ -49,14 +49,14 @@ func TestClient_ListRegions(t *testing.T) {
 				APIVersion: "v1",
 				Kind:       "Region",
 				Metadata: ObjectMeta{
-					Name: "us-east-1",
+					Name: "uk-lon-1",
 				},
 				Spec: RegionSpec{
-					Country:     "United States",
-					Description: "US East (Virginia)",
+					Country:     "United Kingdom",
+					Description: "London",
 					Provider: RegionProvider{
-						ProviderType:       "aws",
-						ProviderRegionName: "us-east-1",
+						ProviderType:       "ospc",
+						ProviderRegionName: "uk-lon-1",
 					},
 				},
 			},
@@ -64,14 +64,14 @@ func TestClient_ListRegions(t *testing.T) {
 				APIVersion: "v1",
 				Kind:       "Region",
 				Metadata: ObjectMeta{
-					Name: "eu-west-1",
+					Name: "us-central-dfw-2",
 				},
 				Spec: RegionSpec{
-					Country:     "Ireland",
-					Description: "EU West (Ireland)",
+					Country:     "United States",
+					Description: "Dallas Fort Worth",
 					Provider: RegionProvider{
-						ProviderType:       "aws",
-						ProviderRegionName: "eu-west-1",
+						ProviderType:       "ospc",
+						ProviderRegionName: "us-central-dfw-2",
 					},
 				},
 			},
@@ -131,14 +131,14 @@ func TestClient_ListRegions(t *testing.T) {
 
 	// Verify first region
 	firstRegion := regionList.Items[0]
-	if firstRegion.Metadata.Name != "us-east-1" {
-		t.Errorf("Expected first region name us-east-1, got %s", firstRegion.Metadata.Name)
+	if firstRegion.Metadata.Name != "uk-lon-1" {
+		t.Errorf("Expected first region name uk-lon-1, got %s", firstRegion.Metadata.Name)
 	}
-	if firstRegion.Spec.Country != "United States" {
-		t.Errorf("Expected first region country 'United States', got %s", firstRegion.Spec.Country)
+	if firstRegion.Spec.Country != "United Kingdom" {
+		t.Errorf("Expected first region country 'United Kingdom', got %s", firstRegion.Spec.Country)
 	}
-	if firstRegion.Spec.Provider.ProviderType != "aws" {
-		t.Errorf("Expected first region provider type 'aws', got %s", firstRegion.Spec.Provider.ProviderType)
+	if firstRegion.Spec.Provider.ProviderType != "ospc" {
+		t.Errorf("Expected first region provider type 'ospc', got %s", firstRegion.Spec.Provider.ProviderType)
 	}
 }
 

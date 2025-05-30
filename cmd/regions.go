@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/georgetaylor/rackspace-spot-cli/pkg/client"
-	"github.com/georgetaylor/rackspace-spot-cli/pkg/config"
-	"github.com/georgetaylor/rackspace-spot-cli/pkg/output"
+	"github.com/georgetaylor/spotctl/pkg/client"
+	"github.com/georgetaylor/spotctl/pkg/config"
+	"github.com/georgetaylor/spotctl/pkg/output"
+	"github.com/georgetaylor/spotctl/pkg/pager"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // regionsCmd represents the regions command
@@ -42,7 +44,7 @@ This command retrieves and displays information for a single region
 by its name, including provider details, location, and metadata.
 
 Examples:
-  rackspace-spot regions get us-east-1
+  rackspace-spot regions get uk-lon-1
   rackspace-spot regions get us-central-dfw-1 -o json`,
 	Args: cobra.ExactArgs(1),
 	RunE: runRegionsGet,
@@ -126,11 +128,28 @@ func runRegionsGet(cmd *cobra.Command, args []string) error {
 
 func outputRegions(regionList *client.RegionList, format string, showDetails bool, wideOutput bool) error {
 	// Create formatter with options
-	formatter := output.NewFormatter(output.OutputOptions{
+	options := output.OutputOptions{
 		Format:      output.OutputFormat(format),
 		ShowDetails: showDetails,
 		WideOutput:  wideOutput,
-	})
+	}
+
+	// Check if pager should be disabled
+	noPager := viper.GetBool("no-pager")
+	if noPager {
+		// Create pager with disabled setting
+		pager := pager.NewPager()
+		pager.Disable = true
+		formatter := output.NewFormatterWithPager(options, pager)
+
+		// Get table configuration for regions
+		tableConfig := getRegionsTableConfig()
+
+		// Output using the shared formatter
+		return formatter.Output(regionList, tableConfig)
+	}
+
+	formatter := output.NewFormatter(options)
 
 	// Get table configuration for regions
 	tableConfig := getRegionsTableConfig()
@@ -141,11 +160,28 @@ func outputRegions(regionList *client.RegionList, format string, showDetails boo
 
 func outputRegion(region *client.Region, format string, showDetails bool, wideOutput bool) error {
 	// Create formatter with options
-	formatter := output.NewFormatter(output.OutputOptions{
+	options := output.OutputOptions{
 		Format:      output.OutputFormat(format),
 		ShowDetails: showDetails,
 		WideOutput:  wideOutput,
-	})
+	}
+
+	// Check if pager should be disabled
+	noPager := viper.GetBool("no-pager")
+	if noPager {
+		// Create pager with disabled setting
+		pager := pager.NewPager()
+		pager.Disable = true
+		formatter := output.NewFormatterWithPager(options, pager)
+
+		// Get table configuration for regions
+		tableConfig := getRegionsTableConfig()
+
+		// Output using the shared formatter
+		return formatter.Output(region, tableConfig)
+	}
+
+	formatter := output.NewFormatter(options)
 
 	// Get table configuration for regions (same config works for single region)
 	tableConfig := getRegionsTableConfig()

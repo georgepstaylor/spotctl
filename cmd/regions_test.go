@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/georgetaylor/rackspace-spot-cli/pkg/client"
+	"github.com/georgetaylor/spotctl/pkg/client"
 	"github.com/spf13/cobra"
 )
 
@@ -39,14 +39,14 @@ func TestRegionsListCommand(t *testing.T) {
 						APIVersion: "v1",
 						Kind:       "Region",
 						Metadata: client.ObjectMeta{
-							Name: "us-east-1",
+							Name: "uk-lon-1",
 						},
 						Spec: client.RegionSpec{
-							Country:     "United States",
-							Description: "US East (Virginia) region",
+							Country:     "United Kingdom",
+							Description: "London",
 							Provider: client.RegionProvider{
-								ProviderType:       "aws",
-								ProviderRegionName: "us-east-1",
+								ProviderType:       "ospc",
+								ProviderRegionName: "uk-lon-1",
 							},
 						},
 					},
