@@ -7,6 +7,17 @@ import (
 	"github.com/spf13/viper"
 )
 
+// Default configuration values
+var Defaults = struct {
+	BaseURL string
+	Timeout int
+	Debug   bool
+}{
+	BaseURL: "https://spot.rackspace.com/apis/ngpc.rxt.io/v1",
+	Timeout: 30,
+	Debug:   false,
+}
+
 // Config holds the application configuration
 type Config struct {
 	RefreshToken string `mapstructure:"refresh-token"`
@@ -21,9 +32,8 @@ func GetConfig() (*Config, error) {
 	var cfg Config
 
 	// Set defaults
-	viper.SetDefault("base-url", "https://spot.rackspace.com/apis/ngpc.rxt.io/v1")
-	viper.SetDefault("timeout", 30)
-	viper.SetDefault("region", "uk-lon-1")
+	viper.SetDefault("base-url", Defaults.BaseURL)
+	viper.SetDefault("timeout", Defaults.Timeout)
 
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
@@ -32,6 +42,10 @@ func GetConfig() (*Config, error) {
 	// Validate required fields
 	if cfg.RefreshToken == "" {
 		return nil, fmt.Errorf("refresh token is required. Set it via --refresh-token flag, config file, or SPOTCTL_REFRESH_TOKEN environment variable")
+	}
+
+	if cfg.Region == "" {
+		return nil, fmt.Errorf("region is required. Set it via --region flag or in your config file")
 	}
 
 	return &cfg, nil

@@ -11,14 +11,6 @@ import (
 	"time"
 )
 
-// min returns the minimum of two integers
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
 // TokenManagerInterface defines the interface for token management
 type TokenManagerInterface interface {
 	GetValidAccessToken(ctx context.Context) (string, error)

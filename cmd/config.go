@@ -106,28 +106,29 @@ var configInitCmd = &cobra.Command{
 			utils.CheckError(fmt.Errorf("refresh token is required"))
 		}
 
-		// Prompt for region with default
-		fmt.Print("Enter your default region [uk-lon-1]: ")
+		// Prompt for region (required)
+		fmt.Print("Enter your default region (e.g., uk-lon-1, aus-syd-1): ")
 		var region string
 		fmt.Scanln(&region)
+
 		if region == "" {
-			region = "uk-lon-1"
+			utils.CheckError(fmt.Errorf("region is required"))
 		}
 
 		// Set values
 		viper.Set("refresh-token", refreshToken)
 		viper.Set("region", region)
-		viper.Set("base-url", "https://api.rackspacecloud.com/spot/v1")
-		viper.Set("debug", false)
-		viper.Set("timeout", 30)
+		viper.Set("base-url", config.Defaults.BaseURL)
+		viper.Set("debug", config.Defaults.Debug)
+		viper.Set("timeout", config.Defaults.Timeout)
 
 		// Create config object
 		cfg := &config.Config{
 			RefreshToken: refreshToken,
 			Region:       region,
-			BaseURL:      "https://api.rackspacecloud.com/spot/v1",
-			Debug:        false,
-			Timeout:      30,
+			BaseURL:      config.Defaults.BaseURL,
+			Debug:        config.Defaults.Debug,
+			Timeout:      config.Defaults.Timeout,
 		}
 
 		// Save the configuration
@@ -164,12 +165,4 @@ func contains(slice []string, item string) bool {
 		}
 	}
 	return false
-}
-
-// Helper function to get minimum of two integers
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
