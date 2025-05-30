@@ -46,8 +46,8 @@ config.yaml
 config.yml
 
 # Build artifacts
-rackspace-spot
-rackspace-spot-*
+spotctl
+spotctl*
 
 # Temporary files
 *.tmp
