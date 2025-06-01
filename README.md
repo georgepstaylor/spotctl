@@ -1,14 +1,28 @@
-# Spotctl
+# spotctl
 
 A command-line interface for managing and interacting with Rackspace Spot resources through their public API.
 
 ## Features
 
-- **Instance Management**: Create, list, delete, and monitor spot instances
-- **Pricing Information**: Get current and historical spot pricing data
+- **Resource Management**: List and manage organizations, regions, servercla# Output in JSON format
+  spotctl cloudspaces list <namespace> --output json
+
+````
+
+## Exampless
 - **Configuration Management**: Easy setup and management of API credentials
-- **Multiple Output Formats**: Support for JSON and table output formats
+- **Multiple Output Formats**: Support for JSON, YAML, and table output formats
+- **Flexible Display Options**: Wide and detail views with customizable table columns
 - **Cross-Platform**: Available for Linux, macOS, and Windows
+
+## Available Commands
+
+- **Organizations management**: List organizations in your account
+- **Regions management**: List available Rackspace regions
+- **Serverclasses management**: List and get details of available server classes
+- **Cloudspaces management**: List cloudspaces in a namespace
+- **Configuration management**: Setup and manage API credentials
+- **Multiple output formats**: Table, JSON, and YAML output formats
 
 ## Installation
 
@@ -19,7 +33,7 @@ git clone https://github.com/georgetaylor/spotctl.git
 cd spotctl
 make build
 # Binary will be available in bin/spotctl
-```
+````
 
 ### Using Go Install
 
@@ -159,33 +173,64 @@ spotctl regions list --details
 spotctl regions list --output json
 ```
 
-### Instance Management
+### Organization Management
 
 ```bash
-# List all instances (implementation pending API docs)
-spotctl instances list
+# List all organizations
+spotctl organizations list
 
-# List instances with JSON output
-spotctl instances list --output json
+# List organizations with detailed information
+spotctl organizations list --details
 
-# Create a new instance (implementation pending API docs)
-spotctl instances create
-
-# Delete an instance
-spotctl instances delete instance-id
+# List organizations with JSON output
+spotctl organizations list --output json
 ```
 
-### Pricing Information
+### ServerClass Management
 
 ```bash
-# Get current pricing
+# List all serverclasses
+spotctl serverclasses list
+
+# List serverclasses with detailed information
+spotctl serverclasses list --details
+
+# Get details of a specific serverclass
+spotctl serverclasses get <serverclass-name>
+
+# Output in JSON format
+spotctl serverclasses list --output json
+```
+
+### CloudSpace Management
+
+```bash
+# List cloudspaces in a namespace
+spotctl cloudspaces list <namespace>
+
+# List cloudspaces with detailed information
+spotctl cloudspaces list <namespace> --details
+
+# List cloudspaces with wide view (all columns)
+spotctl cloudspaces list <namespace> --wide
+
+# Output in JSON format
+spotctl cloudspaces list <namespace> --output json
+```
+
+### Planned Features (API Documentation Pending)
+
+The following commands are available but display placeholder messages pending API documentation:
+
+```bash
+# Instance management (not yet implemented)
+spotctl instances list
+spotctl instances create
+spotctl instances delete <instance-id>
+
+# Pricing information (not yet implemented)
 spotctl pricing current
-
-# Get pricing for specific region
-spotctl pricing current --region us-west-2
-
-# Get pricing history
-spotctl pricing history --start-date 2024-01-01 --end-date 2024-01-31
+spotctl pricing history
 ```
 
 ### Global Options
@@ -194,7 +239,36 @@ spotctl pricing history --start-date 2024-01-01 --end-date 2024-01-31
 - `--region`: Rackspace region
 - `--config`: Path to config file
 - `--debug`: Enable debug output
-- `--output, -o`: Output format (json, table)
+- `--output, -o`: Output format (json, yaml, table)
+- `--details`: Show detailed information with additional columns
+- `--wide`: Show wide view with all available columns
+- `--no-pager`: Disable automatic paging for long output
+
+## Examples
+
+Here are some examples of the currently working commands:
+
+```bash
+# Basic resource listing
+spotctl regions list
+spotctl organizations list
+spotctl serverclasses list
+
+# Detailed views with additional information
+spotctl regions list --details
+spotctl serverclasses list --wide
+
+# Different output formats
+spotctl organizations list --output json
+spotctl regions list --output yaml
+
+# CloudSpace management (requires namespace)
+spotctl cloudspaces list my-namespace
+spotctl cloudspaces list my-namespace --wide --output json
+
+# Get specific serverclass details
+spotctl serverclasses get standard-2-4-80
+```
 
 ## Development
 
@@ -241,10 +315,14 @@ make dev
 │   ├── root.go            # Root command and global flags
 │   ├── version.go         # Version command
 │   ├── config.go          # Configuration management
-│   ├── instances.go       # Instance management commands
-│   └── pricing.go         # Pricing commands
+│   ├── regions.go         # Region management commands
+│   ├── organizations.go   # Organization management commands
+│   ├── serverclasses.go   # ServerClass management commands
+│   └── cloudspaces.go     # CloudSpace management commands
 ├── pkg/
-│   ├── client/            # API client
+│   ├── client/            # API client and types
+│   │   ├── client.go      # Main API client
+│   │   └── types.go       # API response types
 │   └── config/            # Configuration management
 ├── internal/
 │   └── utils/             # Utility functions
