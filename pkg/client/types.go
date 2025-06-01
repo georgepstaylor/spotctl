@@ -152,3 +152,88 @@ type OrganizationList struct {
 	Next          string         `json:"next,omitempty"`
 	Organizations []Organization `json:"organizations"`
 }
+
+// CloudSpace represents a Rackspace Spot cloudspace
+type CloudSpace struct {
+	APIVersion string           `json:"apiVersion,omitempty"`
+	Kind       string           `json:"kind,omitempty"`
+	Metadata   ObjectMeta       `json:"metadata,omitempty"`
+	Spec       CloudSpaceSpec   `json:"spec,omitempty"`
+	Status     CloudSpaceStatus `json:"status,omitempty"`
+}
+
+type CloudSpaceSpec struct {
+	HAControlPlane    bool                `json:"HAControlPlane,omitempty"`
+	BidRequests       []string            `json:"bidRequests,omitempty"`
+	Cloud             string              `json:"cloud,omitempty"`
+	ClusterRef        *ObjectReference    `json:"clusterRef,omitempty"`
+	CNI               string              `json:"cni,omitempty"`
+	DeploymentType    string              `json:"deploymentType,omitempty"`
+	KubernetesVersion string              `json:"kubernetesVersion,omitempty"`
+	Networks          []CloudSpaceNetwork `json:"networks,omitempty"`
+	OnDemandRequests  []string            `json:"onDemandRequests,omitempty"`
+	Region            string              `json:"region,omitempty"`
+	Servers           []CloudSpaceServer  `json:"servers,omitempty"`
+	Type              string              `json:"type,omitempty"`
+	Webhook           string              `json:"webhook,omitempty"`
+}
+
+type CloudSpaceNetwork struct {
+	Name   string `json:"name,omitempty"`
+	Subnet string `json:"subnet,omitempty"`
+}
+
+type CloudSpaceServer struct {
+	Class string `json:"class,omitempty"`
+	Count int    `json:"count,omitempty"`
+}
+
+type ObjectReference struct {
+	APIVersion      string `json:"apiVersion,omitempty"`
+	FieldPath       string `json:"fieldPath,omitempty"`
+	Kind            string `json:"kind,omitempty"`
+	Name            string `json:"name,omitempty"`
+	Namespace       string `json:"namespace,omitempty"`
+	ResourceVersion string `json:"resourceVersion,omitempty"`
+	UID             string `json:"uid,omitempty"`
+}
+
+type CloudSpaceStatus struct {
+	APIServerEndpoint        string                 `json:"APIServerEndpoint,omitempty"`
+	AssignedServers          map[string]interface{} `json:"assignedServers,omitempty"`
+	Bids                     map[string]interface{} `json:"bids,omitempty"`
+	CloudspaceClassName      string                 `json:"cloudspaceClassName,omitempty"`
+	ClusterRef               *CloudSpaceClusterRef  `json:"clusterRef,omitempty"`
+	Conditions               []CloudSpaceCondition  `json:"conditions,omitempty"`
+	CurrentKubernetesVersion string                 `json:"currentKubernetesVersion,omitempty"`
+	FirstReadyTimestamp      *time.Time             `json:"firstReadyTimestamp,omitempty"`
+	Health                   string                 `json:"health,omitempty"`
+	PendingAllocations       map[string]interface{} `json:"pendingAllocations,omitempty"`
+	Phase                    string                 `json:"phase,omitempty"`
+	Reason                   string                 `json:"reason,omitempty"`
+	SSHSecretName            string                 `json:"sshSecretName,omitempty"`
+	UpgradePhase             string                 `json:"upgradePhase,omitempty"`
+}
+
+type CloudSpaceClusterRef struct {
+	Cluster *ObjectReference `json:"cluster,omitempty"`
+	Reason  string           `json:"reason,omitempty"`
+	Status  string           `json:"status,omitempty"`
+}
+
+type CloudSpaceCondition struct {
+	LastTransitionTime *time.Time `json:"lastTransitionTime,omitempty"`
+	Message            string     `json:"message,omitempty"`
+	Reason             string     `json:"reason,omitempty"`
+	Severity           string     `json:"severity,omitempty"`
+	Status             string     `json:"status,omitempty"`
+	Type               string     `json:"type,omitempty"`
+}
+
+// CloudSpaceList represents a list of cloudspaces
+type CloudSpaceList struct {
+	APIVersion string       `json:"apiVersion,omitempty"`
+	Items      []CloudSpace `json:"items"`
+	Kind       string       `json:"kind,omitempty"`
+	Metadata   ListMeta     `json:"metadata,omitempty"`
+}

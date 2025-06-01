@@ -295,3 +295,28 @@ func (c *Client) ListOrganizations(ctx context.Context) (*OrganizationList, erro
 
 	return &orgList, nil
 }
+
+// ListCloudSpaces retrieves all cloudspaces for a given namespace
+func (c *Client) ListCloudSpaces(ctx context.Context, namespace string) (*CloudSpaceList, error) {
+	if namespace == "" {
+		return nil, fmt.Errorf("namespace is required")
+	}
+
+	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces", namespace)
+	resp, err := c.Get(ctx, endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if err := c.HandleAPIError(resp); err != nil {
+		return nil, err
+	}
+
+	var cloudSpaceList CloudSpaceList
+	if err := json.NewDecoder(resp.Body).Decode(&cloudSpaceList); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return &cloudSpaceList, nil
+}
