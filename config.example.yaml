@@ -1,6 +1,5 @@
 # Example configuration file for spotctl
 # Copy this to ~/.spot/config.yaml and update with your valuesExample configuration file for rackspace-spot CLI
-# Copy this to ~/.rackspace-spot.yaml and update with your values
 
 # Your Rackspace Spot refresh token (required)
 # Get this from the Rackspace Spot Console: API Access > Terraform > Get New Token

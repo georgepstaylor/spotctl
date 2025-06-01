@@ -74,3 +74,81 @@ type RegionList struct {
 	Kind       string   `json:"kind,omitempty"`
 	Metadata   ListMeta `json:"metadata,omitempty"`
 }
+
+// ServerClass represents a Rackspace Spot server class
+type ServerClass struct {
+	APIVersion string            `json:"apiVersion,omitempty"`
+	Kind       string            `json:"kind,omitempty"`
+	Metadata   ObjectMeta        `json:"metadata,omitempty"`
+	Spec       ServerClassSpec   `json:"spec,omitempty"`
+	Status     ServerClassStatus `json:"status,omitempty"`
+}
+
+type ServerClassSpec struct {
+	Availability    string               `json:"availability,omitempty"`
+	Category        string               `json:"category,omitempty"`
+	DisplayName     string               `json:"displayName,omitempty"`
+	FlavorType      string               `json:"flavorType,omitempty"`
+	OnDemandPricing ServerClassPricing   `json:"onDemandPricing,omitempty"`
+	Provider        ServerClassProvider  `json:"provider,omitempty"`
+	Region          string               `json:"region,omitempty"`
+	Resources       ServerClassResources `json:"resources,omitempty"`
+}
+
+type ServerClassPricing struct {
+	Cost     string `json:"cost,omitempty"`
+	Interval string `json:"interval,omitempty"`
+}
+
+type ServerClassProvider struct {
+	ProviderFlavorID string `json:"providerFlavorID,omitempty"`
+	ProviderType     string `json:"providerType,omitempty"`
+}
+
+type ServerClassResources struct {
+	CPU    string `json:"cpu,omitempty"`
+	Memory string `json:"memory,omitempty"`
+}
+
+type ServerClassStatus struct {
+	Available   *int                   `json:"available,omitempty"`
+	Capacity    *int                   `json:"capacity,omitempty"`
+	LastAuction *int                   `json:"lastAuction,omitempty"`
+	Reserved    *int                   `json:"reserved,omitempty"`
+	SpotPricing ServerClassSpotPricing `json:"spotPricing,omitempty"`
+}
+
+type ServerClassSpotPricing struct {
+	HammerPricePerHour string `json:"hammerPricePerHour,omitempty"`
+	MarketPricePerHour string `json:"marketPricePerHour,omitempty"`
+}
+
+// ServerClassList represents a list of server classes
+type ServerClassList struct {
+	APIVersion string        `json:"apiVersion,omitempty"`
+	Items      []ServerClass `json:"items"`
+	Kind       string        `json:"kind,omitempty"`
+	Metadata   ListMeta      `json:"metadata,omitempty"`
+}
+
+// Organization types - follows a different API pattern than Kubernetes-style
+type Organization struct {
+	ID          string               `json:"id"`
+	Name        string               `json:"name"`
+	DisplayName string               `json:"display_name"`
+	Metadata    OrganizationMetadata `json:"metadata"`
+}
+
+type OrganizationMetadata struct {
+	Namespace string `json:"namespace"`
+}
+
+// OrganizationList represents the paginated response for organizations
+type OrganizationList struct {
+	Start         int            `json:"start"`
+	Limit         int            `json:"limit"`
+	Length        int            `json:"length"`
+	Total         int            `json:"total"`
+	Next          string         `json:"next,omitempty"`
+	Organizations []Organization `json:"organizations"`
+}
