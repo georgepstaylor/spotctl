@@ -7,9 +7,8 @@ A command-line interface for managing and interacting with Rackspace Spot resour
 - **Resource Management**: List and manage organizations, regions, servercla# Output in JSON format
   spotctl cloudspaces list <namespace> --output json
 
-````
+## Examples
 
-## Exampless
 - **Configuration Management**: Easy setup and management of API credentials
 - **Multiple Output Formats**: Support for JSON, YAML, and table output formats
 - **Flexible Display Options**: Wide and detail views with customizable table columns
@@ -33,7 +32,7 @@ git clone https://github.com/georgetaylor/spotctl.git
 cd spotctl
 make build
 # Binary will be available in bin/spotctl
-````
+```
 
 ### Using Go Install
 
