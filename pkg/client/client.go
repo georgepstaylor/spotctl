@@ -320,3 +320,31 @@ func (c *Client) ListCloudSpaces(ctx context.Context, namespace string) (*CloudS
 
 	return &cloudSpaceList, nil
 }
+
+// CreateCloudSpace creates a new cloudspace in the specified namespace
+func (c *Client) CreateCloudSpace(ctx context.Context, namespace string, cloudSpace *CloudSpace) (*CloudSpace, error) {
+	if namespace == "" {
+		return nil, fmt.Errorf("namespace is required")
+	}
+	if cloudSpace == nil {
+		return nil, fmt.Errorf("cloudspace configuration is required")
+	}
+
+	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces", namespace)
+	resp, err := c.Post(ctx, endpoint, cloudSpace)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if err := c.HandleAPIError(resp); err != nil {
+		return nil, err
+	}
+
+	var createdCloudSpace CloudSpace
+	if err := json.NewDecoder(resp.Body).Decode(&createdCloudSpace); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return &createdCloudSpace, nil
+}
