@@ -60,6 +60,22 @@ Examples:
 	RunE: runCloudspacesCreate,
 }
 
+// cloudspacesDeleteCmd represents the cloudspaces delete command
+var cloudspacesDeleteCmd = &cobra.Command{
+	Use:   "delete [NAME]",
+	Short: "Delete a cloudspace",
+	Long: `Delete a cloudspace by name in the specified namespace.
+
+Examples:
+  # Delete a cloudspace
+  spotctl cloudspaces delete my-cloudspace --namespace org-abc123
+
+  # Delete with confirmation
+  spotctl cloudspaces delete my-cloudspace --namespace org-abc123 --confirm`,
+	Args: cobra.ExactArgs(1),
+	RunE: runCloudspacesDelete,
+}
+
 var (
 	cloudspacesOutputFormat string
 	cloudspacesShowDetails  bool
@@ -72,6 +88,9 @@ var (
 	cloudspaceWebhook           string
 	cloudspaceHAControlPlane    bool
 	cloudspaceCNI               string
+	// Flags for cloudspaces delete command
+	cloudspaceDeleteNamespace string
+	cloudspaceDeleteConfirm   bool
 )
 
 func runCloudspacesList(cmd *cobra.Command, args []string) error {
@@ -251,10 +270,54 @@ func getCreatedCloudSpaceTableConfig() *output.TableConfig {
 	}
 }
 
+func runCloudspacesDelete(cmd *cobra.Command, args []string) error {
+	cloudspaceName := args[0] // Get name from positional argument
+
+	if cloudspaceDeleteNamespace == "" {
+		return fmt.Errorf("namespace is required")
+	}
+
+	// Ask for confirmation unless --confirm flag is used
+	if !cloudspaceDeleteConfirm {
+		fmt.Printf("Are you sure you want to delete cloudspace '%s' in namespace '%s'? (y/N): ", cloudspaceName, cloudspaceDeleteNamespace)
+		var response string
+		fmt.Scanln(&response)
+		if response != "y" && response != "Y" && response != "yes" && response != "Yes" {
+			fmt.Println("Delete cancelled")
+			return nil
+		}
+	}
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to load config: %w", err)
+	}
+
+	apiClient := client.NewClient(cfg)
+
+	ctx := context.Background()
+	deleteResponse, err := apiClient.DeleteCloudSpace(ctx, cloudspaceDeleteNamespace, cloudspaceName)
+	if err != nil {
+		return fmt.Errorf("failed to delete cloudspace: %w", err)
+	}
+
+	// Check if the deletion was successful
+	if deleteResponse.Status == "Success" || deleteResponse.Status == "" {
+		fmt.Printf("Cloudspace '%s' deleted successfully from namespace '%s'\n", cloudspaceName, cloudspaceDeleteNamespace)
+	} else {
+		fmt.Printf("Delete operation completed with status: %s\n", deleteResponse.Status)
+		if deleteResponse.Message != "" {
+			fmt.Printf("Message: %s\n", deleteResponse.Message)
+		}
+	}
+	return nil
+}
+
 func init() {
 	rootCmd.AddCommand(cloudspacesCmd)
 	cloudspacesCmd.AddCommand(cloudspacesListCmd)
 	cloudspacesCmd.AddCommand(cloudspacesCreateCmd)
+	cloudspacesCmd.AddCommand(cloudspacesDeleteCmd)
 
 	// Add flags for cloudspaces list command
 	cloudspacesListCmd.Flags().StringVarP(&cloudspacesNamespace, "namespace", "n", "", "Namespace to list cloudspaces from (required)")
@@ -271,8 +334,13 @@ func init() {
 	cloudspacesCreateCmd.Flags().StringVar(&cloudspaceCNI, "cni", "", "CNI plugin (leave as default unless custom values needed)")
 	cloudspacesCreateCmd.Flags().StringVarP(&cloudspacesOutputFormat, "output", "o", "table", "Output format (table, json, yaml)")
 
+	// Add flags for cloudspaces delete command
+	cloudspacesDeleteCmd.Flags().StringVar(&cloudspaceDeleteNamespace, "namespace", "", "Namespace for the cloudspace (required)")
+	cloudspacesDeleteCmd.Flags().BoolVar(&cloudspaceDeleteConfirm, "confirm", false, "Skip confirmation prompt")
+
 	// Mark required flags
 	cloudspacesListCmd.MarkFlagRequired("namespace")
 	cloudspacesCreateCmd.MarkFlagRequired("namespace")
 	cloudspacesCreateCmd.MarkFlagRequired("region")
+	cloudspacesDeleteCmd.MarkFlagRequired("namespace")
 }

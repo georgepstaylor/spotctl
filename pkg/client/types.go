@@ -230,6 +230,33 @@ type CloudSpaceCondition struct {
 	Type               string     `json:"type,omitempty"`
 }
 
+// DeleteResponse represents the response from a delete operation (Kubernetes Status object)
+type DeleteResponse struct {
+	APIVersion string                 `json:"apiVersion,omitempty"`
+	Code       *int32                 `json:"code,omitempty"`
+	Details    *DeleteDetails         `json:"details,omitempty"`
+	Kind       string                 `json:"kind,omitempty"`
+	Message    string                 `json:"message,omitempty"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
+	Reason     string                 `json:"reason,omitempty"`
+	Status     string                 `json:"status,omitempty"`
+}
+
+type DeleteDetails struct {
+	Causes            []DeleteCause `json:"causes,omitempty"`
+	Group             string        `json:"group,omitempty"`
+	Kind              string        `json:"kind,omitempty"`
+	Name              string        `json:"name,omitempty"`
+	RetryAfterSeconds *int32        `json:"retryAfterSeconds,omitempty"`
+	UID               string        `json:"uid,omitempty"`
+}
+
+type DeleteCause struct {
+	Field   string `json:"field,omitempty"`
+	Message string `json:"message,omitempty"`
+	Reason  string `json:"reason,omitempty"`
+}
+
 // CloudSpaceList represents a list of cloudspaces
 type CloudSpaceList struct {
 	APIVersion string       `json:"apiVersion,omitempty"`

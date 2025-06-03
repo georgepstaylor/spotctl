@@ -348,3 +348,45 @@ func (c *Client) CreateCloudSpace(ctx context.Context, namespace string, cloudSp
 
 	return &createdCloudSpace, nil
 }
+
+// DeleteCloudSpace deletes a cloudspace by name in the specified namespace
+func (c *Client) DeleteCloudSpace(ctx context.Context, namespace, name string) (*DeleteResponse, error) {
+	if namespace == "" {
+		return nil, fmt.Errorf("namespace is required")
+	}
+	if name == "" {
+		return nil, fmt.Errorf("cloudspace name is required")
+	}
+
+	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces/%s", namespace, name)
+	resp, err := c.Delete(ctx, endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if err := c.HandleAPIError(resp); err != nil {
+		return nil, err
+	}
+
+	// For successful deletes, HTTP 200 or 202 means success according to API docs
+	// We'll return a simple success response instead of trying to parse the complex Kubernetes Status object
+	if resp.StatusCode == 200 || resp.StatusCode == 202 {
+		return &DeleteResponse{
+			Status:  "Success",
+			Message: "CloudSpace deleted successfully",
+		}, nil
+	}
+
+	// If we get here, try to parse the actual response for error details
+	var deleteResponse DeleteResponse
+	if err := json.NewDecoder(resp.Body).Decode(&deleteResponse); err != nil {
+		// If we can't parse the response but got a successful status code, assume success
+		return &DeleteResponse{
+			Status:  "Success",
+			Message: "CloudSpace deleted successfully",
+		}, nil
+	}
+
+	return &deleteResponse, nil
+}
