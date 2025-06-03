@@ -24,38 +24,38 @@ Cloudspaces represent Kubernetes clusters deployed through Rackspace Spot.`,
 
 // cloudspacesListCmd represents the cloudspaces list command
 var cloudspacesListCmd = &cobra.Command{
-	Use:   "list [NAMESPACE]",
+	Use:   "list",
 	Short: "List cloudspaces in a namespace",
 	Long: `List all cloudspaces in the specified namespace.
 
 Examples:
   # List cloudspaces in a specific namespace
-  spotctl cloudspaces list my-namespace
+  spotctl cloudspaces list --namespace my-namespace
 
   # List cloudspaces with wide output
-  spotctl cloudspaces list my-namespace --wide
+  spotctl cloudspaces list --namespace my-namespace --wide
 
   # List cloudspaces with JSON output
-  spotctl cloudspaces list my-namespace --output json`,
-	Args: cobra.ExactArgs(1),
+  spotctl cloudspaces list --namespace my-namespace --output json`,
+	Args: cobra.NoArgs,
 	RunE: runCloudspacesList,
 }
 
 // cloudspacesCreateCmd represents the cloudspaces create command
 var cloudspacesCreateCmd = &cobra.Command{
-	Use:   "create [NAMESPACE]",
+	Use:   "create [NAME]",
 	Short: "Create a new cloudspace",
 	Long: `Create a new cloudspace in the specified namespace.
 
 Examples:
-  # Create a cloudspace interactively
-  spotctl cloudspaces create my-namespace
-
-  # Create a cloudspace with specific parameters
-  spotctl cloudspaces create my-namespace --name my-cloudspace --region uk-lon-1 --kubernetes-version 1.31.1
+  # Create a cloudspace with required parameters
+  spotctl cloudspaces create my-cloudspace --namespace org-abc123 --region uk-lon-1 --kubernetes-version 1.31.1
 
   # Create a cloudspace with webhook
-  spotctl cloudspaces create my-namespace --name my-cloudspace --region uk-lon-1 --webhook https://hooks.slack.com/services/...`,
+  spotctl cloudspaces create my-cloudspace --namespace org-abc123 --region uk-lon-1 --webhook https://hooks.slack.com/services/...
+
+  # Create a cloudspace with HA control plane
+  spotctl cloudspaces create my-cloudspace --namespace org-abc123 --region uk-lon-1 --ha-control-plane`,
 	Args: cobra.ExactArgs(1),
 	RunE: runCloudspacesCreate,
 }
@@ -64,18 +64,20 @@ var (
 	cloudspacesOutputFormat string
 	cloudspacesShowDetails  bool
 	cloudspacesWideOutput   bool
+	cloudspacesNamespace    string // For list command
 	// Flags for cloudspaces create command
-	cloudspaceName              string
+	cloudspaceNamespace         string
 	cloudspaceRegion            string
 	cloudspaceKubernetesVersion string
 	cloudspaceWebhook           string
 	cloudspaceHAControlPlane    bool
-	cloudspaceCloud             string
 	cloudspaceCNI               string
 )
 
 func runCloudspacesList(cmd *cobra.Command, args []string) error {
-	namespace := args[0]
+	if cloudspacesNamespace == "" {
+		return fmt.Errorf("namespace is required")
+	}
 
 	cfg, err := config.GetConfig()
 	if err != nil {
@@ -85,7 +87,7 @@ func runCloudspacesList(cmd *cobra.Command, args []string) error {
 	client := client.NewClient(cfg)
 
 	ctx := context.Background()
-	cloudSpaceList, err := client.ListCloudSpaces(ctx, namespace)
+	cloudSpaceList, err := client.ListCloudSpaces(ctx, cloudspacesNamespace)
 	if err != nil {
 		return fmt.Errorf("failed to list cloudspaces: %w", err)
 	}
@@ -94,6 +96,21 @@ func runCloudspacesList(cmd *cobra.Command, args []string) error {
 }
 
 func outputCloudSpaces(cloudSpaceList *client.CloudSpaceList, format string, showDetails bool, wideOutput bool) error {
+	// Check if no cloudspaces were found
+	if len(cloudSpaceList.Items) == 0 {
+		if format == "json" {
+			fmt.Println("[]")
+			return nil
+		} else if format == "yaml" {
+			fmt.Println("[]")
+			return nil
+		} else {
+			// For table format, show a helpful message
+			fmt.Printf("No cloudspaces found in namespace %s\n", cloudspacesNamespace)
+			return nil
+		}
+	}
+
 	// Create formatter with options
 	options := output.OutputOptions{
 		Format:      output.OutputFormat(format),
@@ -131,20 +148,20 @@ func getCloudSpacesTableConfig() *output.TableConfig {
 			{Header: "NAME", Field: "metadata.name"},
 			{Header: "NAMESPACE", Field: "metadata.namespace"},
 			{Header: "REGION", Field: "spec.region"},
-			{Header: "PHASE", Field: "status.phase"},
-			{Header: "HEALTH", Field: "status.health"},
+			{Header: "PHASE", Field: "status.phase", Default: "<none>"},
+			{Header: "HEALTH", Field: "status.health", Default: "<none>"},
 		},
 		DetailCols: []output.TableColumn{
-			{Header: "K8S VERSION", Field: "status.currentKubernetesVersion"},
-			{Header: "CNI", Field: "spec.cni"},
-			{Header: "DEPLOYMENT TYPE", Field: "spec.deploymentType"},
-			{Header: "HA CONTROL PLANE", Field: "spec.HAControlPlane"},
+			{Header: "K8S VERSION", Field: "status.currentKubernetesVersion", Default: "<none>"},
+			{Header: "CNI", Field: "spec.cni", Default: "<none>"},
+			{Header: "DEPLOYMENT TYPE", Field: "spec.deploymentType", Default: "<none>"},
+			{Header: "HA CONTROL PLANE", Field: "spec.HAControlPlane", Default: "<none>"},
 		},
 	}
 }
 
 func runCloudspacesCreate(cmd *cobra.Command, args []string) error {
-	namespace := args[0]
+	cloudspaceName := args[0] // Get name from positional argument
 
 	cfg, err := config.GetConfig()
 	if err != nil {
@@ -159,21 +176,24 @@ func runCloudspacesCreate(cmd *cobra.Command, args []string) error {
 		Kind:       "CloudSpace",
 		Metadata: client.ObjectMeta{
 			Name:      cloudspaceName,
-			Namespace: namespace,
+			Namespace: cloudspaceNamespace, // Use namespace flag
 		},
 		Spec: client.CloudSpaceSpec{
 			Region:            cloudspaceRegion,
 			KubernetesVersion: cloudspaceKubernetesVersion,
 			Webhook:           cloudspaceWebhook,
 			HAControlPlane:    cloudspaceHAControlPlane,
-			Cloud:             cloudspaceCloud,
+			Cloud:             "default", // API requires this to be set to "default"
 			CNI:               cloudspaceCNI,
 		},
 	}
 
 	// Validate required fields
 	if cloudspaceName == "" {
-		return fmt.Errorf("cloudspace name is required (use --name flag)")
+		return fmt.Errorf("cloudspace name is required (use positional argument)")
+	}
+	if cloudspaceNamespace == "" {
+		return fmt.Errorf("namespace is required (use --namespace flag)")
 	}
 	if cloudspaceRegion == "" {
 		return fmt.Errorf("region is required (use --region flag)")
@@ -183,7 +203,7 @@ func runCloudspacesCreate(cmd *cobra.Command, args []string) error {
 	}
 
 	ctx := context.Background()
-	createdCloudSpace, err := apiClient.CreateCloudSpace(ctx, namespace, cloudSpace)
+	createdCloudSpace, err := apiClient.CreateCloudSpace(ctx, cloudspaceNamespace, cloudSpace)
 	if err != nil {
 		return fmt.Errorf("failed to create cloudspace: %w", err)
 	}
@@ -224,8 +244,9 @@ func getCreatedCloudSpaceTableConfig() *output.TableConfig {
 			{Header: "NAME", Field: "metadata.name"},
 			{Header: "NAMESPACE", Field: "metadata.namespace"},
 			{Header: "REGION", Field: "spec.region"},
-			{Header: "K8S VERSION", Field: "spec.kubernetesVersion"},
-			{Header: "STATUS", Field: "status.phase"},
+			{Header: "K8S VERSION", Field: "spec.kubernetesVersion", Default: "<none>"},
+			{Header: "PHASE", Field: "status.phase", Default: "<none>"},
+			{Header: "HEALTH", Field: "status.health", Default: "<none>"},
 		},
 	}
 }
@@ -236,21 +257,22 @@ func init() {
 	cloudspacesCmd.AddCommand(cloudspacesCreateCmd)
 
 	// Add flags for cloudspaces list command
+	cloudspacesListCmd.Flags().StringVarP(&cloudspacesNamespace, "namespace", "n", "", "Namespace to list cloudspaces from (required)")
 	cloudspacesListCmd.Flags().StringVarP(&cloudspacesOutputFormat, "output", "o", "table", "Output format (table, json, yaml)")
 	cloudspacesListCmd.Flags().BoolVarP(&cloudspacesShowDetails, "details", "d", false, "Show detailed output")
 	cloudspacesListCmd.Flags().BoolVarP(&cloudspacesWideOutput, "wide", "w", false, "Show additional columns")
 
 	// Add flags for cloudspaces create command
-	cloudspacesCreateCmd.Flags().StringVarP(&cloudspaceName, "name", "n", "", "Name of the cloudspace (required)")
+	cloudspacesCreateCmd.Flags().StringVar(&cloudspaceNamespace, "namespace", "", "Namespace for the cloudspace (required)")
 	cloudspacesCreateCmd.Flags().StringVarP(&cloudspaceRegion, "region", "r", "", "Region for the cloudspace (required)")
 	cloudspacesCreateCmd.Flags().StringVarP(&cloudspaceKubernetesVersion, "kubernetes-version", "k", "1.31.1", "Kubernetes version (1.31.1, 1.30.10, 1.29.6)")
 	cloudspacesCreateCmd.Flags().StringVarP(&cloudspaceWebhook, "webhook", "w", "", "Webhook URL for notifications")
 	cloudspacesCreateCmd.Flags().BoolVar(&cloudspaceHAControlPlane, "ha-control-plane", false, "Enable HA control plane")
-	cloudspacesCreateCmd.Flags().StringVar(&cloudspaceCloud, "cloud", "", "Cloud provider (leave as default unless custom values needed)")
 	cloudspacesCreateCmd.Flags().StringVar(&cloudspaceCNI, "cni", "", "CNI plugin (leave as default unless custom values needed)")
 	cloudspacesCreateCmd.Flags().StringVarP(&cloudspacesOutputFormat, "output", "o", "table", "Output format (table, json, yaml)")
 
 	// Mark required flags
-	cloudspacesCreateCmd.MarkFlagRequired("name")
+	cloudspacesListCmd.MarkFlagRequired("namespace")
+	cloudspacesCreateCmd.MarkFlagRequired("namespace")
 	cloudspacesCreateCmd.MarkFlagRequired("region")
 }
