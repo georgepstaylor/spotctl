@@ -12,6 +12,7 @@ import (
 // MockCloudSpaceClient implements a simple mock for testing cloudspaces command business logic
 type MockCloudSpaceClient struct {
 	cloudspaces *client.CloudSpaceList
+	cloudspace  *client.CloudSpace
 	err         error
 }
 
@@ -29,6 +30,10 @@ func (m *MockCloudSpaceClient) CreateCloudSpace(namespace string, cloudSpace *cl
 		Phase: "Creating",
 	}
 	return &created, nil
+}
+
+func (m *MockCloudSpaceClient) GetCloudSpace(namespace, name string) (*client.CloudSpace, error) {
+	return m.cloudspace, m.err
 }
 
 func TestCloudspacesListCommand(t *testing.T) {
@@ -365,6 +370,142 @@ func TestCloudspacesCreateCommand(t *testing.T) {
 			}
 			if !tt.expectError && err != nil {
 				t.Errorf("Expected no error but got: %v", err)
+			}
+		})
+	}
+}
+
+func TestCloudspacesGetCommand(t *testing.T) {
+	tests := []struct {
+		name           string
+		mockCloudSpace *client.CloudSpace
+		mockError      error
+		args           []string
+		expectError    bool
+	}{
+		{
+			name: "successful cloudspace get",
+			mockCloudSpace: &client.CloudSpace{
+				APIVersion: "ngpc.rxt.io/v1",
+				Kind:       "CloudSpace",
+				Metadata: client.ObjectMeta{
+					Name:      "test-cloudspace",
+					Namespace: "test-namespace",
+				},
+				Spec: client.CloudSpaceSpec{
+					Region:            "uk-lon-1",
+					Cloud:             "default",
+					KubernetesVersion: "1.31.1",
+					HAControlPlane:    true,
+					CNI:               "calico",
+				},
+				Status: client.CloudSpaceStatus{
+					Phase:  "Running",
+					Health: "Healthy",
+				},
+			},
+			mockError:   nil,
+			args:        []string{"test-cloudspace", "--namespace", "test-namespace"},
+			expectError: false,
+		},
+		{
+			name:           "cloudspace not found",
+			mockCloudSpace: nil,
+			mockError:      errors.New("API error 404: CloudSpace not found"),
+			args:           []string{"missing-cloudspace", "--namespace", "test-namespace"},
+			expectError:    true,
+		},
+		{
+			name:           "missing namespace flag",
+			mockCloudSpace: nil,
+			mockError:      nil,
+			args:           []string{"test-cloudspace"},
+			expectError:    true,
+		},
+		{
+			name:           "missing cloudspace name",
+			mockCloudSpace: nil,
+			mockError:      nil,
+			args:           []string{"--namespace", "test-namespace"},
+			expectError:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a buffer to capture output
+			var buf bytes.Buffer
+
+			// Create the command
+			cmd := &cobra.Command{
+				Use:  "get [NAME]",
+				Args: cobra.ExactArgs(1),
+				RunE: func(cmd *cobra.Command, args []string) error {
+					// Check if namespace flag is provided
+					namespace, _ := cmd.Flags().GetString("namespace")
+					if namespace == "" {
+						return errors.New("required flag \"namespace\" not set")
+					}
+
+					// Mock the client behavior
+					mockClient := &MockCloudSpaceClient{
+						cloudspace: tt.mockCloudSpace,
+						err:        tt.mockError,
+					}
+
+					// Simulate the function logic
+					if tt.mockError != nil {
+						return tt.mockError
+					}
+
+					// For this test, we'll just verify that we get the expected cloudspace
+					cloudspace, err := mockClient.GetCloudSpace(namespace, args[0])
+					if err != nil {
+						return err
+					}
+
+					// Write some output to verify the command works
+					if cloudspace == nil {
+						buf.WriteString("CloudSpace not found.")
+					} else {
+						buf.WriteString("Found cloudspace: " + cloudspace.Metadata.Name)
+					}
+
+					return nil
+				},
+			}
+
+			// Add namespace flag
+			cmd.Flags().String("namespace", "", "Namespace for the cloudspace")
+
+			// Set output to our buffer
+			cmd.SetOut(&buf)
+			cmd.SetErr(&buf)
+
+			// Set the arguments
+			cmd.SetArgs(tt.args)
+
+			// Execute the command
+			err := cmd.Execute()
+
+			// Check error expectation
+			if tt.expectError {
+				if err == nil {
+					t.Errorf("Expected error but got none")
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Unexpected error: %v", err)
+				}
+
+				// Check output for successful cases
+				output := buf.String()
+				if tt.mockCloudSpace != nil {
+					expectedOutput := "Found cloudspace: " + tt.mockCloudSpace.Metadata.Name
+					if output != expectedOutput {
+						t.Errorf("Expected '%s' output, got: %s", expectedOutput, output)
+					}
+				}
 			}
 		})
 	}

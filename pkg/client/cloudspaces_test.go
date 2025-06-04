@@ -392,3 +392,153 @@ func TestCreateCloudSpace(t *testing.T) {
 		})
 	}
 }
+
+func TestGetCloudSpace(t *testing.T) {
+	tests := []struct {
+		name             string
+		namespace        string
+		cloudspaceName   string
+		mockResponse     string
+		mockStatus       int
+		expectError      bool
+		expectedErrorMsg string
+	}{
+		{
+			name:           "successful cloudspace get",
+			namespace:      "test-namespace",
+			cloudspaceName: "test-cloudspace",
+			mockResponse: `{
+				"apiVersion": "ngpc.rxt.io/v1",
+				"kind": "CloudSpace",
+				"metadata": {
+					"name": "test-cloudspace",
+					"namespace": "test-namespace",
+					"creationTimestamp": "2023-01-01T00:00:00Z"
+				},
+				"spec": {
+					"region": "uk-lon-1",
+					"cloud": "default",
+					"kubernetesVersion": "1.31.1",
+					"HAControlPlane": true,
+					"cni": "calico",
+					"deploymentType": "standard"
+				},
+				"status": {
+					"phase": "Running",
+					"health": "Healthy",
+					"currentKubernetesVersion": "1.31.1"
+				}
+			}`,
+			mockStatus:  200,
+			expectError: false,
+		},
+		{
+			name:             "cloudspace not found",
+			namespace:        "test-namespace",
+			cloudspaceName:   "missing-cloudspace",
+			mockResponse:     `{"code": 404, "message": "CloudSpace not found"}`,
+			mockStatus:       404,
+			expectError:      true,
+			expectedErrorMsg: "API error 404: CloudSpace not found",
+		},
+		{
+			name:             "missing namespace",
+			namespace:        "",
+			cloudspaceName:   "test-cloudspace",
+			mockResponse:     "",
+			mockStatus:       0,
+			expectError:      true,
+			expectedErrorMsg: "namespace is required",
+		},
+		{
+			name:             "missing cloudspace name",
+			namespace:        "test-namespace",
+			cloudspaceName:   "",
+			mockResponse:     "",
+			mockStatus:       0,
+			expectError:      true,
+			expectedErrorMsg: "cloudspace name is required",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Skip server setup for validation tests
+			if tt.namespace == "" || tt.cloudspaceName == "" {
+				client := &Client{}
+				_, err := client.GetCloudSpace(context.Background(), tt.namespace, tt.cloudspaceName)
+				if !tt.expectError {
+					t.Errorf("expected error but got none")
+					return
+				}
+				if err == nil || !strings.Contains(err.Error(), tt.expectedErrorMsg) {
+					t.Errorf("expected error message to contain %q, got %q", tt.expectedErrorMsg, err.Error())
+				}
+				return
+			}
+
+			// Setup mock server
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				expectedPath := "/namespaces/" + tt.namespace + "/cloudspaces/" + tt.cloudspaceName
+				if r.URL.Path != expectedPath {
+					t.Errorf("expected path %s, got %s", expectedPath, r.URL.Path)
+				}
+
+				if r.Method != "GET" {
+					t.Errorf("expected GET method, got %s", r.Method)
+				}
+
+				w.WriteHeader(tt.mockStatus)
+				w.Write([]byte(tt.mockResponse))
+			}))
+			defer server.Close()
+
+			// Create test client with mock token manager
+			cfg := &config.Config{
+				RefreshToken: "test-token",
+				BaseURL:      server.URL,
+				Debug:        false,
+				Timeout:      30,
+			}
+
+			mockTokenManager := &MockTokenManager{
+				accessToken: "mock-access-token",
+			}
+			client := NewTestClient(cfg, mockTokenManager)
+
+			// Test the method
+			ctx := context.Background()
+			cloudSpace, err := client.GetCloudSpace(ctx, tt.namespace, tt.cloudspaceName)
+
+			// Check error expectations
+			if tt.expectError {
+				if err == nil {
+					t.Errorf("expected error but got none")
+				} else if tt.expectedErrorMsg != "" && !strings.Contains(err.Error(), tt.expectedErrorMsg) {
+					t.Errorf("expected error message to contain %q, got %q", tt.expectedErrorMsg, err.Error())
+				}
+			} else {
+				if err != nil {
+					t.Errorf("unexpected error: %v", err)
+				}
+
+				// Validate the successful response
+				if cloudSpace.Metadata.Name != tt.cloudspaceName {
+					t.Errorf("expected name %q, got %q", tt.cloudspaceName, cloudSpace.Metadata.Name)
+				}
+
+				if cloudSpace.Metadata.Namespace != tt.namespace {
+					t.Errorf("expected namespace %q, got %q", tt.namespace, cloudSpace.Metadata.Namespace)
+				}
+
+				if cloudSpace.Spec.Region != "uk-lon-1" {
+					t.Errorf("expected region %q, got %q", "uk-lon-1", cloudSpace.Spec.Region)
+				}
+
+				if cloudSpace.Status.Phase != "Running" {
+					t.Errorf("expected phase %q, got %q", "Running", cloudSpace.Status.Phase)
+				}
+			}
+		})
+	}
+}

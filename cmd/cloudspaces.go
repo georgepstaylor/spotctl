@@ -76,25 +76,29 @@ Examples:
 	RunE: runCloudspacesDelete,
 }
 
-var (
-	cloudspacesOutputFormat string
-	cloudspacesShowDetails  bool
-	cloudspacesWideOutput   bool
-	cloudspacesNamespace    string // For list command
-	// Flags for cloudspaces create command
-	cloudspaceNamespace         string
-	cloudspaceRegion            string
-	cloudspaceKubernetesVersion string
-	cloudspaceWebhook           string
-	cloudspaceHAControlPlane    bool
-	cloudspaceCNI               string
-	// Flags for cloudspaces delete command
-	cloudspaceDeleteNamespace string
-	cloudspaceDeleteConfirm   bool
-)
+// cloudspacesGetCmd represents the cloudspaces get command
+var cloudspacesGetCmd = &cobra.Command{
+	Use:   "get [NAME]",
+	Short: "Get a specific cloudspace",
+	Long: `Get detailed information about a specific cloudspace by name in the specified namespace.
+
+Examples:
+  # Get a specific cloudspace
+  spotctl cloudspaces get my-cloudspace --namespace org-abc123
+
+  # Get cloudspace with JSON output
+  spotctl cloudspaces get my-cloudspace --namespace org-abc123 --output json
+
+  # Get cloudspace with YAML output
+  spotctl cloudspaces get my-cloudspace --namespace org-abc123 --output yaml`,
+	Args: cobra.ExactArgs(1),
+	RunE: runCloudspacesGet,
+}
+
 
 func runCloudspacesList(cmd *cobra.Command, args []string) error {
-	if cloudspacesNamespace == "" {
+	namespace, _ := cmd.Flags().GetString("namespace")
+	if namespace == "" {
 		return fmt.Errorf("namespace is required")
 	}
 
@@ -106,15 +110,19 @@ func runCloudspacesList(cmd *cobra.Command, args []string) error {
 	client := client.NewClient(cfg)
 
 	ctx := context.Background()
-	cloudSpaceList, err := client.ListCloudSpaces(ctx, cloudspacesNamespace)
+	cloudSpaceList, err := client.ListCloudSpaces(ctx, namespace)
 	if err != nil {
 		return fmt.Errorf("failed to list cloudspaces: %w", err)
 	}
 
-	return outputCloudSpaces(cloudSpaceList, cloudspacesOutputFormat, cloudspacesShowDetails, cloudspacesWideOutput)
+	outputFormat, _ := cmd.Flags().GetString("output")
+	showDetails, _ := cmd.Flags().GetBool("details")
+	wideOutput, _ := cmd.Flags().GetBool("wide")
+
+	return outputCloudSpaces(cloudSpaceList, outputFormat, showDetails, wideOutput, namespace)
 }
 
-func outputCloudSpaces(cloudSpaceList *client.CloudSpaceList, format string, showDetails bool, wideOutput bool) error {
+func outputCloudSpaces(cloudSpaceList *client.CloudSpaceList, format string, showDetails bool, wideOutput bool, namespace string) error {
 	// Check if no cloudspaces were found
 	if len(cloudSpaceList.Items) == 0 {
 		if format == "json" {
@@ -125,7 +133,7 @@ func outputCloudSpaces(cloudSpaceList *client.CloudSpaceList, format string, sho
 			return nil
 		} else {
 			// For table format, show a helpful message
-			fmt.Printf("No cloudspaces found in namespace %s\n", cloudspacesNamespace)
+			fmt.Printf("No cloudspaces found in namespace %s\n", namespace)
 			return nil
 		}
 	}
@@ -182,6 +190,15 @@ func getCloudSpacesTableConfig() *output.TableConfig {
 func runCloudspacesCreate(cmd *cobra.Command, args []string) error {
 	cloudspaceName := args[0] // Get name from positional argument
 
+	// Get flag values
+	namespace, _ := cmd.Flags().GetString("namespace")
+	region, _ := cmd.Flags().GetString("region")
+	kubernetesVersion, _ := cmd.Flags().GetString("kubernetes-version")
+	webhook, _ := cmd.Flags().GetString("webhook")
+	haControlPlane, _ := cmd.Flags().GetBool("ha-control-plane")
+	cni, _ := cmd.Flags().GetString("cni")
+	outputFormat, _ := cmd.Flags().GetString("output")
+
 	cfg, err := config.GetConfig()
 	if err != nil {
 		return fmt.Errorf("failed to load config: %w", err)
@@ -195,15 +212,15 @@ func runCloudspacesCreate(cmd *cobra.Command, args []string) error {
 		Kind:       "CloudSpace",
 		Metadata: client.ObjectMeta{
 			Name:      cloudspaceName,
-			Namespace: cloudspaceNamespace, // Use namespace flag
+			Namespace: namespace, // Use namespace flag
 		},
 		Spec: client.CloudSpaceSpec{
-			Region:            cloudspaceRegion,
-			KubernetesVersion: cloudspaceKubernetesVersion,
-			Webhook:           cloudspaceWebhook,
-			HAControlPlane:    cloudspaceHAControlPlane,
+			Region:            region,
+			KubernetesVersion: kubernetesVersion,
+			Webhook:           webhook,
+			HAControlPlane:    haControlPlane,
 			Cloud:             "default", // API requires this to be set to "default"
-			CNI:               cloudspaceCNI,
+			CNI:               cni,
 		},
 	}
 
@@ -211,24 +228,24 @@ func runCloudspacesCreate(cmd *cobra.Command, args []string) error {
 	if cloudspaceName == "" {
 		return fmt.Errorf("cloudspace name is required (use positional argument)")
 	}
-	if cloudspaceNamespace == "" {
+	if namespace == "" {
 		return fmt.Errorf("namespace is required (use --namespace flag)")
 	}
-	if cloudspaceRegion == "" {
+	if region == "" {
 		return fmt.Errorf("region is required (use --region flag)")
 	}
-	if cloudspaceKubernetesVersion == "" {
+	if kubernetesVersion == "" {
 		return fmt.Errorf("kubernetes version is required (use --kubernetes-version flag)")
 	}
 
 	ctx := context.Background()
-	createdCloudSpace, err := apiClient.CreateCloudSpace(ctx, cloudspaceNamespace, cloudSpace)
+	createdCloudSpace, err := apiClient.CreateCloudSpace(ctx, namespace, cloudSpace)
 	if err != nil {
 		return fmt.Errorf("failed to create cloudspace: %w", err)
 	}
 
 	// Output the created cloudspace
-	return outputCreatedCloudSpace(createdCloudSpace, cloudspacesOutputFormat)
+	return outputCreatedCloudSpace(createdCloudSpace, outputFormat)
 }
 
 func outputCreatedCloudSpace(cloudSpace *client.CloudSpace, format string) error {
@@ -273,13 +290,17 @@ func getCreatedCloudSpaceTableConfig() *output.TableConfig {
 func runCloudspacesDelete(cmd *cobra.Command, args []string) error {
 	cloudspaceName := args[0] // Get name from positional argument
 
-	if cloudspaceDeleteNamespace == "" {
+	// Get flag values
+	namespace, _ := cmd.Flags().GetString("namespace")
+	confirm, _ := cmd.Flags().GetBool("confirm")
+
+	if namespace == "" {
 		return fmt.Errorf("namespace is required")
 	}
 
 	// Ask for confirmation unless --confirm flag is used
-	if !cloudspaceDeleteConfirm {
-		fmt.Printf("Are you sure you want to delete cloudspace '%s' in namespace '%s'? (y/N): ", cloudspaceName, cloudspaceDeleteNamespace)
+	if !confirm {
+		fmt.Printf("Are you sure you want to delete cloudspace '%s' in namespace '%s'? (y/N): ", cloudspaceName, namespace)
 		var response string
 		fmt.Scanln(&response)
 		if response != "y" && response != "Y" && response != "yes" && response != "Yes" {
@@ -296,14 +317,14 @@ func runCloudspacesDelete(cmd *cobra.Command, args []string) error {
 	apiClient := client.NewClient(cfg)
 
 	ctx := context.Background()
-	deleteResponse, err := apiClient.DeleteCloudSpace(ctx, cloudspaceDeleteNamespace, cloudspaceName)
+	deleteResponse, err := apiClient.DeleteCloudSpace(ctx, namespace, cloudspaceName)
 	if err != nil {
 		return fmt.Errorf("failed to delete cloudspace: %w", err)
 	}
 
 	// Check if the deletion was successful
 	if deleteResponse.Status == "Success" || deleteResponse.Status == "" {
-		fmt.Printf("Cloudspace '%s' deleted successfully from namespace '%s'\n", cloudspaceName, cloudspaceDeleteNamespace)
+		fmt.Printf("Cloudspace '%s' deleted successfully from namespace '%s'\n", cloudspaceName, namespace)
 	} else {
 		fmt.Printf("Delete operation completed with status: %s\n", deleteResponse.Status)
 		if deleteResponse.Message != "" {
@@ -313,34 +334,106 @@ func runCloudspacesDelete(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func runCloudspacesGet(cmd *cobra.Command, args []string) error {
+	cloudspaceName := args[0] // Get name from positional argument
+
+	// Get flag values
+	namespace, _ := cmd.Flags().GetString("namespace")
+	outputFormat, _ := cmd.Flags().GetString("output")
+
+	if namespace == "" {
+		return fmt.Errorf("namespace is required")
+	}
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return fmt.Errorf("failed to load config: %w", err)
+	}
+
+	client := client.NewClient(cfg)
+
+	ctx := context.Background()
+	cloudSpace, err := client.GetCloudSpace(ctx, namespace, cloudspaceName)
+	if err != nil {
+		return fmt.Errorf("failed to get cloudspace: %w", err)
+	}
+
+	return outputCloudSpace(cloudSpace, outputFormat)
+}
+
+func outputCloudSpace(cloudSpace *client.CloudSpace, format string) error {
+	// Create formatter with options
+	options := output.OutputOptions{
+		Format: output.OutputFormat(format),
+	}
+
+	// Check if pager should be disabled
+	noPager := viper.GetBool("no-pager")
+	if noPager {
+		// Create pager with disabled setting
+		pager := pager.NewPager()
+		pager.Disable = true
+		formatter := output.NewFormatterWithPager(options, pager)
+
+		// For single cloudspace output, we'll use a simplified table config
+		tableConfig := getCloudSpaceTableConfig()
+		return formatter.Output(cloudSpace, tableConfig)
+	}
+
+	formatter := output.NewFormatter(options)
+
+	// For single cloudspace output, we'll use a simplified table config
+	tableConfig := getCloudSpaceTableConfig()
+	return formatter.Output(cloudSpace, tableConfig)
+}
+
+func getCloudSpaceTableConfig() *output.TableConfig {
+	return &output.TableConfig{
+		Columns: []output.TableColumn{
+			{Header: "NAME", Field: "metadata.name"},
+			{Header: "NAMESPACE", Field: "metadata.namespace"},
+			{Header: "REGION", Field: "spec.region"},
+			{Header: "K8S VERSION", Field: "spec.kubernetesVersion", Default: "<none>"},
+			{Header: "PHASE", Field: "status.phase", Default: "<none>"},
+			{Header: "HEALTH", Field: "status.health", Default: "<none>"},
+		},
+	}
+}
+
 func init() {
 	rootCmd.AddCommand(cloudspacesCmd)
 	cloudspacesCmd.AddCommand(cloudspacesListCmd)
 	cloudspacesCmd.AddCommand(cloudspacesCreateCmd)
 	cloudspacesCmd.AddCommand(cloudspacesDeleteCmd)
+	cloudspacesCmd.AddCommand(cloudspacesGetCmd)
 
 	// Add flags for cloudspaces list command
-	cloudspacesListCmd.Flags().StringVarP(&cloudspacesNamespace, "namespace", "n", "", "Namespace to list cloudspaces from (required)")
-	cloudspacesListCmd.Flags().StringVarP(&cloudspacesOutputFormat, "output", "o", "table", "Output format (table, json, yaml)")
-	cloudspacesListCmd.Flags().BoolVarP(&cloudspacesShowDetails, "details", "d", false, "Show detailed output")
-	cloudspacesListCmd.Flags().BoolVarP(&cloudspacesWideOutput, "wide", "w", false, "Show additional columns")
+	cloudspacesListCmd.Flags().StringP("namespace", "n", "", "Namespace to list cloudspaces from (required)")
+	cloudspacesListCmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml)")
+	cloudspacesListCmd.Flags().BoolP("details", "d", false, "Show detailed output")
+	cloudspacesListCmd.Flags().BoolP("wide", "w", false, "Show additional columns")
 
 	// Add flags for cloudspaces create command
-	cloudspacesCreateCmd.Flags().StringVar(&cloudspaceNamespace, "namespace", "", "Namespace for the cloudspace (required)")
-	cloudspacesCreateCmd.Flags().StringVarP(&cloudspaceRegion, "region", "r", "", "Region for the cloudspace (required)")
-	cloudspacesCreateCmd.Flags().StringVarP(&cloudspaceKubernetesVersion, "kubernetes-version", "k", "1.31.1", "Kubernetes version (1.31.1, 1.30.10, 1.29.6)")
-	cloudspacesCreateCmd.Flags().StringVarP(&cloudspaceWebhook, "webhook", "w", "", "Webhook URL for notifications")
-	cloudspacesCreateCmd.Flags().BoolVar(&cloudspaceHAControlPlane, "ha-control-plane", false, "Enable HA control plane")
-	cloudspacesCreateCmd.Flags().StringVar(&cloudspaceCNI, "cni", "", "CNI plugin (leave as default unless custom values needed)")
-	cloudspacesCreateCmd.Flags().StringVarP(&cloudspacesOutputFormat, "output", "o", "table", "Output format (table, json, yaml)")
+	cloudspacesCreateCmd.Flags().String("namespace", "", "Namespace for the cloudspace (required)")
+	cloudspacesCreateCmd.Flags().StringP("region", "r", "", "Region for the cloudspace (required)")
+	cloudspacesCreateCmd.Flags().StringP("kubernetes-version", "k", "1.31.1", "Kubernetes version (1.31.1, 1.30.10, 1.29.6)")
+	cloudspacesCreateCmd.Flags().StringP("webhook", "w", "", "Webhook URL for notifications")
+	cloudspacesCreateCmd.Flags().Bool("ha-control-plane", false, "Enable HA control plane")
+	cloudspacesCreateCmd.Flags().String("cni", "", "CNI plugin (leave as default unless custom values needed)")
+	cloudspacesCreateCmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml)")
 
 	// Add flags for cloudspaces delete command
-	cloudspacesDeleteCmd.Flags().StringVar(&cloudspaceDeleteNamespace, "namespace", "", "Namespace for the cloudspace (required)")
-	cloudspacesDeleteCmd.Flags().BoolVar(&cloudspaceDeleteConfirm, "confirm", false, "Skip confirmation prompt")
+	cloudspacesDeleteCmd.Flags().String("namespace", "", "Namespace for the cloudspace (required)")
+	cloudspacesDeleteCmd.Flags().Bool("confirm", false, "Skip confirmation prompt")
+
+	// Add flags for cloudspaces get command
+	cloudspacesGetCmd.Flags().String("namespace", "", "Namespace for the cloudspace (required)")
+	cloudspacesGetCmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml)")
 
 	// Mark required flags
 	cloudspacesListCmd.MarkFlagRequired("namespace")
 	cloudspacesCreateCmd.MarkFlagRequired("namespace")
 	cloudspacesCreateCmd.MarkFlagRequired("region")
 	cloudspacesDeleteCmd.MarkFlagRequired("namespace")
+	cloudspacesGetCmd.MarkFlagRequired("namespace")
 }
