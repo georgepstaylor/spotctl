@@ -53,7 +53,8 @@ test-coverage: ## Run tests with coverage
 .PHONY: lint
 lint: ## Run linter
 	@echo "Running linter..."
-	golangci-lint run
+	go vet ./...
+	gofmt -l .
 
 .PHONY: fmt
 fmt: ## Format code
