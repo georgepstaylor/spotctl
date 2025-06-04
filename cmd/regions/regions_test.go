@@ -146,22 +146,17 @@ func TestRegionsCommandFlags(t *testing.T) {
 		{
 			name:     "default flags",
 			args:     []string{"list"},
-			expected: "output=table details=false wide=false",
+			expected: "output=table details=false",
 		},
 		{
 			name:     "json output",
 			args:     []string{"list", "-o", "json"},
-			expected: "output=json details=false wide=false",
+			expected: "output=json details=false",
 		},
 		{
 			name:     "details flag",
 			args:     []string{"list", "--details"},
-			expected: "output=table details=true wide=false",
-		},
-		{
-			name:     "wide flag",
-			args:     []string{"list", "--wide"},
-			expected: "output=table details=false wide=true",
+			expected: "output=table details=true",
 		},
 	}
 
@@ -178,14 +173,13 @@ func TestRegionsCommandFlags(t *testing.T) {
 					// Test that flags can be retrieved
 					output, _ := cmd.Flags().GetString("output")
 					details, _ := cmd.Flags().GetBool("details")
-					wide, _ := cmd.Flags().GetBool("wide")
 
 					// Verify flags are accessible
 					if output == "" {
 						output = "table" // default
 					}
 
-					cmd.Printf("output=%s details=%v wide=%v", output, details, wide)
+					cmd.Printf("output=%s details=%v", output, details)
 					return nil
 				},
 			}
@@ -193,7 +187,6 @@ func TestRegionsCommandFlags(t *testing.T) {
 			// Add standard flags
 			listCmd.Flags().StringP("output", "o", "table", "Output format (table|json|yaml)")
 			listCmd.Flags().Bool("details", false, "Show detailed output")
-			listCmd.Flags().Bool("wide", false, "Show wide output")
 
 			regionsCmd.AddCommand(listCmd)
 

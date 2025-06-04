@@ -24,7 +24,6 @@ your authenticated account, including organization details and metadata.`,
 	// Add flags for organizations list command
 	cmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml)")
 	cmd.Flags().Bool("details", false, "Show detailed organization information")
-	cmd.Flags().Bool("wide", false, "Show additional columns")
 
 	return cmd
 }
@@ -46,7 +45,6 @@ func runOrganizationsList(cmd *cobra.Command, args []string) error {
 	// Get flag values
 	outputFormat, _ := cmd.Flags().GetString("output")
 	showDetails, _ := cmd.Flags().GetBool("details")
-	wideOutput, _ := cmd.Flags().GetBool("wide")
 
-	return outputOrganizations(orgList, outputFormat, showDetails, wideOutput)
+	return outputOrganizations(orgList, outputFormat, showDetails)
 }

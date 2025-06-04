@@ -120,8 +120,6 @@ func TestFormatter_OutputTable(t *testing.T) {
 		},
 		DetailCols: []TableColumn{
 			{Header: "DESCRIPTION", Field: "spec.description", Default: "N/A"},
-		},
-		WideCols: []TableColumn{
 			{Header: "UID", Field: "metadata.uid", Default: "N/A"},
 		},
 	}

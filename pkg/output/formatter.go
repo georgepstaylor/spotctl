@@ -27,7 +27,6 @@ const (
 type OutputOptions struct {
 	Format      OutputFormat
 	ShowDetails bool
-	WideOutput  bool
 }
 
 // TableColumn represents a column in table output
@@ -42,7 +41,6 @@ type TableColumn struct {
 type TableConfig struct {
 	Columns    []TableColumn
 	DetailCols []TableColumn // Additional columns for --details
-	WideCols   []TableColumn // Additional columns for --wide
 }
 
 // Formatter handles output formatting for CLI commands
@@ -137,9 +135,7 @@ func (f *Formatter) outputTableToWriter(w io.Writer, data interface{}, config *T
 
 	// Determine which columns to show
 	columns := config.Columns
-	if f.options.WideOutput {
-		columns = append(columns, config.WideCols...)
-	} else if f.options.ShowDetails {
+	if f.options.ShowDetails {
 		columns = append(columns, config.DetailCols...)
 	}
 

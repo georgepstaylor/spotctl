@@ -90,7 +90,7 @@ spotctl regions list --output json
 spotctl regions list --output yaml
 
 # Detailed view with extra columns
-spotctl regions list --details --wide
+spotctl regions list --details
 ```
 
 ### Global Options
@@ -99,7 +99,6 @@ spotctl regions list --details --wide
 | -------------- | -------------------------------------- |
 | `--output, -o` | Output format: `table`, `json`, `yaml` |
 | `--details`    | Show additional columns                |
-| `--wide`       | Show all available columns             |
 | `--no-pager`   | Disable automatic paging               |
 | `--debug`      | Enable debug output                    |
 

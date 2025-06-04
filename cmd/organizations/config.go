@@ -18,19 +18,15 @@ func getOrganizationsTableConfig() *output.TableConfig {
 		DetailCols: []output.TableColumn{
 			{Header: "NAMESPACE", Field: "metadata.namespace"},
 		},
-		WideCols: []output.TableColumn{
-			// Organizations don't have additional wide columns in the current API
-		},
 	}
 }
 
 // outputOrganizations handles formatting and output of organization lists
-func outputOrganizations(orgList *client.OrganizationList, format string, showDetails bool, wideOutput bool) error {
+func outputOrganizations(orgList *client.OrganizationList, format string, showDetails bool) error {
 	// Create formatter with options
 	options := output.OutputOptions{
 		Format:      output.OutputFormat(format),
 		ShowDetails: showDetails,
-		WideOutput:  wideOutput,
 	}
 
 	// Check if pager should be disabled

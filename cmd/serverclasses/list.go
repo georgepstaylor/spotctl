@@ -24,7 +24,6 @@ all regions, including their specifications, pricing, and current availability.`
 	// Add flags for list command
 	cmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml)")
 	cmd.Flags().Bool("details", false, "Show detailed server class information")
-	cmd.Flags().Bool("wide", false, "Show additional columns including availability and pricing")
 
 	return cmd
 }
@@ -46,7 +45,6 @@ func runList(cmd *cobra.Command, args []string) error {
 	// Read flags directly from command
 	outputFormat, _ := cmd.Flags().GetString("output")
 	showDetails, _ := cmd.Flags().GetBool("details")
-	wideOutput, _ := cmd.Flags().GetBool("wide")
 
-	return outputServerClasses(serverClassList, outputFormat, showDetails, wideOutput)
+	return outputServerClasses(serverClassList, outputFormat, showDetails)
 }

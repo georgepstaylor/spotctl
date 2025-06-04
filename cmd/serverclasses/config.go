@@ -23,11 +23,6 @@ func getServerClassesTableConfig() *output.TableConfig {
 			{Header: "FLAVOR TYPE", Field: "spec.flavorType"},
 			{Header: "PROVIDER TYPE", Field: "spec.provider.providerType"},
 			{Header: "ON-DEMAND COST", Field: "spec.onDemandPricing.cost"},
-		},
-		WideCols: []output.TableColumn{
-			// {Header: "AVAILABLE", Field: "status.available", Default: "N/A"},
-			// {Header: "CAPACITY", Field: "status.capacity", Default: "N/A"},
-			// {Header: "RESERVED", Field: "status.reserved", Default: "N/A"},
 			{Header: "SPOT PRICE", Field: "status.spotPricing.marketPricePerHour", Default: "N/A"},
 			{Header: "HAMMER PRICE", Field: "status.spotPricing.hammerPricePerHour", Default: "N/A"},
 		},
@@ -35,12 +30,11 @@ func getServerClassesTableConfig() *output.TableConfig {
 }
 
 // outputServerClasses handles formatting and output of server class lists
-func outputServerClasses(serverClassList *client.ServerClassList, format string, showDetails bool, wideOutput bool) error {
+func outputServerClasses(serverClassList *client.ServerClassList, format string, showDetails bool) error {
 	// Create formatter with options
 	options := output.OutputOptions{
 		Format:      output.OutputFormat(format),
 		ShowDetails: showDetails,
-		WideOutput:  wideOutput,
 	}
 
 	// Check if pager should be disabled
@@ -68,12 +62,11 @@ func outputServerClasses(serverClassList *client.ServerClassList, format string,
 }
 
 // outputServerClass handles formatting and output of a single server class
-func outputServerClass(serverClass *client.ServerClass, format string, showDetails bool, wideOutput bool) error {
+func outputServerClass(serverClass *client.ServerClass, format string, showDetails bool) error {
 	// Create formatter with options
 	options := output.OutputOptions{
 		Format:      output.OutputFormat(format),
 		ShowDetails: showDetails,
-		WideOutput:  wideOutput,
 	}
 
 	// Check if pager should be disabled

@@ -32,6 +32,7 @@ Examples:
 	// Add flags for cloudspaces get command
 	cmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml)")
 	cmd.Flags().StringP("namespace", "n", "", "Namespace of the cloudspace (required)")
+	cmd.Flags().Bool("details", false, "Show detailed cloudspace information")
 
 	return cmd
 }
@@ -42,6 +43,7 @@ func runGet(cmd *cobra.Command, args []string) error {
 	// Get flag values
 	namespace, _ := cmd.Flags().GetString("namespace")
 	outputFormat, _ := cmd.Flags().GetString("output")
+	showDetails, _ := cmd.Flags().GetBool("details")
 
 	if namespace == "" {
 		return fmt.Errorf("namespace is required")
@@ -60,5 +62,5 @@ func runGet(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to get cloudspace: %w", err)
 	}
 
-	return outputCloudSpace(cloudSpace, outputFormat)
+	return outputCloudSpace(cloudSpace, outputFormat, showDetails)
 }
