@@ -1,4 +1,4 @@
-package cmd
+package serverclasses
 
 import (
 	"github.com/georgetaylor/spotctl/pkg/client"

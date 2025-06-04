@@ -1,4 +1,4 @@
-package cmd
+package regions
 
 import (
 	"github.com/georgetaylor/spotctl/pkg/client"

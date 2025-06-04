@@ -1,4 +1,4 @@
-package cmd
+package serverclasses
 
 import (
 	"bytes"

@@ -1,4 +1,4 @@
-package cmd
+package organizations
 
 import (
 	"github.com/georgetaylor/spotctl/pkg/client"

@@ -6,6 +6,11 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/georgetaylor/spotctl/cmd/cloudspaces"
+	"github.com/georgetaylor/spotctl/cmd/organizations"
+	"github.com/georgetaylor/spotctl/cmd/regions"
+	"github.com/georgetaylor/spotctl/cmd/serverclasses"
 )
 
 var cfgFile string
@@ -42,6 +47,12 @@ func init() {
 	viper.BindPFlag("region", rootCmd.PersistentFlags().Lookup("region"))
 	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
 	viper.BindPFlag("no-pager", rootCmd.PersistentFlags().Lookup("no-pager"))
+
+	// Register commands
+	rootCmd.AddCommand(cloudspaces.NewCommand())
+	rootCmd.AddCommand(organizations.NewCommand())
+	rootCmd.AddCommand(regions.NewCommand())
+	rootCmd.AddCommand(serverclasses.NewCommand())
 }
 
 // initConfig reads in config file and ENV variables if set.
