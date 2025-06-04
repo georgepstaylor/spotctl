@@ -33,11 +33,6 @@ your authenticated account, including organization details and metadata.`,
 	RunE: runOrganizationsList,
 }
 
-var (
-	organizationsOutputFormat string
-	organizationsShowDetails  bool
-	organizationsWideOutput   bool
-)
 
 func runOrganizationsList(cmd *cobra.Command, args []string) error {
 	cfg, err := config.GetConfig()
@@ -53,7 +48,12 @@ func runOrganizationsList(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to list organizations: %w", err)
 	}
 
-	return outputOrganizations(orgList, organizationsOutputFormat, organizationsShowDetails, organizationsWideOutput)
+	// Get flag values
+	outputFormat, _ := cmd.Flags().GetString("output")
+	showDetails, _ := cmd.Flags().GetBool("details")
+	wideOutput, _ := cmd.Flags().GetBool("wide")
+
+	return outputOrganizations(orgList, outputFormat, showDetails, wideOutput)
 }
 
 func outputOrganizations(orgList *client.OrganizationList, format string, showDetails bool, wideOutput bool) error {
@@ -109,7 +109,7 @@ func init() {
 	organizationsCmd.AddCommand(organizationsListCmd)
 
 	// Add flags for organizations list command
-	organizationsListCmd.Flags().StringVarP(&organizationsOutputFormat, "output", "o", "table", "Output format (table, json, yaml)")
-	organizationsListCmd.Flags().BoolVar(&organizationsShowDetails, "details", false, "Show detailed organization information")
-	organizationsListCmd.Flags().BoolVar(&organizationsWideOutput, "wide", false, "Show additional columns")
+	organizationsListCmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml)")
+	organizationsListCmd.Flags().Bool("details", false, "Show detailed organization information")
+	organizationsListCmd.Flags().Bool("wide", false, "Show additional columns")
 }

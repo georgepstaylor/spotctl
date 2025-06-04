@@ -49,15 +49,6 @@ Examples:
 	RunE: runServerClassesGet,
 }
 
-var (
-	serverclassesOutputFormat string
-	serverclassesShowDetails  bool
-	serverclassesWideOutput   bool
-	// Flags for get command
-	serverclassesGetOutputFormat string
-	serverclassesGetShowDetails  bool
-	serverclassesGetWideOutput   bool
-)
 
 func runServerClassesList(cmd *cobra.Command, args []string) error {
 	cfg, err := config.GetConfig()
@@ -73,7 +64,12 @@ func runServerClassesList(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to list server classes: %w", err)
 	}
 
-	return outputServerClasses(serverClassList, serverclassesOutputFormat, serverclassesShowDetails, serverclassesWideOutput)
+	// Read flags directly from command
+	outputFormat, _ := cmd.Flags().GetString("output")
+	showDetails, _ := cmd.Flags().GetBool("details")
+	wideOutput, _ := cmd.Flags().GetBool("wide")
+
+	return outputServerClasses(serverClassList, outputFormat, showDetails, wideOutput)
 }
 
 func outputServerClasses(serverClassList *client.ServerClassList, format string, showDetails bool, wideOutput bool) error {
@@ -123,7 +119,12 @@ func runServerClassesGet(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to get server class '%s': %w", name, err)
 	}
 
-	return outputServerClass(serverClass, serverclassesGetOutputFormat, serverclassesGetShowDetails, serverclassesGetWideOutput)
+	// Read flags directly from command
+	outputFormat, _ := cmd.Flags().GetString("output")
+	showDetails, _ := cmd.Flags().GetBool("details")
+	wideOutput, _ := cmd.Flags().GetBool("wide")
+
+	return outputServerClass(serverClass, outputFormat, showDetails, wideOutput)
 }
 
 func outputServerClass(serverClass *client.ServerClass, format string, showDetails bool, wideOutput bool) error {
@@ -190,12 +191,12 @@ func init() {
 	serverclassesCmd.AddCommand(serverclassesGetCmd)
 
 	// Add flags for serverclasses list command
-	serverclassesListCmd.Flags().StringVarP(&serverclassesOutputFormat, "output", "o", "table", "Output format (table, json, yaml)")
-	serverclassesListCmd.Flags().BoolVar(&serverclassesShowDetails, "details", false, "Show detailed server class information")
-	serverclassesListCmd.Flags().BoolVar(&serverclassesWideOutput, "wide", false, "Show additional columns including availability and pricing")
+	serverclassesListCmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml)")
+	serverclassesListCmd.Flags().Bool("details", false, "Show detailed server class information")
+	serverclassesListCmd.Flags().Bool("wide", false, "Show additional columns including availability and pricing")
 
 	// Add flags for serverclasses get command
-	serverclassesGetCmd.Flags().StringVarP(&serverclassesGetOutputFormat, "output", "o", "table", "Output format (table, json, yaml)")
-	serverclassesGetCmd.Flags().BoolVar(&serverclassesGetShowDetails, "details", false, "Show detailed server class information")
-	serverclassesGetCmd.Flags().BoolVar(&serverclassesGetWideOutput, "wide", false, "Show additional columns including availability and pricing")
+	serverclassesGetCmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml)")
+	serverclassesGetCmd.Flags().Bool("details", false, "Show detailed server class information")
+	serverclassesGetCmd.Flags().Bool("wide", false, "Show additional columns including availability and pricing")
 }

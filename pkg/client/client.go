@@ -390,3 +390,31 @@ func (c *Client) DeleteCloudSpace(ctx context.Context, namespace, name string) (
 
 	return &deleteResponse, nil
 }
+
+// GetCloudSpace retrieves a specific cloudspace by name in the specified namespace
+func (c *Client) GetCloudSpace(ctx context.Context, namespace, name string) (*CloudSpace, error) {
+	if namespace == "" {
+		return nil, fmt.Errorf("namespace is required")
+	}
+	if name == "" {
+		return nil, fmt.Errorf("cloudspace name is required")
+	}
+
+	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces/%s", namespace, name)
+	resp, err := c.Get(ctx, endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if err := c.HandleAPIError(resp); err != nil {
+		return nil, err
+	}
+
+	var cloudSpace CloudSpace
+	if err := json.NewDecoder(resp.Body).Decode(&cloudSpace); err != nil {
+		return nil, fmt.Errorf("failed to parse response: %w", err)
+	}
+
+	return &cloudSpace, nil
+}

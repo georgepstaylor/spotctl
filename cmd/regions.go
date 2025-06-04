@@ -50,16 +50,6 @@ Examples:
 	RunE: runRegionsGet,
 }
 
-var (
-	regionsOutputFormat string
-	regionsShowDetails  bool
-	regionsWideOutput   bool
-
-	// Separate variables for get command to avoid flag conflicts
-	regionsGetOutputFormat string
-	regionsGetShowDetails  bool
-	regionsGetWideOutput   bool
-)
 
 func init() {
 	// Add regions command to root
@@ -72,14 +62,14 @@ func init() {
 	regionsCmd.AddCommand(regionsGetCmd)
 
 	// Add flags for regions list command
-	regionsListCmd.Flags().StringVarP(&regionsOutputFormat, "output", "o", "table", "Output format (table, json, yaml)")
-	regionsListCmd.Flags().BoolVar(&regionsShowDetails, "details", false, "Show detailed region information")
-	regionsListCmd.Flags().BoolVar(&regionsWideOutput, "wide", false, "Show additional columns including metadata")
+	regionsListCmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml)")
+	regionsListCmd.Flags().Bool("details", false, "Show detailed region information")
+	regionsListCmd.Flags().Bool("wide", false, "Show additional columns including metadata")
 
 	// Add flags for regions get command
-	regionsGetCmd.Flags().StringVarP(&regionsGetOutputFormat, "output", "o", "table", "Output format (table, json, yaml)")
-	regionsGetCmd.Flags().BoolVar(&regionsGetShowDetails, "details", false, "Show detailed region information")
-	regionsGetCmd.Flags().BoolVar(&regionsGetWideOutput, "wide", false, "Show additional columns including metadata")
+	regionsGetCmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml)")
+	regionsGetCmd.Flags().Bool("details", false, "Show detailed region information")
+	regionsGetCmd.Flags().Bool("wide", false, "Show additional columns including metadata")
 }
 
 func runRegionsList(cmd *cobra.Command, args []string) error {
@@ -100,7 +90,12 @@ func runRegionsList(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to list regions: %w", err)
 	}
 
-	return outputRegions(regionList, regionsOutputFormat, regionsShowDetails, regionsWideOutput)
+	// Get flag values
+	outputFormat, _ := cmd.Flags().GetString("output")
+	showDetails, _ := cmd.Flags().GetBool("details")
+	wideOutput, _ := cmd.Flags().GetBool("wide")
+
+	return outputRegions(regionList, outputFormat, showDetails, wideOutput)
 }
 
 func runRegionsGet(cmd *cobra.Command, args []string) error {
@@ -123,7 +118,12 @@ func runRegionsGet(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to get region '%s': %w", regionName, err)
 	}
 
-	return outputRegion(region, regionsGetOutputFormat, regionsGetShowDetails, regionsGetWideOutput)
+	// Get flag values
+	outputFormat, _ := cmd.Flags().GetString("output")
+	showDetails, _ := cmd.Flags().GetBool("details")
+	wideOutput, _ := cmd.Flags().GetBool("wide")
+
+	return outputRegion(region, outputFormat, showDetails, wideOutput)
 }
 
 func outputRegions(regionList *client.RegionList, format string, showDetails bool, wideOutput bool) error {
