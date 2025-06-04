@@ -6,10 +6,7 @@ import (
 
 	"github.com/georgetaylor/spotctl/pkg/client"
 	"github.com/georgetaylor/spotctl/pkg/config"
-	"github.com/georgetaylor/spotctl/pkg/output"
-	"github.com/georgetaylor/spotctl/pkg/pager"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // organizationsCmd represents the organizations command
@@ -33,7 +30,6 @@ your authenticated account, including organization details and metadata.`,
 	RunE: runOrganizationsList,
 }
 
-
 func runOrganizationsList(cmd *cobra.Command, args []string) error {
 	cfg, err := config.GetConfig()
 	if err != nil {
@@ -54,54 +50,6 @@ func runOrganizationsList(cmd *cobra.Command, args []string) error {
 	wideOutput, _ := cmd.Flags().GetBool("wide")
 
 	return outputOrganizations(orgList, outputFormat, showDetails, wideOutput)
-}
-
-func outputOrganizations(orgList *client.OrganizationList, format string, showDetails bool, wideOutput bool) error {
-	// Create formatter with options
-	options := output.OutputOptions{
-		Format:      output.OutputFormat(format),
-		ShowDetails: showDetails,
-		WideOutput:  wideOutput,
-	}
-
-	// Check if pager should be disabled
-	noPager := viper.GetBool("no-pager")
-	if noPager {
-		// Create pager with disabled setting
-		pager := pager.NewPager()
-		pager.Disable = true
-		formatter := output.NewFormatterWithPager(options, pager)
-
-		// Get table configuration for organizations
-		tableConfig := getOrganizationsTableConfig()
-
-		// Pass the organizations array directly instead of the full OrganizationList
-		return formatter.Output(orgList.Organizations, tableConfig)
-	}
-
-	formatter := output.NewFormatter(options)
-
-	// Get table configuration for organizations
-	tableConfig := getOrganizationsTableConfig()
-
-	// Pass the organizations array directly instead of the full OrganizationList
-	return formatter.Output(orgList.Organizations, tableConfig)
-}
-
-func getOrganizationsTableConfig() *output.TableConfig {
-	return &output.TableConfig{
-		Columns: []output.TableColumn{
-			{Header: "ID", Field: "id"},
-			{Header: "NAME", Field: "name"},
-			{Header: "DISPLAY NAME", Field: "display_name"},
-		},
-		DetailCols: []output.TableColumn{
-			{Header: "NAMESPACE", Field: "metadata.namespace"},
-		},
-		WideCols: []output.TableColumn{
-			// Organizations don't have additional wide columns in the current API
-		},
-	}
 }
 
 func init() {

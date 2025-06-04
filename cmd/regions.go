@@ -6,10 +6,7 @@ import (
 
 	"github.com/georgetaylor/spotctl/pkg/client"
 	"github.com/georgetaylor/spotctl/pkg/config"
-	"github.com/georgetaylor/spotctl/pkg/output"
-	"github.com/georgetaylor/spotctl/pkg/pager"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // regionsCmd represents the regions command
@@ -49,7 +46,6 @@ Examples:
 	Args: cobra.ExactArgs(1),
 	RunE: runRegionsGet,
 }
-
 
 func init() {
 	// Add regions command to root
@@ -124,68 +120,4 @@ func runRegionsGet(cmd *cobra.Command, args []string) error {
 	wideOutput, _ := cmd.Flags().GetBool("wide")
 
 	return outputRegion(region, outputFormat, showDetails, wideOutput)
-}
-
-func outputRegions(regionList *client.RegionList, format string, showDetails bool, wideOutput bool) error {
-	// Create formatter with options
-	options := output.OutputOptions{
-		Format:      output.OutputFormat(format),
-		ShowDetails: showDetails,
-		WideOutput:  wideOutput,
-	}
-
-	// Check if pager should be disabled
-	noPager := viper.GetBool("no-pager")
-	if noPager {
-		// Create pager with disabled setting
-		pager := pager.NewPager()
-		pager.Disable = true
-		formatter := output.NewFormatterWithPager(options, pager)
-
-		// Get table configuration for regions
-		tableConfig := getRegionsTableConfig()
-
-		// Output using the shared formatter
-		return formatter.Output(regionList, tableConfig)
-	}
-
-	formatter := output.NewFormatter(options)
-
-	// Get table configuration for regions
-	tableConfig := getRegionsTableConfig()
-
-	// Output using the shared formatter
-	return formatter.Output(regionList, tableConfig)
-}
-
-func outputRegion(region *client.Region, format string, showDetails bool, wideOutput bool) error {
-	// Create formatter with options
-	options := output.OutputOptions{
-		Format:      output.OutputFormat(format),
-		ShowDetails: showDetails,
-		WideOutput:  wideOutput,
-	}
-
-	// Check if pager should be disabled
-	noPager := viper.GetBool("no-pager")
-	if noPager {
-		// Create pager with disabled setting
-		pager := pager.NewPager()
-		pager.Disable = true
-		formatter := output.NewFormatterWithPager(options, pager)
-
-		// Get table configuration for regions
-		tableConfig := getRegionsTableConfig()
-
-		// Output using the shared formatter
-		return formatter.Output(region, tableConfig)
-	}
-
-	formatter := output.NewFormatter(options)
-
-	// Get table configuration for regions (same config works for single region)
-	tableConfig := getRegionsTableConfig()
-
-	// Output using the shared formatter
-	return formatter.Output(region, tableConfig)
 }
