@@ -288,7 +288,7 @@ func TestCreateCloudSpace(t *testing.T) {
 			// Skip creating server for error test cases that don't need HTTP
 			if tt.expectedErrorMsg != "" && (tt.namespace == "" || tt.cloudSpace == nil) {
 				cfg := &config.Config{
-					BaseURL:      "https://api.spot.rackspace.com",
+					BaseURL:      "https://spot.rackspace.com",
 					RefreshToken: "test-token",
 					Timeout:      30,
 				}
