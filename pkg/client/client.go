@@ -94,6 +94,7 @@ func NewClient(cfg *config.Config) *Client {
 
 // MakeRequest performs an HTTP request to the API with dynamic apiVersion support
 // This is the primary method for making requests with full control over method, endpoint, body, and API version
+// The contentType parameter is optional - if not provided, defaults to "application/json"
 //
 // For convenience, use the wrapper methods:
 // - Get, Post, Put, Delete (for default API version)
@@ -102,7 +103,8 @@ func NewClient(cfg *config.Config) *Client {
 // Example usage:
 //
 //	resp, err := client.MakeRequest(ctx, http.MethodGet, "/custom-endpoint", nil, APIVersionAuth)
-func (c *Client) MakeRequest(ctx context.Context, method, endpoint string, body interface{}, apiVersion APIVersion) (*http.Response, error) {
+//	resp, err := client.MakeRequest(ctx, http.MethodPatch, "/endpoint", data, APIVersionDefault, "application/json-patch+json")
+func (c *Client) MakeRequest(ctx context.Context, method, endpoint string, body interface{}, apiVersion APIVersion, contentType ...string) (*http.Response, error) {
 	// Build the URL based on the apiVersion
 	baseURL := c.config.BaseURL
 	if apiVersion != APIVersionDefault {
@@ -132,13 +134,23 @@ func (c *Client) MakeRequest(ctx context.Context, method, endpoint string, body 
 		return nil, fmt.Errorf("failed to get access token: %w", err)
 	}
 
+	// Set content type - default to application/json if not specified
+	ct := "application/json"
+	if len(contentType) > 0 && contentType[0] != "" {
+		ct = contentType[0]
+	}
+
 	// Set headers
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Type", ct)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
 	req.Header.Set("User-Agent", "spotctl/0.0.1")
 
 	if c.config.Debug {
-		fmt.Printf("Making %s request to %s (API: %s)\n", method, url, apiVersion)
+		if ct != "application/json" {
+			fmt.Printf("Making %s request to %s (API: %s, Content-Type: %s)\n", method, url, apiVersion, ct)
+		} else {
+			fmt.Printf("Making %s request to %s (API: %s)\n", method, url, apiVersion)
+		}
 	}
 
 	resp, err := c.httpClient.Do(req)
@@ -172,6 +184,16 @@ func (c *Client) Put(ctx context.Context, endpoint string, body interface{}) (*h
 // Delete performs a DELETE request
 func (c *Client) Delete(ctx context.Context, endpoint string) (*http.Response, error) {
 	return c.MakeRequest(ctx, http.MethodDelete, endpoint, nil, APIVersionDefault)
+}
+
+// Patch performs a PATCH request
+func (c *Client) Patch(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodPatch, endpoint, body, APIVersionDefault)
+}
+
+// PatchWithContentType performs a PATCH request with a specific content type
+func (c *Client) PatchWithContentType(ctx context.Context, endpoint string, body interface{}, contentType string) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodPatch, endpoint, body, APIVersionDefault, contentType)
 }
 
 // PostAuth performs a POST request to the auth API
@@ -430,6 +452,34 @@ func (c *Client) GetCloudSpace(ctx context.Context, namespace, name string) (*Cl
 	resp, err := c.Get(ctx, endpoint)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if err := c.HandleAPIError(resp); err != nil {
+		return nil, err
+	}
+
+	var cloudSpace CloudSpace
+	if err := json.NewDecoder(resp.Body).Decode(&cloudSpace); err != nil {
+		return nil, fmt.Errorf("failed to parse response: %w", err)
+	}
+
+	return &cloudSpace, nil
+}
+
+// EditCloudSpace applies JSON patch operations to update a cloudspace
+func (c *Client) EditCloudSpace(ctx context.Context, namespace, name string, patchOps interface{}) (*CloudSpace, error) {
+	if namespace == "" {
+		return nil, fmt.Errorf("namespace is required")
+	}
+	if name == "" {
+		return nil, fmt.Errorf("cloudspace name is required")
+	}
+
+	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces/%s", namespace, name)
+	resp, err := c.PatchWithContentType(ctx, endpoint, patchOps, "application/json-patch+json")
+	if err != nil {
+		return nil, fmt.Errorf("failed to make patch request: %w", err)
 	}
 	defer resp.Body.Close()
 

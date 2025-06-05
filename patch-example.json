@@ -1,0 +1,7 @@
+[
+    {
+        "op": "replace",
+        "path": "/spec/kubernetesVersion",
+        "value": "1.31.1"
+    }
+]

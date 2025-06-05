@@ -17,6 +17,7 @@ Cloudspaces represent Kubernetes clusters deployed through Rackspace Spot.`,
 	cmd.AddCommand(NewListCommand())
 	cmd.AddCommand(NewGetCommand())
 	cmd.AddCommand(NewCreateCommand())
+	cmd.AddCommand(NewEditCommand())
 	cmd.AddCommand(NewDeleteCommand())
 
 	return cmd
