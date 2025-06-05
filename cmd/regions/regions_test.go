@@ -146,17 +146,17 @@ func TestRegionsCommandFlags(t *testing.T) {
 		{
 			name:     "default flags",
 			args:     []string{"list"},
-			expected: "output=table details=false",
+			expected: "output=table",
 		},
 		{
 			name:     "json output",
 			args:     []string{"list", "-o", "json"},
-			expected: "output=json details=false",
+			expected: "output=json",
 		},
 		{
-			name:     "details flag",
-			args:     []string{"list", "--details"},
-			expected: "output=table details=true",
+			name:     "wide output",
+			args:     []string{"list", "-o", "wide"},
+			expected: "output=wide",
 		},
 	}
 
@@ -172,21 +172,19 @@ func TestRegionsCommandFlags(t *testing.T) {
 				RunE: func(cmd *cobra.Command, args []string) error {
 					// Test that flags can be retrieved
 					output, _ := cmd.Flags().GetString("output")
-					details, _ := cmd.Flags().GetBool("details")
 
 					// Verify flags are accessible
 					if output == "" {
 						output = "table" // default
 					}
 
-					cmd.Printf("output=%s details=%v", output, details)
+					cmd.Printf("output=%s", output)
 					return nil
 				},
 			}
 
 			// Add standard flags
-			listCmd.Flags().StringP("output", "o", "table", "Output format (table|json|yaml)")
-			listCmd.Flags().Bool("details", false, "Show detailed output")
+			listCmd.Flags().StringP("output", "o", "table", "Output format (table|json|yaml|wide)")
 
 			regionsCmd.AddCommand(listCmd)
 

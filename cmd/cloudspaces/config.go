@@ -30,7 +30,7 @@ func getCloudSpacesTableConfig() *output.TableConfig {
 }
 
 // outputCloudSpaces handles formatting and output of cloudspace lists
-func outputCloudSpaces(cloudSpaceList *client.CloudSpaceList, format string, showDetails bool, namespace string) error {
+func outputCloudSpaces(cloudSpaceList *client.CloudSpaceList, format string, namespace string) error {
 	// Check if no cloudspaces were found
 	if len(cloudSpaceList.Items) == 0 {
 		if format == "json" {
@@ -48,8 +48,7 @@ func outputCloudSpaces(cloudSpaceList *client.CloudSpaceList, format string, sho
 
 	// Create formatter with options
 	options := output.OutputOptions{
-		Format:      output.OutputFormat(format),
-		ShowDetails: showDetails,
+		Format: output.OutputFormat(format),
 	}
 
 	// Check if pager should be disabled
@@ -104,11 +103,10 @@ func outputCreatedCloudSpace(cloudSpace *client.CloudSpace, format string) error
 }
 
 // outputCloudSpace handles formatting and output of a single cloudspace
-func outputCloudSpace(cloudSpace *client.CloudSpace, format string, showDetails bool) error {
+func outputCloudSpace(cloudSpace *client.CloudSpace, format string) error {
 	// Create formatter with options
 	options := output.OutputOptions{
-		Format:      output.OutputFormat(format),
-		ShowDetails: showDetails,
+		Format: output.OutputFormat(format),
 	}
 
 	// Check if pager should be disabled
@@ -119,14 +117,14 @@ func outputCloudSpace(cloudSpace *client.CloudSpace, format string, showDetails 
 		pager.Disable = true
 		formatter := output.NewFormatterWithPager(options, pager)
 
-		// Use standard table config, details will be shown based on ShowDetails option
+		// Use standard table config
 		tableConfig := getCloudSpacesTableConfig()
 		return formatter.Output(cloudSpace, tableConfig)
 	}
 
 	formatter := output.NewFormatter(options)
 
-	// Use standard table config, details will be shown based on ShowDetails option
+	// Use standard table config
 	tableConfig := getCloudSpacesTableConfig()
 	return formatter.Output(cloudSpace, tableConfig)
 }

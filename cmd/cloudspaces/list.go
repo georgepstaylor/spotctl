@@ -21,7 +21,7 @@ Examples:
   spotctl cloudspaces list --namespace my-namespace
 
   # List cloudspaces with detailed output
-  spotctl cloudspaces list --namespace my-namespace --details
+  spotctl cloudspaces list --namespace my-namespace -o wide
 
   # List cloudspaces with JSON output
   spotctl cloudspaces list --namespace my-namespace --output json`,
@@ -30,8 +30,7 @@ Examples:
 	}
 
 	// Add flags for cloudspaces list command
-	cmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml)")
-	cmd.Flags().Bool("details", false, "Show detailed cloudspace information")
+	cmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml, wide)")
 	cmd.Flags().StringP("namespace", "n", "", "Namespace to list cloudspaces from (required)")
 
 	return cmd
@@ -57,7 +56,6 @@ func runList(cmd *cobra.Command, args []string) error {
 	}
 
 	outputFormat, _ := cmd.Flags().GetString("output")
-	showDetails, _ := cmd.Flags().GetBool("details")
 
-	return outputCloudSpaces(cloudSpaceList, outputFormat, showDetails, namespace)
+	return outputCloudSpaces(cloudSpaceList, outputFormat, namespace)
 }

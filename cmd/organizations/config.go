@@ -22,11 +22,10 @@ func getOrganizationsTableConfig() *output.TableConfig {
 }
 
 // outputOrganizations handles formatting and output of organization lists
-func outputOrganizations(orgList *client.OrganizationList, format string, showDetails bool) error {
+func outputOrganizations(orgList *client.OrganizationList, format string) error {
 	// Create formatter with options
 	options := output.OutputOptions{
-		Format:      output.OutputFormat(format),
-		ShowDetails: showDetails,
+		Format: output.OutputFormat(format),
 	}
 
 	// Check if pager should be disabled

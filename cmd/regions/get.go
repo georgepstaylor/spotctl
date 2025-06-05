@@ -27,8 +27,7 @@ Examples:
 	}
 
 	// Add flags for get command
-	cmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml)")
-	cmd.Flags().Bool("details", false, "Show additional details")
+	cmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml, wide)")
 
 	return cmd
 }
@@ -55,7 +54,6 @@ func runGet(cmd *cobra.Command, args []string) error {
 
 	// Get flag values
 	outputFormat, _ := cmd.Flags().GetString("output")
-	showDetails, _ := cmd.Flags().GetBool("details")
 
-	return outputRegion(region, outputFormat, showDetails)
+	return outputRegion(region, outputFormat)
 }

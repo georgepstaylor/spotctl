@@ -30,11 +30,10 @@ func getServerClassesTableConfig() *output.TableConfig {
 }
 
 // outputServerClasses handles formatting and output of server class lists
-func outputServerClasses(serverClassList *client.ServerClassList, format string, showDetails bool) error {
+func outputServerClasses(serverClassList *client.ServerClassList, format string) error {
 	// Create formatter with options
 	options := output.OutputOptions{
-		Format:      output.OutputFormat(format),
-		ShowDetails: showDetails,
+		Format: output.OutputFormat(format),
 	}
 
 	// Check if pager should be disabled
@@ -62,11 +61,10 @@ func outputServerClasses(serverClassList *client.ServerClassList, format string,
 }
 
 // outputServerClass handles formatting and output of a single server class
-func outputServerClass(serverClass *client.ServerClass, format string, showDetails bool) error {
+func outputServerClass(serverClass *client.ServerClass, format string) error {
 	// Create formatter with options
 	options := output.OutputOptions{
-		Format:      output.OutputFormat(format),
-		ShowDetails: showDetails,
+		Format: output.OutputFormat(format),
 	}
 
 	// Check if pager should be disabled

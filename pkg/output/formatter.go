@@ -21,6 +21,7 @@ const (
 	TableFormat OutputFormat = "table"
 	JSONFormat  OutputFormat = "json"
 	YAMLFormat  OutputFormat = "yaml"
+	WideFormat  OutputFormat = "wide"
 )
 
 // OutputOptions contains options for formatting output
@@ -80,9 +81,13 @@ func (f *Formatter) OutputToWriter(w io.Writer, data interface{}, tableConfig *T
 		return f.outputJSONToWriter(w, data)
 	case YAMLFormat:
 		return f.outputYAMLToWriter(w, data)
-	case TableFormat:
+	case TableFormat, WideFormat:
 		if tableConfig == nil {
 			return fmt.Errorf("table configuration required for table output")
+		}
+		// For wide format, enable details automatically
+		if f.options.Format == WideFormat {
+			f.options.ShowDetails = true
 		}
 		return f.outputTableToWriter(w, data, tableConfig)
 	default:

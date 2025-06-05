@@ -23,11 +23,10 @@ func getRegionsTableConfig() *output.TableConfig {
 }
 
 // outputRegions handles formatting and output of region lists
-func outputRegions(regionList *client.RegionList, format string, showDetails bool) error {
+func outputRegions(regionList *client.RegionList, format string) error {
 	// Create formatter with options
 	options := output.OutputOptions{
-		Format:      output.OutputFormat(format),
-		ShowDetails: showDetails,
+		Format: output.OutputFormat(format),
 	}
 
 	// Check if pager should be disabled
@@ -55,11 +54,10 @@ func outputRegions(regionList *client.RegionList, format string, showDetails boo
 }
 
 // outputRegion handles formatting and output of a single region
-func outputRegion(region *client.Region, format string, showDetails bool) error {
+func outputRegion(region *client.Region, format string) error {
 	// Create formatter with options
 	options := output.OutputOptions{
-		Format:      output.OutputFormat(format),
-		ShowDetails: showDetails,
+		Format: output.OutputFormat(format),
 	}
 
 	// Check if pager should be disabled
