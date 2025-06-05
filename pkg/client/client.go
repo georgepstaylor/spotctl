@@ -13,6 +13,49 @@ import (
 	"github.com/georgetaylor/spotctl/pkg/config"
 )
 
+// APIVersion represents the different API versions available
+type APIVersion string
+
+// API version constants
+const (
+	// APIVersionDefault is the default API version for most operations
+	APIVersionDefault APIVersion = "ngpc.rxt.io"
+	// APIVersionAuth is the API version for authentication-related operations
+	APIVersionAuth APIVersion = "auth.ngpc.rxt.io"
+	// Future API versions can be added here, for example:
+	// APIVersionV2     APIVersion = "v2.ngpc.rxt.io"
+	// APIVersionBeta   APIVersion = "beta.ngpc.rxt.io"
+)
+
+// String returns the string representation of the API version
+func (v APIVersion) String() string {
+	return string(v)
+}
+
+// NewAPIVersion creates a new APIVersion from a string
+// This can be used for custom or future API versions
+func NewAPIVersion(version string) APIVersion {
+	return APIVersion(version)
+}
+
+// IsValid checks if the API version is one of the known versions
+func (v APIVersion) IsValid() bool {
+	switch v {
+	case APIVersionDefault, APIVersionAuth:
+		return true
+	default:
+		return false
+	}
+}
+
+// GetAllAPIVersions returns a slice of all known API versions
+func GetAllAPIVersions() []APIVersion {
+	return []APIVersion{
+		APIVersionDefault,
+		APIVersionAuth,
+	}
+}
+
 // Client represents the Rackspace Spot API client
 type Client struct {
 	httpClient   *http.Client
@@ -49,9 +92,25 @@ func NewClient(cfg *config.Config) *Client {
 	}
 }
 
-// makeRequest performs an HTTP request to the API
-func (c *Client) makeRequest(ctx context.Context, method, endpoint string, body interface{}) (*http.Response, error) {
-	url := fmt.Sprintf("%s%s", c.config.BaseURL, endpoint)
+// MakeRequest performs an HTTP request to the API with dynamic apiVersion support
+// This is the primary method for making requests with full control over method, endpoint, body, and API version
+//
+// For convenience, use the wrapper methods:
+// - Get, Post, Put, Delete (for default API version)
+// - GetAuth, PostAuth, PutAuth, DeleteAuth (for auth API version)
+//
+// Example usage:
+//
+//	resp, err := client.MakeRequest(ctx, http.MethodGet, "/custom-endpoint", nil, APIVersionAuth)
+func (c *Client) MakeRequest(ctx context.Context, method, endpoint string, body interface{}, apiVersion APIVersion) (*http.Response, error) {
+	// Build the URL based on the apiVersion
+	baseURL := c.config.BaseURL
+	if apiVersion != APIVersionDefault {
+		// Replace the default API version with the specified one
+		baseURL = strings.Replace(baseURL, "/apis/ngpc.rxt.io/", fmt.Sprintf("/apis/%s/", apiVersion.String()), 1)
+	}
+
+	url := fmt.Sprintf("%s%s", baseURL, endpoint)
 
 	var reqBody io.Reader
 	if body != nil {
@@ -79,55 +138,7 @@ func (c *Client) makeRequest(ctx context.Context, method, endpoint string, body 
 	req.Header.Set("User-Agent", "spotctl/0.0.1")
 
 	if c.config.Debug {
-		fmt.Printf("Making %s request to %s\n", method, url)
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
-	}
-
-	return resp, nil
-}
-
-// makeAuthRequest is similar to makeRequest but uses the auth API subdomain
-func (c *Client) makeAuthRequest(ctx context.Context, method, endpoint string, body interface{}) (*http.Response, error) {
-	// Convert the base URL to use auth subdomain
-	// Change from "https://spot.rackspace.com/apis/ngpc.rxt.io/v1" to "https://spot.rackspace.com/apis/auth.ngpc.rxt.io/v1"
-	authBaseURL := fmt.Sprintf("%s", c.config.BaseURL)
-	if strings.Contains(authBaseURL, "/apis/ngpc.rxt.io/") {
-		authBaseURL = strings.Replace(authBaseURL, "/apis/ngpc.rxt.io/", "/apis/auth.ngpc.rxt.io/", 1)
-	}
-
-	url := fmt.Sprintf("%s%s", authBaseURL, endpoint)
-
-	var reqBody io.Reader
-	if body != nil {
-		jsonBody, err := json.Marshal(body)
-		if err != nil {
-			return nil, fmt.Errorf("failed to marshal request body: %w", err)
-		}
-		reqBody = bytes.NewBuffer(jsonBody)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, method, url, reqBody)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	// Get valid access token
-	accessToken, err := c.tokenManager.GetValidAccessToken(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get access token: %w", err)
-	}
-
-	// Set headers
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
-	req.Header.Set("User-Agent", "spotctl/0.0.1")
-
-	if c.config.Debug {
-		fmt.Printf("Making %s request to %s\n", method, url)
+		fmt.Printf("Making %s request to %s (API: %s)\n", method, url, apiVersion)
 	}
 
 	resp, err := c.httpClient.Do(req)
@@ -140,27 +151,42 @@ func (c *Client) makeAuthRequest(ctx context.Context, method, endpoint string, b
 
 // Get performs a GET request
 func (c *Client) Get(ctx context.Context, endpoint string) (*http.Response, error) {
-	return c.makeRequest(ctx, http.MethodGet, endpoint, nil)
+	return c.MakeRequest(ctx, http.MethodGet, endpoint, nil, APIVersionDefault)
 }
 
 // GetAuth performs a GET request to the auth API (different subdomain)
 func (c *Client) GetAuth(ctx context.Context, endpoint string) (*http.Response, error) {
-	return c.makeAuthRequest(ctx, http.MethodGet, endpoint, nil)
+	return c.MakeRequest(ctx, http.MethodGet, endpoint, nil, APIVersionAuth)
 }
 
 // Post performs a POST request
 func (c *Client) Post(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
-	return c.makeRequest(ctx, http.MethodPost, endpoint, body)
+	return c.MakeRequest(ctx, http.MethodPost, endpoint, body, APIVersionDefault)
 }
 
 // Put performs a PUT request
 func (c *Client) Put(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
-	return c.makeRequest(ctx, http.MethodPut, endpoint, body)
+	return c.MakeRequest(ctx, http.MethodPut, endpoint, body, APIVersionDefault)
 }
 
 // Delete performs a DELETE request
 func (c *Client) Delete(ctx context.Context, endpoint string) (*http.Response, error) {
-	return c.makeRequest(ctx, http.MethodDelete, endpoint, nil)
+	return c.MakeRequest(ctx, http.MethodDelete, endpoint, nil, APIVersionDefault)
+}
+
+// PostAuth performs a POST request to the auth API
+func (c *Client) PostAuth(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodPost, endpoint, body, APIVersionAuth)
+}
+
+// PutAuth performs a PUT request to the auth API
+func (c *Client) PutAuth(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodPut, endpoint, body, APIVersionAuth)
+}
+
+// DeleteAuth performs a DELETE request to the auth API
+func (c *Client) DeleteAuth(ctx context.Context, endpoint string) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodDelete, endpoint, nil, APIVersionAuth)
 }
 
 // HandleAPIError checks if the response indicates an API error and returns an APIError

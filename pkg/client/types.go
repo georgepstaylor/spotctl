@@ -2,7 +2,6 @@ package client
 
 import "time"
 
-// Standard Kubernetes-style metadata
 type ObjectMeta struct {
 	Annotations                map[string]string    `json:"annotations,omitempty"`
 	CreationTimestamp          *time.Time           `json:"creationTimestamp,omitempty"`
@@ -40,7 +39,6 @@ type OwnerReference struct {
 	UID                string `json:"uid"`
 }
 
-// List metadata for Kubernetes-style lists
 type ListMeta struct {
 	Continue           string `json:"continue,omitempty"`
 	RemainingItemCount *int64 `json:"remainingItemCount,omitempty"`
@@ -131,7 +129,6 @@ type ServerClassList struct {
 	Metadata   ListMeta      `json:"metadata,omitempty"`
 }
 
-// Organization types - follows a different API pattern than Kubernetes-style
 type Organization struct {
 	ID          string               `json:"id"`
 	Name        string               `json:"name"`
@@ -230,7 +227,7 @@ type CloudSpaceCondition struct {
 	Type               string     `json:"type,omitempty"`
 }
 
-// DeleteResponse represents the response from a delete operation (Kubernetes Status object)
+// DeleteResponse represents the response from a delete operation
 type DeleteResponse struct {
 	APIVersion string                 `json:"apiVersion,omitempty"`
 	Code       *int32                 `json:"code,omitempty"`
