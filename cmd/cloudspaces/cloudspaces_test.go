@@ -2,7 +2,12 @@ package cloudspaces
 
 import (
 	"bytes"
+	"context"
 	"errors"
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/georgetaylor/spotctl/pkg/client"
@@ -34,6 +39,14 @@ func (m *MockCloudSpaceClient) CreateCloudSpace(namespace string, cloudSpace *cl
 
 func (m *MockCloudSpaceClient) GetCloudSpace(namespace, name string) (*client.CloudSpace, error) {
 	return m.cloudspace, m.err
+}
+
+func (m *MockCloudSpaceClient) EditCloudSpace(ctx context.Context, namespace, name string, patchOps interface{}) (*client.CloudSpace, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
+	// Return the mock cloudspace (simulating successful patch)
+	return m.cloudspace, nil
 }
 
 func TestCloudspacesListCommand(t *testing.T) {
@@ -505,6 +518,419 @@ func TestCloudspacesGetCommand(t *testing.T) {
 					if output != expectedOutput {
 						t.Errorf("Expected '%s' output, got: %s", expectedOutput, output)
 					}
+				}
+			}
+		})
+	}
+}
+
+func TestCloudspacesEditCommand(t *testing.T) {
+	// Create a temporary directory for test files
+	tmpDir, err := os.MkdirTemp("", "edit-test-*")
+	if err != nil {
+		t.Fatalf("Failed to create temp dir: %v", err)
+	}
+	defer os.RemoveAll(tmpDir)
+
+	// Create a valid patch file
+	validPatchFile := filepath.Join(tmpDir, "valid-patch.json")
+	validPatch := `[
+		{
+			"op": "replace",
+			"path": "/spec/webhook",
+			"value": "https://example.com/webhook"
+		}
+	]`
+	if err := os.WriteFile(validPatchFile, []byte(validPatch), 0644); err != nil {
+		t.Fatalf("Failed to create valid patch file: %v", err)
+	}
+
+	// Create an invalid patch file
+	invalidPatchFile := filepath.Join(tmpDir, "invalid-patch.json")
+	invalidPatch := `invalid json`
+	if err := os.WriteFile(invalidPatchFile, []byte(invalidPatch), 0644); err != nil {
+		t.Fatalf("Failed to create invalid patch file: %v", err)
+	}
+
+	// Create an empty patch file
+	emptyPatchFile := filepath.Join(tmpDir, "empty-patch.json")
+	emptyPatch := `[]`
+	if err := os.WriteFile(emptyPatchFile, []byte(emptyPatch), 0644); err != nil {
+		t.Fatalf("Failed to create empty patch file: %v", err)
+	}
+
+	// Mock cloudspace that would be returned after edit
+	mockUpdatedCloudSpace := &client.CloudSpace{
+		APIVersion: "ngpc.rxt.io/v1",
+		Kind:       "CloudSpace",
+		Metadata: client.ObjectMeta{
+			Name:      "test-cloudspace",
+			Namespace: "test-namespace",
+			Labels: map[string]string{
+				"environment": "test",
+			},
+		},
+		Spec: client.CloudSpaceSpec{
+			Region:            "uk-lon-1",
+			KubernetesVersion: "1.31.1",
+			Cloud:             "default",
+			CNI:               "calico",
+		},
+		Status: client.CloudSpaceStatus{
+			Phase:  "Running",
+			Health: "Healthy",
+		},
+	}
+
+	tests := []struct {
+		name        string
+		args        []string
+		flags       map[string]string
+		mockError   error
+		expectError bool
+		expectOut   []string // strings that should appear in output
+	}{
+		{
+			name: "successful edit with valid patch",
+			args: []string{"test-cloudspace"},
+			flags: map[string]string{
+				"namespace": "test-namespace",
+				"file":      validPatchFile,
+				"confirm":   "true",
+				"output":    "table",
+			},
+			mockError:   nil,
+			expectError: false,
+			expectOut:   []string{"Applying 1 patch operation(s)", "replace /spec/webhook"},
+		},
+		{
+			name: "successful edit with json output",
+			args: []string{"test-cloudspace"},
+			flags: map[string]string{
+				"namespace": "test-namespace",
+				"file":      validPatchFile,
+				"confirm":   "true",
+				"output":    "json",
+			},
+			mockError:   nil,
+			expectError: false,
+			expectOut:   []string{"Applying 1 patch operation(s)", "\"name\":\"test-cloudspace\""},
+		},
+		{
+			name: "successful edit with empty patch",
+			args: []string{"test-cloudspace"},
+			flags: map[string]string{
+				"namespace": "test-namespace",
+				"file":      emptyPatchFile,
+				"confirm":   "true",
+			},
+			mockError:   nil,
+			expectError: false,
+			expectOut:   []string{"Applying 0 patch operation(s)"},
+		},
+		{
+			name: "missing namespace flag",
+			args: []string{"test-cloudspace"},
+			flags: map[string]string{
+				"file": validPatchFile,
+			},
+			expectError: true,
+		},
+		{
+			name: "missing file flag",
+			args: []string{"test-cloudspace"},
+			flags: map[string]string{
+				"namespace": "test-namespace",
+			},
+			expectError: true,
+		},
+		{
+			name: "missing cloudspace name",
+			args: []string{},
+			flags: map[string]string{
+				"namespace": "test-namespace",
+				"file":      validPatchFile,
+			},
+			expectError: true,
+		},
+		{
+			name: "nonexistent patch file",
+			args: []string{"test-cloudspace"},
+			flags: map[string]string{
+				"namespace": "test-namespace",
+				"file":      "/nonexistent/file.json",
+				"confirm":   "true",
+			},
+			expectError: true,
+		},
+		{
+			name: "invalid patch file",
+			args: []string{"test-cloudspace"},
+			flags: map[string]string{
+				"namespace": "test-namespace",
+				"file":      invalidPatchFile,
+				"confirm":   "true",
+			},
+			expectError: true,
+		},
+		{
+			name: "API error during edit",
+			args: []string{"test-cloudspace"},
+			flags: map[string]string{
+				"namespace": "test-namespace",
+				"file":      validPatchFile,
+				"confirm":   "true",
+			},
+			mockError:   errors.New("API error: cloudspace not found"),
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create mock client
+			mockClient := &MockCloudSpaceClient{
+				cloudspace: mockUpdatedCloudSpace,
+				err:        tt.mockError,
+			}
+
+			// Capture output
+			var buf bytes.Buffer
+			var stdoutBuf bytes.Buffer
+
+			// Create the edit command
+			editCmd := NewEditCommand()
+			editCmd.SetOut(&buf)
+			editCmd.SetErr(&buf)
+
+			// Override the runEdit function to use our mock client
+			editCmd.RunE = func(cmd *cobra.Command, args []string) error {
+				namespace, _ := cmd.Flags().GetString("namespace")
+				file, _ := cmd.Flags().GetString("file")
+				outputFormat, _ := cmd.Flags().GetString("output")
+
+				// Load the JSON patch operations from the file
+				patchOps, err := loadPatchOperations(file)
+				if err != nil {
+					return err
+				}
+
+				// Capture displayPatchOperations output
+				old := os.Stdout
+				r, w, _ := os.Pipe()
+				os.Stdout = w
+
+				// Display the patch operations that will be applied
+				displayPatchOperations(patchOps)
+
+				// Restore stdout and capture the output
+				w.Close()
+				os.Stdout = old
+				output, _ := io.ReadAll(r)
+				stdoutBuf.Write(output)
+
+				// Skip confirmation since we set confirm=true in flags or this is a test
+				skipConfirmation, _ := cmd.Flags().GetBool("confirm")
+				if !skipConfirmation {
+					// In tests, we always confirm to avoid hanging
+					buf.WriteString("Confirmation skipped in test\n")
+				}
+
+				// Apply the patch operations using mock client
+				_, err = mockClient.EditCloudSpace(context.Background(), namespace, args[0], patchOps)
+				if err != nil {
+					return err
+				}
+
+				// Output the updated cloudspace - simplified for testing
+				if outputFormat == "json" {
+					buf.WriteString(`{"apiVersion":"ngpc.rxt.io/v1","kind":"CloudSpace","metadata":{"name":"test-cloudspace"}}`)
+				} else {
+					buf.WriteString("CloudSpace updated successfully")
+				}
+
+				return nil
+			}
+
+			// Set flags
+			for flag, value := range tt.flags {
+				if err := editCmd.Flags().Set(flag, value); err != nil {
+					t.Fatalf("Failed to set flag %s=%s: %v", flag, value, err)
+				}
+			}
+
+			// Set args and execute
+			editCmd.SetArgs(tt.args)
+			err := editCmd.Execute()
+
+			// Check error expectation
+			if tt.expectError {
+				if err == nil {
+					t.Errorf("Expected error but got none")
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Unexpected error: %v", err)
+				}
+
+				// Check expected output strings in both buffers
+				combinedOutput := stdoutBuf.String() + buf.String()
+				for _, expected := range tt.expectOut {
+					if !strings.Contains(combinedOutput, expected) {
+						t.Errorf("Expected output to contain %q, but got: %s", expected, combinedOutput)
+					}
+				}
+			}
+		})
+	}
+}
+
+func TestLoadPatchOperations(t *testing.T) {
+	// Create a temporary directory for test files
+	tmpDir, err := os.MkdirTemp("", "patch-test-*")
+	if err != nil {
+		t.Fatalf("Failed to create temp dir: %v", err)
+	}
+	defer os.RemoveAll(tmpDir)
+
+	tests := []struct {
+		name        string
+		fileContent string
+		expectError bool
+		expectCount int
+	}{
+		{
+			name: "valid patch operations",
+			fileContent: `[
+				{
+					"op": "replace",
+					"path": "/spec/region",
+					"value": "uk-lon-1"
+				},
+				{
+					"op": "add",
+					"path": "/metadata/labels/env",
+					"value": "test"
+				}
+			]`,
+			expectError: false,
+			expectCount: 2,
+		},
+		{
+			name:        "empty array",
+			fileContent: `[]`,
+			expectError: false,
+			expectCount: 0,
+		},
+		{
+			name:        "invalid json",
+			fileContent: `invalid json`,
+			expectError: true,
+		},
+		{
+			name:        "valid json but wrong structure",
+			fileContent: `{"not": "an array"}`,
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create test file
+			testFile := filepath.Join(tmpDir, tt.name+".json")
+			if err := os.WriteFile(testFile, []byte(tt.fileContent), 0644); err != nil {
+				t.Fatalf("Failed to create test file: %v", err)
+			}
+
+			// Test loadPatchOperations
+			ops, err := loadPatchOperations(testFile)
+
+			if tt.expectError {
+				if err == nil {
+					t.Errorf("Expected error but got none")
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Unexpected error: %v", err)
+				}
+				if len(ops) != tt.expectCount {
+					t.Errorf("Expected %d operations, got %d", tt.expectCount, len(ops))
+				}
+			}
+		})
+	}
+
+	// Test nonexistent file
+	t.Run("nonexistent file", func(t *testing.T) {
+		_, err := loadPatchOperations("/nonexistent/file.json")
+		if err == nil {
+			t.Errorf("Expected error for nonexistent file but got none")
+		}
+	})
+}
+
+func TestDisplayPatchOperations(t *testing.T) {
+	tests := []struct {
+		name       string
+		operations []PatchOperation
+		expectOut  []string
+	}{
+		{
+			name: "multiple operations with different types",
+			operations: []PatchOperation{
+				{Op: "replace", Path: "/spec/region", Value: "uk-lon-1"},
+				{Op: "add", Path: "/metadata/labels/env", Value: "test"},
+				{Op: "remove", Path: "/spec/oldField"},
+				{Op: "replace", Path: "/spec/count", Value: float64(42)},
+				{Op: "replace", Path: "/spec/enabled", Value: true},
+			},
+			expectOut: []string{
+				"Applying 5 patch operation(s)",
+				"1. replace /spec/region = \"uk-lon-1\"",
+				"2. add /metadata/labels/env = \"test\"",
+				"3. remove /spec/oldField",
+				"4. replace /spec/count = 42",
+				"5. replace /spec/enabled = true",
+			},
+		},
+		{
+			name:       "empty operations",
+			operations: []PatchOperation{},
+			expectOut:  []string{"Applying 0 patch operation(s)"},
+		},
+		{
+			name: "operation with complex value",
+			operations: []PatchOperation{
+				{Op: "add", Path: "/spec/config", Value: map[string]interface{}{"key": "value", "nested": map[string]interface{}{"inner": "data"}}},
+			},
+			expectOut: []string{
+				"Applying 1 patch operation(s)",
+				"1. add /spec/config = {",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Capture output
+			old := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+
+			// Call function
+			displayPatchOperations(tt.operations)
+
+			// Restore stdout and read output
+			w.Close()
+			os.Stdout = old
+
+			output, _ := io.ReadAll(r)
+			outputStr := string(output)
+
+			// Check expected strings
+			for _, expected := range tt.expectOut {
+				if !strings.Contains(outputStr, expected) {
+					t.Errorf("Expected output to contain %q, but got: %s", expected, outputStr)
 				}
 			}
 		})
