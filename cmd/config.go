@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/georgetaylor/spotctl/internal/utils"
 	"github.com/georgetaylor/spotctl/pkg/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -65,7 +64,7 @@ var configSetCmd = &cobra.Command{
 		// Validate the key
 		validKeys := []string{"refresh-token", "region", "base-url", "debug", "timeout"}
 		if !contains(validKeys, key) {
-			utils.CheckError(fmt.Errorf("invalid configuration key '%s'. Valid keys are: %v", key, validKeys))
+			CheckError(fmt.Errorf("invalid configuration key '%s'. Valid keys are: %v", key, validKeys))
 		}
 
 		// Set the value in viper
@@ -82,7 +81,7 @@ var configSetCmd = &cobra.Command{
 
 		// Save the configuration
 		err := config.SaveConfig(cfg)
-		utils.CheckError(err)
+		CheckError(err)
 
 		fmt.Printf("Configuration saved: %s = %s\n", key, value)
 	},
@@ -103,7 +102,7 @@ var configInitCmd = &cobra.Command{
 		fmt.Scanln(&refreshToken)
 
 		if refreshToken == "" {
-			utils.CheckError(fmt.Errorf("refresh token is required"))
+			CheckError(fmt.Errorf("refresh token is required"))
 		}
 
 		// Prompt for region (required)
@@ -112,7 +111,7 @@ var configInitCmd = &cobra.Command{
 		fmt.Scanln(&region)
 
 		if region == "" {
-			utils.CheckError(fmt.Errorf("region is required"))
+			CheckError(fmt.Errorf("region is required"))
 		}
 
 		// Set values
@@ -133,18 +132,12 @@ var configInitCmd = &cobra.Command{
 
 		// Save the configuration
 		err := config.SaveConfig(cfg)
-		utils.CheckError(err)
+		CheckError(err)
 
 		fmt.Println()
 		fmt.Println("Configuration saved successfully!")
 		fmt.Println("You can now use spotctl.")
 	},
-}
-
-// GetOutputFormat helper function
-func GetOutputFormat(cmd *cobra.Command) string {
-	output, _ := cmd.Flags().GetString("output")
-	return output
 }
 
 func init() {
@@ -154,7 +147,7 @@ func init() {
 	configCmd.AddCommand(configInitCmd) // Add configInitCmd to config command
 
 	// Add output flag to show command
-	utils.AddOutputFlag(configShowCmd)
+	AddOutputFlag(configShowCmd)
 }
 
 // Helper function to check if a slice contains a string
@@ -165,4 +158,12 @@ func contains(slice []string, item string) bool {
 		}
 	}
 	return false
+}
+
+// Helper function to get minimum of two integers
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }

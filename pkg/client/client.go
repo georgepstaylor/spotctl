@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/georgetaylor/spotctl/pkg/config"
+	"github.com/georgetaylor/spotctl/pkg/errors"
 )
 
 // APIVersion represents the different API versions available
@@ -92,147 +93,159 @@ func NewClient(cfg *config.Config) *Client {
 	}
 }
 
-// MakeRequest performs an HTTP request to the API with dynamic apiVersion support
-// This is the primary method for making requests with full control over method, endpoint, body, and API version
-// The contentType parameter is optional - if not provided, defaults to "application/json"
-//
-// For convenience, use the wrapper methods:
-// - Get, Post, Put, Delete (for default API version)
-// - GetAuth, PostAuth, PutAuth, DeleteAuth (for auth API version)
-//
-// Example usage:
-//
-//	resp, err := client.MakeRequest(ctx, http.MethodGet, "/custom-endpoint", nil, APIVersionAuth)
-//	resp, err := client.MakeRequest(ctx, http.MethodPatch, "/endpoint", data, APIVersionDefault, "application/json-patch+json")
-func (c *Client) MakeRequest(ctx context.Context, method, endpoint string, body interface{}, apiVersion APIVersion, contentType ...string) (*http.Response, error) {
-	// Build the URL based on the apiVersion
+// requestOptions contains options for making HTTP requests
+type requestOptions struct {
+	method      string
+	endpoint    string
+	body        interface{}
+	apiVersion  APIVersion
+	contentType string
+}
+
+// prepareRequest prepares an HTTP request with the given options
+func (c *Client) prepareRequest(ctx context.Context, opts requestOptions) (*http.Request, error) {
 	baseURL := c.config.BaseURL
-	if apiVersion != APIVersionDefault {
-		// Replace the default API version with the specified one
-		baseURL = strings.Replace(baseURL, "/apis/ngpc.rxt.io/", fmt.Sprintf("/apis/%s/", apiVersion.String()), 1)
+	if opts.apiVersion != APIVersionDefault {
+		baseURL = strings.Replace(baseURL, "/apis/ngpc.rxt.io/", fmt.Sprintf("/apis/%s/", opts.apiVersion.String()), 1)
 	}
 
-	url := fmt.Sprintf("%s%s", baseURL, endpoint)
+	url := fmt.Sprintf("%s%s", baseURL, opts.endpoint)
 
 	var reqBody io.Reader
-	if body != nil {
-		jsonBody, err := json.Marshal(body)
+	if opts.body != nil {
+		jsonBody, err := json.Marshal(opts.body)
 		if err != nil {
-			return nil, fmt.Errorf("failed to marshal request body: %w", err)
+			return nil, errors.NewInternalError("failed to marshal request body", err)
 		}
 		reqBody = bytes.NewBuffer(jsonBody)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, method, url, reqBody)
+	req, err := http.NewRequestWithContext(ctx, opts.method, url, reqBody)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+		return nil, errors.NewInternalError("failed to create request", err)
 	}
 
-	// Get valid access token
 	accessToken, err := c.tokenManager.GetValidAccessToken(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get access token: %w", err)
+		return nil, errors.NewAPIError(http.StatusUnauthorized, "failed to get access token", err)
 	}
 
-	// Set content type - default to application/json if not specified
-	ct := "application/json"
-	if len(contentType) > 0 && contentType[0] != "" {
-		ct = contentType[0]
+	contentType := "application/json"
+	if opts.contentType != "" {
+		contentType = opts.contentType
 	}
 
-	// Set headers
-	req.Header.Set("Content-Type", ct)
+	req.Header.Set("Content-Type", contentType)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
 	req.Header.Set("User-Agent", "spotctl/0.0.1")
 
 	if c.config.Debug {
-		if ct != "application/json" {
-			fmt.Printf("Making %s request to %s (API: %s, Content-Type: %s)\n", method, url, apiVersion, ct)
-		} else {
-			fmt.Printf("Making %s request to %s (API: %s)\n", method, url, apiVersion)
-		}
+		fmt.Printf("Making %s request to %s (API: %s)\n", opts.method, url, opts.apiVersion)
 	}
 
+	return req, nil
+}
+
+// doRequest executes an HTTP request and handles the response
+func (c *Client) doRequest(req *http.Request) (*http.Response, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("request failed: %w", err)
+		return nil, errors.NewAPIError(0, "request failed", err)
 	}
 
-	return resp, nil
-}
-
-// Get performs a GET request
-func (c *Client) Get(ctx context.Context, endpoint string) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodGet, endpoint, nil, APIVersionDefault)
-}
-
-// GetAuth performs a GET request to the auth API (different subdomain)
-func (c *Client) GetAuth(ctx context.Context, endpoint string) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodGet, endpoint, nil, APIVersionAuth)
-}
-
-// Post performs a POST request
-func (c *Client) Post(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodPost, endpoint, body, APIVersionDefault)
-}
-
-// Put performs a PUT request
-func (c *Client) Put(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodPut, endpoint, body, APIVersionDefault)
-}
-
-// Delete performs a DELETE request
-func (c *Client) Delete(ctx context.Context, endpoint string) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodDelete, endpoint, nil, APIVersionDefault)
-}
-
-// Patch performs a PATCH request
-func (c *Client) Patch(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodPatch, endpoint, body, APIVersionDefault)
-}
-
-// PatchWithContentType performs a PATCH request with a specific content type
-func (c *Client) PatchWithContentType(ctx context.Context, endpoint string, body interface{}, contentType string) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodPatch, endpoint, body, APIVersionDefault, contentType)
-}
-
-// PostAuth performs a POST request to the auth API
-func (c *Client) PostAuth(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodPost, endpoint, body, APIVersionAuth)
-}
-
-// PutAuth performs a PUT request to the auth API
-func (c *Client) PutAuth(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodPut, endpoint, body, APIVersionAuth)
-}
-
-// DeleteAuth performs a DELETE request to the auth API
-func (c *Client) DeleteAuth(ctx context.Context, endpoint string) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodDelete, endpoint, nil, APIVersionAuth)
-}
-
-// HandleAPIError checks if the response indicates an API error and returns an APIError
-func (c *Client) HandleAPIError(resp *http.Response) error {
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		return nil
+		return resp, nil
 	}
 
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("HTTP %d: failed to read error response", resp.StatusCode)
+		return nil, errors.NewAPIError(resp.StatusCode, "failed to read error response", err)
 	}
 
-	var apiErr APIError
+	var apiErr struct {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+		Details string `json:"details,omitempty"`
+	}
+
 	if err := json.Unmarshal(body, &apiErr); err != nil {
-		return fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
+		return nil, errors.NewAPIError(resp.StatusCode, string(body), nil)
 	}
 
 	if apiErr.Code == 0 {
 		apiErr.Code = resp.StatusCode
 	}
 
-	return &apiErr
+	return nil, &APIError{
+		Code:    apiErr.Code,
+		Message: apiErr.Message,
+		Details: apiErr.Details,
+	}
+}
+
+// MakeRequest performs an HTTP request to the API
+func (c *Client) MakeRequest(ctx context.Context, method, endpoint string, body interface{}, apiVersion APIVersion, contentType ...string) (*http.Response, error) {
+	opts := requestOptions{
+		method:      method,
+		endpoint:    endpoint,
+		body:        body,
+		apiVersion:  apiVersion,
+		contentType: "",
+	}
+
+	if len(contentType) > 0 {
+		opts.contentType = contentType[0]
+	}
+
+	req, err := c.prepareRequest(ctx, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.doRequest(req)
+}
+
+// Convenience methods for common HTTP methods
+func (c *Client) Get(ctx context.Context, endpoint string) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodGet, endpoint, nil, APIVersionDefault)
+}
+
+func (c *Client) Post(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodPost, endpoint, body, APIVersionDefault)
+}
+
+func (c *Client) Put(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodPut, endpoint, body, APIVersionDefault)
+}
+
+func (c *Client) Delete(ctx context.Context, endpoint string) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodDelete, endpoint, nil, APIVersionDefault)
+}
+
+func (c *Client) Patch(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodPatch, endpoint, body, APIVersionDefault)
+}
+
+func (c *Client) PatchWithContentType(ctx context.Context, endpoint string, body interface{}, contentType string) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodPatch, endpoint, body, APIVersionDefault, contentType)
+}
+
+// Auth-specific convenience methods
+func (c *Client) GetAuth(ctx context.Context, endpoint string) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodGet, endpoint, nil, APIVersionAuth)
+}
+
+func (c *Client) PostAuth(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodPost, endpoint, body, APIVersionAuth)
+}
+
+func (c *Client) PutAuth(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodPut, endpoint, body, APIVersionAuth)
+}
+
+func (c *Client) DeleteAuth(ctx context.Context, endpoint string) (*http.Response, error) {
+	return c.MakeRequest(ctx, http.MethodDelete, endpoint, nil, APIVersionAuth)
 }
 
 // ListRegions retrieves all available regions
@@ -493,4 +506,28 @@ func (c *Client) EditCloudSpace(ctx context.Context, namespace, name string, pat
 	}
 
 	return &cloudSpace, nil
+}
+
+// HandleAPIError checks if the response indicates an API error and returns an APIError
+func (c *Client) HandleAPIError(resp *http.Response) error {
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+		return nil
+	}
+
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("HTTP %d: failed to read error response", resp.StatusCode)
+	}
+
+	var apiErr APIError
+	if err := json.Unmarshal(body, &apiErr); err != nil {
+		return fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
+	}
+
+	if apiErr.Code == 0 {
+		apiErr.Code = resp.StatusCode
+	}
+
+	return &apiErr
 }

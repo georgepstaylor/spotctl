@@ -77,8 +77,8 @@ func TestClient_ListServerClasses(t *testing.T) {
 			// Create mock server
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// Verify request
-				if r.URL.Path != "/serverclasses" {
-					t.Errorf("Expected path '/serverclasses', got '%s'", r.URL.Path)
+				if r.URL.Path != "/apis/ngpc.rxt.io/v1/serverclasses" {
+					t.Errorf("Expected path '/apis/ngpc.rxt.io/v1/serverclasses', got '%s'", r.URL.Path)
 				}
 				if r.Method != http.MethodGet {
 					t.Errorf("Expected method GET, got %s", r.Method)
@@ -98,7 +98,8 @@ func TestClient_ListServerClasses(t *testing.T) {
 			// Create test config
 			cfg := &config.Config{
 				RefreshToken: "test-token",
-				BaseURL:      server.URL,
+				BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
+				Region:       "uk-lon-1",
 				Debug:        false,
 				Timeout:      30,
 			}
@@ -119,8 +120,8 @@ func TestClient_ListServerClasses(t *testing.T) {
 					t.Errorf("Expected error '%s', got nil", tt.expectedError)
 					return
 				}
-				if err.Error() != tt.expectedError {
-					t.Errorf("Expected error '%s', got '%s'", tt.expectedError, err.Error())
+				if !contains(err.Error(), tt.expectedError) {
+					t.Errorf("Expected error to contain '%s', got '%s'", tt.expectedError, err.Error())
 				}
 				return
 			}
@@ -171,7 +172,8 @@ func TestClient_ListServerClasses_InvalidJSON(t *testing.T) {
 	// Create test config
 	cfg := &config.Config{
 		RefreshToken: "test-token",
-		BaseURL:      server.URL,
+		BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
+		Region:       "uk-lon-1",
 		Debug:        false,
 		Timeout:      30,
 	}
@@ -251,7 +253,7 @@ func TestClient_GetServerClass(t *testing.T) {
 			// Create mock server
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// Verify request
-				expectedPath := "/serverclasses/" + tt.serverClassName
+				expectedPath := "/apis/ngpc.rxt.io/v1/serverclasses/" + tt.serverClassName
 				if r.URL.Path != expectedPath {
 					t.Errorf("Expected path '%s', got '%s'", expectedPath, r.URL.Path)
 				}
@@ -273,7 +275,10 @@ func TestClient_GetServerClass(t *testing.T) {
 			// Create test config
 			cfg := &config.Config{
 				RefreshToken: "test-token",
-				BaseURL:      server.URL,
+				BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
+				Region:       "uk-lon-1",
+				Debug:        false,
+				Timeout:      30,
 			}
 
 			// Create client
@@ -292,7 +297,7 @@ func TestClient_GetServerClass(t *testing.T) {
 					return
 				}
 				if !contains(err.Error(), tt.expectedError) {
-					t.Errorf("Expected error containing '%s', got '%s'", tt.expectedError, err.Error())
+					t.Errorf("Expected error to contain '%s', got '%s'", tt.expectedError, err.Error())
 				}
 			} else {
 				if err != nil {
@@ -322,7 +327,10 @@ func TestClient_GetServerClass_InvalidJSON(t *testing.T) {
 	// Create test config
 	cfg := &config.Config{
 		RefreshToken: "test-token",
-		BaseURL:      server.URL,
+		BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
+		Region:       "uk-lon-1",
+		Debug:        false,
+		Timeout:      30,
 	}
 
 	// Create client

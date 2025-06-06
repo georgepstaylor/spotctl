@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"errors"
+
 	"github.com/georgetaylor/spotctl/pkg/config"
 )
 
@@ -87,8 +89,8 @@ func TestClient_ListRegions(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("Expected GET request, got %s", r.Method)
 		}
-		if r.URL.Path != "/regions" {
-			t.Errorf("Expected /regions path, got %s", r.URL.Path)
+		if r.URL.Path != "/apis/ngpc.rxt.io/v1/regions" {
+			t.Errorf("Expected /apis/ngpc.rxt.io/v1/regions path, got %s", r.URL.Path)
 		}
 		if r.Header.Get("Authorization") == "" {
 			t.Errorf("Expected Authorization header")
@@ -102,10 +104,11 @@ func TestClient_ListRegions(t *testing.T) {
 
 	// Create test config
 	cfg := &config.Config{
-		BaseURL:      server.URL,
-		RefreshToken: "test-refresh-token",
+		RefreshToken: "test-token",
+		BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
+		Region:       "uk-lon-1",
+		Debug:        false,
 		Timeout:      30,
-		Debug:        true,
 	}
 
 	// Create client
@@ -157,10 +160,11 @@ func TestClient_ListRegions_APIError(t *testing.T) {
 
 	// Create test config
 	cfg := &config.Config{
-		BaseURL:      server.URL,
-		RefreshToken: "invalid-refresh-token",
+		RefreshToken: "test-token",
+		BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
+		Region:       "uk-lon-1",
+		Debug:        false,
 		Timeout:      30,
-		Debug:        true,
 	}
 
 	// Create client
@@ -177,7 +181,8 @@ func TestClient_ListRegions_APIError(t *testing.T) {
 	}
 
 	// Verify it's an API error
-	if apiErr, ok := err.(*APIError); ok {
+	var apiErr *APIError
+	if errors.As(err, &apiErr) {
 		if apiErr.Code != 401 {
 			t.Errorf("Expected error code 401, got %d", apiErr.Code)
 		}
