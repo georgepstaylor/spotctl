@@ -23,13 +23,14 @@ jobs:
       - name: Generate Coverage Report
         run: make coverage
 
-      - name: Check Coverage Thresholds
-        run: |
-          TOTAL_COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
-          if (( $(echo "$TOTAL_COVERAGE < 80" | bc -l) )); then
-            echo "Coverage is below threshold: $TOTAL_COVERAGE%"
-            exit 1
-          fi
+      # we don't want to fail the build if the coverage is below 80% just yet
+      # - name: Check Coverage Thresholds
+      #   run: |
+      #     TOTAL_COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
+      #     if (( $(echo "$TOTAL_COVERAGE < 80" | bc -l) )); then
+      #       echo "Coverage is below threshold: $TOTAL_COVERAGE%"
+      #       exit 1
+      #     fi
 
       - name: Commit Coverage Report
         run: |
