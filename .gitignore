@@ -52,3 +52,7 @@ spotctl*
 # Temporary files
 *.tmp
 *.temp
+
+.cursor/
+.vscode/
+.idea/
