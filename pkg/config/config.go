@@ -16,7 +16,7 @@ var Defaults = struct {
 	Debug        bool
 	OutputFormat string
 }{
-	BaseURL:      "https://api.rackspace.com/apis/ngpc.rxt.io/v1",
+	BaseURL:      "https://spot.rackspace.com/apis",
 	Timeout:      30,
 	Debug:        false,
 	OutputFormat: "table",

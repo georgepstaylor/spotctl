@@ -9,7 +9,7 @@ refresh-token: "your-refresh-token-here"
 region: "uk-lon-1"
 
 # API base URL (default should work for most users)
-base-url: "https://api.rackspacecloud.com/spot/v1"
+base-url: "https://spot.rackspace.com/apis"
 
 # Enable debug output (optional)
 debug: false

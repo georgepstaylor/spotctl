@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/georgetaylor/spotctl/pkg/config"
@@ -20,12 +19,9 @@ type APIVersion string
 // API version constants
 const (
 	// APIVersionDefault is the default API version for most operations
-	APIVersionDefault APIVersion = "ngpc.rxt.io"
+	APIVersionDefault APIVersion = "ngpc.rxt.io/v1"
 	// APIVersionAuth is the API version for authentication-related operations
-	APIVersionAuth APIVersion = "auth.ngpc.rxt.io"
-	// Future API versions can be added here, for example:
-	// APIVersionV2     APIVersion = "v2.ngpc.rxt.io"
-	// APIVersionBeta   APIVersion = "beta.ngpc.rxt.io"
+	APIVersionAuth APIVersion = "auth.ngpc.rxt.io/v1"
 )
 
 // String returns the string representation of the API version
@@ -104,30 +100,26 @@ type requestOptions struct {
 
 // prepareRequest prepares an HTTP request with the given options
 func (c *Client) prepareRequest(ctx context.Context, opts requestOptions) (*http.Request, error) {
-	baseURL := c.config.BaseURL
-	if opts.apiVersion != APIVersionDefault {
-		baseURL = strings.Replace(baseURL, "/apis/ngpc.rxt.io/", fmt.Sprintf("/apis/%s/", opts.apiVersion.String()), 1)
-	}
-
-	url := fmt.Sprintf("%s%s", baseURL, opts.endpoint)
+	// Construct the full URL by combining base URL, API version, and endpoint
+	url := fmt.Sprintf("%s/%s%s", c.config.BaseURL, opts.apiVersion.String(), opts.endpoint)
 
 	var reqBody io.Reader
 	if opts.body != nil {
 		jsonBody, err := json.Marshal(opts.body)
 		if err != nil {
-			return nil, errors.NewInternalError("failed to marshal request body", err)
+			return nil, errors.NewInternalError(fmt.Sprintf("failed to marshal request body for %s %s", opts.method, url), err)
 		}
 		reqBody = bytes.NewBuffer(jsonBody)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, opts.method, url, reqBody)
 	if err != nil {
-		return nil, errors.NewInternalError("failed to create request", err)
+		return nil, errors.NewInternalError(fmt.Sprintf("failed to create request for %s %s", opts.method, url), err)
 	}
 
 	accessToken, err := c.tokenManager.GetValidAccessToken(ctx)
 	if err != nil {
-		return nil, errors.NewAPIError(http.StatusUnauthorized, "failed to get access token", err)
+		return nil, errors.NewAPIError(http.StatusUnauthorized, fmt.Sprintf("failed to get access token for %s %s", opts.method, url), err)
 	}
 
 	contentType := "application/json"
@@ -150,17 +142,19 @@ func (c *Client) prepareRequest(ctx context.Context, opts requestOptions) (*http
 func (c *Client) doRequest(req *http.Request) (*http.Response, error) {
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, errors.NewAPIError(0, "request failed", err)
+		return nil, errors.NewAPIError(0, fmt.Sprintf("request failed for %s %s", req.Method, req.URL.String()), err)
 	}
 
+	// For successful responses, return the response without closing the body
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		return resp, nil
 	}
 
+	// For error responses, read and parse the error body
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.NewAPIError(resp.StatusCode, "failed to read error response", err)
+		return nil, errors.NewAPIError(resp.StatusCode, fmt.Sprintf("failed to read error response for %s %s", req.Method, req.URL.String()), err)
 	}
 
 	var apiErr struct {
@@ -170,7 +164,7 @@ func (c *Client) doRequest(req *http.Request) (*http.Response, error) {
 	}
 
 	if err := json.Unmarshal(body, &apiErr); err != nil {
-		return nil, errors.NewAPIError(resp.StatusCode, string(body), nil)
+		return nil, errors.NewAPIError(resp.StatusCode, fmt.Sprintf("invalid error response format for %s %s: %s", req.Method, req.URL.String(), string(body)), nil)
 	}
 
 	if apiErr.Code == 0 {
@@ -248,45 +242,35 @@ func (c *Client) DeleteAuth(ctx context.Context, endpoint string) (*http.Respons
 	return c.MakeRequest(ctx, http.MethodDelete, endpoint, nil, APIVersionAuth)
 }
 
-// ListRegions retrieves all available regions
+// ListRegions retrieves a list of available regions
 func (c *Client) ListRegions(ctx context.Context) (*RegionList, error) {
 	resp, err := c.Get(ctx, "/regions")
 	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if err := c.HandleAPIError(resp); err != nil {
-		return nil, err
+		return nil, errors.NewAPIError(0, "failed to list regions", err)
 	}
 
-	var regionList RegionList
-	if err := json.NewDecoder(resp.Body).Decode(&regionList); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
+	var regions RegionList
+	if err := json.NewDecoder(resp.Body).Decode(&regions); err != nil {
+		return nil, errors.NewInternalError("failed to decode regions response", err)
 	}
 
-	return &regionList, nil
+	return &regions, nil
 }
 
 // GetRegion retrieves a specific region by name
 func (c *Client) GetRegion(ctx context.Context, name string) (*Region, error) {
 	if name == "" {
-		return nil, fmt.Errorf("region name is required")
+		return nil, errors.NewValidationError("region name cannot be empty", nil)
 	}
 
 	resp, err := c.Get(ctx, fmt.Sprintf("/regions/%s", name))
 	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if err := c.HandleAPIError(resp); err != nil {
-		return nil, err
+		return nil, errors.NewAPIError(0, fmt.Sprintf("failed to get region %s", name), err)
 	}
 
 	var region Region
 	if err := json.NewDecoder(resp.Body).Decode(&region); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
+		return nil, errors.NewInternalError(fmt.Sprintf("failed to decode region %s response", name), err)
 	}
 
 	return &region, nil
@@ -508,8 +492,13 @@ func (c *Client) EditCloudSpace(ctx context.Context, namespace, name string, pat
 	return &cloudSpace, nil
 }
 
-// HandleAPIError checks if the response indicates an API error and returns an APIError
+// HandleAPIError processes API error responses and returns appropriate error types
 func (c *Client) HandleAPIError(resp *http.Response) error {
+	if resp == nil {
+		return errors.NewInternalError("received nil response", nil)
+	}
+
+	// For successful responses (2xx), return nil
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		return nil
 	}
@@ -517,17 +506,32 @@ func (c *Client) HandleAPIError(resp *http.Response) error {
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("HTTP %d: failed to read error response", resp.StatusCode)
+		return errors.NewAPIError(resp.StatusCode, "failed to read error response body", err)
 	}
 
-	var apiErr APIError
+	var apiErr struct {
+		Code    int    `json:"code"`
+		Message string `json:"message"`
+		Details string `json:"details,omitempty"`
+	}
+
 	if err := json.Unmarshal(body, &apiErr); err != nil {
-		return fmt.Errorf("HTTP %d: %s", resp.StatusCode, string(body))
+		return errors.NewAPIError(resp.StatusCode, fmt.Sprintf("invalid error response format: %s", string(body)), nil)
 	}
 
 	if apiErr.Code == 0 {
 		apiErr.Code = resp.StatusCode
 	}
 
-	return &apiErr
+	// Add request context to error message
+	errorMsg := fmt.Sprintf("%s %s failed: %s", resp.Request.Method, resp.Request.URL.String(), apiErr.Message)
+	if apiErr.Details != "" {
+		errorMsg = fmt.Sprintf("%s (Details: %s)", errorMsg, apiErr.Details)
+	}
+
+	return &APIError{
+		Code:    apiErr.Code,
+		Message: errorMsg,
+		Details: apiErr.Details,
+	}
 }
