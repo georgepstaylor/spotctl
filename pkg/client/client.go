@@ -517,6 +517,34 @@ func (c *Client) ListSpotNodePools(ctx context.Context, namespace string) (*Spot
 	return &spotNodePoolList, nil
 }
 
+// CreateSpotNodePool creates a new spot node pool in the specified namespace
+func (c *Client) CreateSpotNodePool(ctx context.Context, namespace string, spotNodePool *SpotNodePool) (*SpotNodePool, error) {
+	if namespace == "" {
+		return nil, fmt.Errorf("namespace is required")
+	}
+	if spotNodePool == nil {
+		return nil, fmt.Errorf("spot node pool configuration is required")
+	}
+
+	endpoint := fmt.Sprintf("/namespaces/%s/spotnodepools", namespace)
+	resp, err := c.Post(ctx, endpoint, spotNodePool)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if err := c.HandleAPIError(resp); err != nil {
+		return nil, err
+	}
+
+	var createdSpotNodePool SpotNodePool
+	if err := json.NewDecoder(resp.Body).Decode(&createdSpotNodePool); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return &createdSpotNodePool, nil
+}
+
 // GetSpotNodePool retrieves a specific spot node pool by name in the specified namespace
 func (c *Client) GetSpotNodePool(ctx context.Context, namespace, name string) (*SpotNodePool, error) {
 	if namespace == "" {

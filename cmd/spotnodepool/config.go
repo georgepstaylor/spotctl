@@ -103,3 +103,30 @@ func outputSpotNodePools(spotNodePoolList *client.SpotNodePoolList, format strin
 	// Pass the spot node pools array directly instead of the full SpotNodePoolList
 	return formatter.Output(spotNodePoolList.Items, tableConfig)
 }
+
+// outputCreatedSpotNodePool handles formatting and output of a newly created spot node pool
+func outputCreatedSpotNodePool(spotNodePool *client.SpotNodePool, format string) error {
+	// Create formatter with options
+	options := output.OutputOptions{
+		Format: output.OutputFormat(format),
+	}
+
+	// Check if pager should be disabled
+	noPager := viper.GetBool("no-pager")
+	if noPager {
+		// Create pager with disabled setting
+		pager := pager.NewPager()
+		pager.Disable = true
+		formatter := output.NewFormatterWithPager(options, pager)
+
+		// Use standard table config for created spot node pools
+		tableConfig := getSpotNodePoolTableConfig()
+		return formatter.Output(spotNodePool, tableConfig)
+	}
+
+	formatter := output.NewFormatter(options)
+
+	// Use standard table config for created spot node pools
+	tableConfig := getSpotNodePoolTableConfig()
+	return formatter.Output(spotNodePool, tableConfig)
+}

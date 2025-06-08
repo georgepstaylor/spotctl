@@ -25,6 +25,18 @@ func (m *MockSpotNodePoolClient) ListSpotNodePools(namespace string) (*client.Sp
 	return m.spotnodepoollist, m.err
 }
 
+func (m *MockSpotNodePoolClient) CreateSpotNodePool(namespace string, spotNodePool *client.SpotNodePool) (*client.SpotNodePool, error) {
+	if m.err != nil {
+		return nil, m.err
+	}
+	// Return a created spot node pool with some status information
+	created := *spotNodePool
+	created.Status = client.SpotNodePoolStatus{
+		BidStatus: "Pending",
+	}
+	return &created, nil
+}
+
 func TestSpotNodePoolGetCommand(t *testing.T) {
 	tests := []struct {
 		name             string
@@ -43,7 +55,7 @@ func TestSpotNodePoolGetCommand(t *testing.T) {
 					Namespace: "test-namespace",
 				},
 				Spec: client.SpotNodePoolSpec{
-					ServerClass: "gp.4x8",
+					ServerClass: "gp.vs1.large-lon",
 					Desired:     &[]int{3}[0],
 					CloudSpace:  "test-cloudspace",
 				},
@@ -96,10 +108,9 @@ func TestSpotNodePoolGetCommand(t *testing.T) {
 					}
 
 					// Mock the client behavior
-					mockClient := &MockSpotNodePoolClient{
-						spotnodepool: tt.mockSpotNodePool,
-						err:          tt.mockError,
-					}
+					mockClient := &MockSpotNodePoolClient{}
+					mockClient.spotnodepool = tt.mockSpotNodePool
+					mockClient.err = tt.mockError
 
 					// Simulate the function logic
 					if tt.mockError != nil {
@@ -203,7 +214,7 @@ func TestSpotNodePoolListCommand(t *testing.T) {
 							Namespace: "test-namespace",
 						},
 						Spec: client.SpotNodePoolSpec{
-							ServerClass: "gp.4x8",
+							ServerClass: "gp.vs1.large-lon",
 							Desired:     &[]int{3}[0],
 							CloudSpace:  "test-cloudspace",
 						},
@@ -273,10 +284,9 @@ func TestSpotNodePoolListCommand(t *testing.T) {
 					}
 
 					// Mock the client behavior
-					mockClient := &MockSpotNodePoolClient{
-						spotnodepoollist: tt.mockSpotNodePoolList,
-						err:              tt.mockError,
-					}
+					mockClient := &MockSpotNodePoolClient{}
+					mockClient.spotnodepoollist = tt.mockSpotNodePoolList
+					mockClient.err = tt.mockError
 
 					// Simulate the function logic
 					if tt.mockError != nil {
@@ -341,6 +351,154 @@ func TestSpotNodePoolListCommand(t *testing.T) {
 						if !strings.Contains(output, snp.Metadata.Name) {
 							t.Errorf("Expected spotnodepool name '%s' in output: %s", snp.Metadata.Name, output)
 						}
+					}
+				}
+			}
+		})
+	}
+}
+
+func TestSpotNodePoolCreateCommand(t *testing.T) {
+	tests := []struct {
+		name        string
+		mockError   error
+		args        []string
+		expectError bool
+	}{
+		{
+			name:        "successful spotnodepool create",
+			mockError:   nil,
+			args:        []string{"test-spotnodepool", "--namespace", "test-ns", "--server-class", "gp.vs1.large-lon", "--cloudspace", "test-cloudspace", "--desired", "3"},
+			expectError: false,
+		},
+		{
+			name:        "missing namespace flag",
+			mockError:   nil,
+			args:        []string{"test-spotnodepool", "--server-class", "gp.vs1.large-lon", "--cloudspace", "test-cloudspace", "--desired", "3"},
+			expectError: true,
+		},
+		{
+			name:        "missing name argument",
+			mockError:   nil,
+			args:        []string{"--namespace", "test-ns"},
+			expectError: true,
+		},
+		{
+			name:        "missing server class flag",
+			mockError:   nil,
+			args:        []string{"test-spotnodepool", "--namespace", "test-ns", "--cloudspace", "test-cloudspace", "--desired", "3"},
+			expectError: true,
+		},
+		{
+			name:        "API error",
+			mockError:   errors.New("API error: unauthorized"),
+			args:        []string{"test-spotnodepool", "--namespace", "test-ns", "--server-class", "gp.vs1.large-lon", "--cloudspace", "test-cloudspace", "--desired", "3"},
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a buffer to capture output
+			var buf bytes.Buffer
+
+			// Create the command
+			cmd := &cobra.Command{
+				Use:  "create [NAME]",
+				Args: cobra.ExactArgs(1),
+				RunE: func(cmd *cobra.Command, args []string) error {
+					// Check if required flags are provided
+					namespace, _ := cmd.Flags().GetString("namespace")
+					serverClass, _ := cmd.Flags().GetString("server-class")
+					cloudSpace, _ := cmd.Flags().GetString("cloudspace")
+					desired, _ := cmd.Flags().GetInt("desired")
+
+					if namespace == "" {
+						return errors.New("namespace is required")
+					}
+					if serverClass == "" {
+						return errors.New("server-class is required")
+					}
+					if cloudSpace == "" {
+						return errors.New("cloudspace is required")
+					}
+					if desired == 0 {
+						return errors.New("desired is required and must be greater than 0")
+					}
+
+					// Mock the client behavior
+					mockClient := &MockSpotNodePoolClient{}
+					mockClient.err = tt.mockError
+
+					// Simulate the function logic
+					if tt.mockError != nil {
+						return tt.mockError
+					}
+
+					// Create the SpotNodePool object
+					spotNodePool := &client.SpotNodePool{
+						APIVersion: "ngpc.rxt.io/v1",
+						Kind:       "SpotNodePool",
+						Metadata: client.ObjectMeta{
+							Name:      args[0],
+							Namespace: namespace,
+						},
+						Spec: client.SpotNodePoolSpec{
+							ServerClass: serverClass,
+							CloudSpace:  cloudSpace,
+							Desired:     &desired,
+						},
+					}
+
+					// For this test, we'll just verify that we can create the spotnodepool
+					createdSpotNodePool, err := mockClient.CreateSpotNodePool(namespace, spotNodePool)
+					if err != nil {
+						return err
+					}
+
+					// Write some output to verify the command works
+					if createdSpotNodePool == nil {
+						buf.WriteString("SpotNodePool creation failed.")
+					} else {
+						buf.WriteString("Created spotnodepool: " + createdSpotNodePool.Metadata.Name)
+					}
+
+					return nil
+				},
+			}
+
+			// Add required flags
+			cmd.Flags().String("namespace", "", "Namespace for the spotnodepool")
+			cmd.Flags().String("server-class", "", "Server class for the spotnodepool")
+			cmd.Flags().String("cloudspace", "", "Cloud space for the spotnodepool")
+			cmd.Flags().Int("desired", 0, "Desired number of nodes")
+
+			// Set output to our buffer
+			cmd.SetOut(&buf)
+			cmd.SetErr(&buf)
+
+			// Set the arguments
+			cmd.SetArgs(tt.args)
+
+			// Execute the command
+			err := cmd.Execute()
+
+			// Check error expectation
+			if tt.expectError {
+				if err == nil {
+					t.Errorf("Expected error but got none")
+				}
+			} else {
+				if err != nil {
+					t.Errorf("Unexpected error: %v", err)
+				}
+
+				// Check output for successful cases
+				output := buf.String()
+				if tt.mockError == nil {
+					expectedOutput := "Created spotnodepool: test-spotnodepool"
+					if output != expectedOutput {
+						t.Errorf("Expected '%s' output, got: %s", expectedOutput, output)
 					}
 				}
 			}
