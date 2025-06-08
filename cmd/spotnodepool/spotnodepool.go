@@ -14,6 +14,7 @@ Spot node pools represent groups of worker nodes deployed through Rackspace Spot
 	}
 
 	// Add all subcommands
+	cmd.AddCommand(NewListCommand())
 	cmd.AddCommand(NewGetCommand())
 
 	return cmd

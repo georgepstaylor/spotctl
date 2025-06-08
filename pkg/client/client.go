@@ -492,6 +492,31 @@ func (c *Client) EditCloudSpace(ctx context.Context, namespace, name string, pat
 	return &cloudSpace, nil
 }
 
+// ListSpotNodePools retrieves all spot node pools for a given namespace
+func (c *Client) ListSpotNodePools(ctx context.Context, namespace string) (*SpotNodePoolList, error) {
+	if namespace == "" {
+		return nil, fmt.Errorf("namespace is required")
+	}
+
+	endpoint := fmt.Sprintf("/namespaces/%s/spotnodepools", namespace)
+	resp, err := c.Get(ctx, endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if err := c.HandleAPIError(resp); err != nil {
+		return nil, err
+	}
+
+	var spotNodePoolList SpotNodePoolList
+	if err := json.NewDecoder(resp.Body).Decode(&spotNodePoolList); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return &spotNodePoolList, nil
+}
+
 // GetSpotNodePool retrieves a specific spot node pool by name in the specified namespace
 func (c *Client) GetSpotNodePool(ctx context.Context, namespace, name string) (*SpotNodePool, error) {
 	if namespace == "" {
