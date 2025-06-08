@@ -77,8 +77,8 @@ func TestClient_ListServerClasses(t *testing.T) {
 			// Create mock server
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// Verify request
-				if r.URL.Path != "/apis/ngpc.rxt.io/v1/serverclasses" {
-					t.Errorf("Expected path '/apis/ngpc.rxt.io/v1/serverclasses', got '%s'", r.URL.Path)
+				if r.URL.Path != "/ngpc.rxt.io/v1/serverclasses" {
+					t.Errorf("Expected path '/ngpc.rxt.io/v1/serverclasses', got '%s'", r.URL.Path)
 				}
 				if r.Method != http.MethodGet {
 					t.Errorf("Expected method GET, got %s", r.Method)
@@ -98,7 +98,7 @@ func TestClient_ListServerClasses(t *testing.T) {
 			// Create test config
 			cfg := &config.Config{
 				RefreshToken: "test-token",
-				BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
+				BaseURL:      server.URL,
 				Region:       "uk-lon-1",
 				Debug:        false,
 				Timeout:      30,
@@ -172,7 +172,7 @@ func TestClient_ListServerClasses_InvalidJSON(t *testing.T) {
 	// Create test config
 	cfg := &config.Config{
 		RefreshToken: "test-token",
-		BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
+		BaseURL:      server.URL,
 		Region:       "uk-lon-1",
 		Debug:        false,
 		Timeout:      30,
@@ -253,7 +253,7 @@ func TestClient_GetServerClass(t *testing.T) {
 			// Create mock server
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// Verify request
-				expectedPath := "/apis/ngpc.rxt.io/v1/serverclasses/" + tt.serverClassName
+				expectedPath := "/ngpc.rxt.io/v1/serverclasses/" + tt.serverClassName
 				if r.URL.Path != expectedPath {
 					t.Errorf("Expected path '%s', got '%s'", expectedPath, r.URL.Path)
 				}
@@ -275,7 +275,7 @@ func TestClient_GetServerClass(t *testing.T) {
 			// Create test config
 			cfg := &config.Config{
 				RefreshToken: "test-token",
-				BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
+				BaseURL:      server.URL,
 				Region:       "uk-lon-1",
 				Debug:        false,
 				Timeout:      30,
@@ -327,7 +327,7 @@ func TestClient_GetServerClass_InvalidJSON(t *testing.T) {
 	// Create test config
 	cfg := &config.Config{
 		RefreshToken: "test-token",
-		BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
+		BaseURL:      server.URL,
 		Region:       "uk-lon-1",
 		Debug:        false,
 		Timeout:      30,

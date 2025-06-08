@@ -89,8 +89,8 @@ func TestClient_ListRegions(t *testing.T) {
 		if r.Method != http.MethodGet {
 			t.Errorf("Expected GET request, got %s", r.Method)
 		}
-		if r.URL.Path != "/apis/ngpc.rxt.io/v1/regions" {
-			t.Errorf("Expected /apis/ngpc.rxt.io/v1/regions path, got %s", r.URL.Path)
+		if r.URL.Path != "/ngpc.rxt.io/v1/regions" {
+			t.Errorf("Expected /ngpc.rxt.io/v1/regions path, got %s", r.URL.Path)
 		}
 		if r.Header.Get("Authorization") == "" {
 			t.Errorf("Expected Authorization header")
@@ -105,7 +105,7 @@ func TestClient_ListRegions(t *testing.T) {
 	// Create test config
 	cfg := &config.Config{
 		RefreshToken: "test-token",
-		BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
+		BaseURL:      server.URL,
 		Region:       "uk-lon-1",
 		Debug:        false,
 		Timeout:      30,
@@ -161,7 +161,7 @@ func TestClient_ListRegions_APIError(t *testing.T) {
 	// Create test config
 	cfg := &config.Config{
 		RefreshToken: "test-token",
-		BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
+		BaseURL:      server.URL,
 		Region:       "uk-lon-1",
 		Debug:        false,
 		Timeout:      30,

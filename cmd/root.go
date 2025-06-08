@@ -11,6 +11,7 @@ import (
 	"github.com/georgetaylor/spotctl/cmd/organizations"
 	"github.com/georgetaylor/spotctl/cmd/regions"
 	"github.com/georgetaylor/spotctl/cmd/serverclasses"
+	"github.com/georgetaylor/spotctl/cmd/spotnodepool"
 )
 
 var cfgFile string
@@ -53,6 +54,7 @@ func init() {
 	rootCmd.AddCommand(organizations.NewCommand())
 	rootCmd.AddCommand(regions.NewCommand())
 	rootCmd.AddCommand(serverclasses.NewCommand())
+	rootCmd.AddCommand(spotnodepool.NewCommand())
 }
 
 // initConfig reads in config file and ENV variables if set.

@@ -261,3 +261,56 @@ type CloudSpaceList struct {
 	Kind       string       `json:"kind,omitempty"`
 	Metadata   ListMeta     `json:"metadata,omitempty"`
 }
+
+// SpotNodePool represents a Rackspace Spot node pool
+type SpotNodePool struct {
+	APIVersion string             `json:"apiVersion,omitempty"`
+	Kind       string             `json:"kind,omitempty"`
+	Metadata   ObjectMeta         `json:"metadata,omitempty"`
+	Spec       SpotNodePoolSpec   `json:"spec,omitempty"`
+	Status     SpotNodePoolStatus `json:"status,omitempty"`
+}
+
+type SpotNodePoolSpec struct {
+	Autoscaling       *SpotNodePoolAutoscaling `json:"autoscaling,omitempty"`
+	BidPrice          string                   `json:"bidPrice,omitempty"`
+	CloudSpace        string                   `json:"cloudSpace,omitempty"`
+	CustomAnnotations map[string]string        `json:"customAnnotations,omitempty"`
+	CustomLabels      map[string]string        `json:"customLabels,omitempty"`
+	CustomTaints      []SpotNodePoolTaint      `json:"customTaints,omitempty"`
+	Desired           *int                     `json:"desired,omitempty"`
+	ServerClass       string                   `json:"serverClass,omitempty"`
+}
+
+type SpotNodePoolAutoscaling struct {
+	Enabled  bool `json:"enabled,omitempty"`
+	MaxNodes *int `json:"maxNodes,omitempty"`
+	MinNodes *int `json:"minNodes,omitempty"`
+}
+
+type SpotNodePoolTaint struct {
+	Effect    string     `json:"effect,omitempty"`
+	Key       string     `json:"key,omitempty"`
+	TimeAdded *time.Time `json:"timeAdded,omitempty"`
+	Value     string     `json:"value,omitempty"`
+}
+
+type SpotNodePoolStatus struct {
+	BidStatus            string                      `json:"bidStatus,omitempty"`
+	CustomMetadataStatus *SpotNodePoolMetadataStatus `json:"customMetadataStatus,omitempty"`
+	WonCount             *int                        `json:"wonCount,omitempty"`
+}
+
+type SpotNodePoolMetadataStatus struct {
+	Annotations []string `json:"annotations,omitempty"`
+	Labels      []string `json:"labels,omitempty"`
+	Taints      []string `json:"taints,omitempty"`
+}
+
+// SpotNodePoolList represents a list of spot node pools
+type SpotNodePoolList struct {
+	APIVersion string         `json:"apiVersion,omitempty"`
+	Items      []SpotNodePool `json:"items"`
+	Kind       string         `json:"kind,omitempty"`
+	Metadata   ListMeta       `json:"metadata,omitempty"`
+}

@@ -77,8 +77,8 @@ func TestClient_ListOrganizations(t *testing.T) {
 			// Create mock server
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				// Verify request
-				if r.URL.Path != "/apis/auth.ngpc.rxt.io/v1/organizations" {
-					t.Errorf("Expected path '/apis/auth.ngpc.rxt.io/v1/organizations', got '%s'", r.URL.Path)
+				if r.URL.Path != "/auth.ngpc.rxt.io/v1/organizations" {
+					t.Errorf("Expected path '/auth.ngpc.rxt.io/v1/organizations', got '%s'", r.URL.Path)
 				}
 				if r.Method != http.MethodGet {
 					t.Errorf("Expected method GET, got %s", r.Method)
@@ -98,7 +98,7 @@ func TestClient_ListOrganizations(t *testing.T) {
 			// Create test config - set base URL to match expected pattern for auth conversion
 			cfg := &config.Config{
 				RefreshToken: "test-token",
-				BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
+				BaseURL:      server.URL,
 				Region:       "uk-lon-1",
 				Debug:        false,
 				Timeout:      30,

@@ -117,7 +117,7 @@ func TestListCloudSpaces(t *testing.T) {
 
 			// Create mock server
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				expectedPath := "/namespaces/" + tt.namespace + "/cloudspaces"
+				expectedPath := "/ngpc.rxt.io/v1/namespaces/" + tt.namespace + "/cloudspaces"
 				if r.URL.Path != expectedPath {
 					t.Errorf("expected path %s, got %s", expectedPath, r.URL.Path)
 				}
@@ -328,7 +328,7 @@ func TestCreateCloudSpace(t *testing.T) {
 				}
 
 				// Verify the request
-				expectedPath := "/apis/ngpc.rxt.io/v1/namespaces/" + tt.namespace + "/cloudspaces"
+				expectedPath := "/ngpc.rxt.io/v1/namespaces/" + tt.namespace + "/cloudspaces"
 				if r.URL.Path != expectedPath {
 					t.Errorf("expected path %q, got %q", expectedPath, r.URL.Path)
 				}
@@ -343,7 +343,7 @@ func TestCreateCloudSpace(t *testing.T) {
 			defer server.Close()
 
 			cfg := &config.Config{
-				BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
+				BaseURL:      server.URL,
 				RefreshToken: "test-token",
 				Timeout:      30,
 			}
@@ -479,7 +479,7 @@ func TestGetCloudSpace(t *testing.T) {
 
 			// Setup mock server
 			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				expectedPath := "/namespaces/" + tt.namespace + "/cloudspaces/" + tt.cloudspaceName
+				expectedPath := "/ngpc.rxt.io/v1/namespaces/" + tt.namespace + "/cloudspaces/" + tt.cloudspaceName
 				if r.URL.Path != expectedPath {
 					t.Errorf("expected path %s, got %s", expectedPath, r.URL.Path)
 				}
