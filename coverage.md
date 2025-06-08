@@ -1,6 +1,6 @@
 # Test Coverage Report
 
-Generated on: Sun Jun  8 12:08:21 UTC 2025
+Generated on: Sun Jun  8 13:12:45 UTC 2025
 
 ## Coverage Summary
 
@@ -55,10 +55,13 @@ github.com/georgetaylor/spotctl/cmd/serverclasses/get.go:35:		runGet				0.0%
 github.com/georgetaylor/spotctl/cmd/serverclasses/list.go:13:		NewListCommand			0.0%
 github.com/georgetaylor/spotctl/cmd/serverclasses/list.go:30:		runList				0.0%
 github.com/georgetaylor/spotctl/cmd/serverclasses/serverclasses.go:6:	NewCommand			0.0%
-github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:12:		getSpotNodePoolTableConfig	100.0%
-github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:33:		outputSpotNodePool		0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:14:		getSpotNodePoolTableConfig	100.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:35:		outputSpotNodePool		0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:62:		outputSpotNodePools		0.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/get.go:13:		NewGetCommand			0.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/get.go:42:		runGet				0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/list.go:13:		NewListCommand			0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/list.go:39:		runList				0.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/spotnodepool.go:6:	NewCommand			0.0%
 github.com/georgetaylor/spotctl/cmd/version.go:27:			init				0.0%
 github.com/georgetaylor/spotctl/main.go:9:				main				0.0%
@@ -95,8 +98,9 @@ github.com/georgetaylor/spotctl/pkg/client/client.go:370:		CreateCloudSpace		86.
 github.com/georgetaylor/spotctl/pkg/client/client.go:398:		DeleteCloudSpace		0.0%
 github.com/georgetaylor/spotctl/pkg/client/client.go:440:		GetCloudSpace			86.7%
 github.com/georgetaylor/spotctl/pkg/client/client.go:468:		EditCloudSpace			0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:496:		GetSpotNodePool			86.7%
-github.com/georgetaylor/spotctl/pkg/client/client.go:524:		HandleAPIError			17.6%
+github.com/georgetaylor/spotctl/pkg/client/client.go:496:		ListSpotNodePools		84.6%
+github.com/georgetaylor/spotctl/pkg/client/client.go:521:		GetSpotNodePool			86.7%
+github.com/georgetaylor/spotctl/pkg/client/client.go:549:		HandleAPIError			17.6%
 github.com/georgetaylor/spotctl/pkg/config/config.go:36:		ValidateConfig			100.0%
 github.com/georgetaylor/spotctl/pkg/config/config.go:62:		GetConfig			0.0%
 github.com/georgetaylor/spotctl/pkg/config/config.go:84:		SaveConfig			0.0%
@@ -129,7 +133,7 @@ github.com/georgetaylor/spotctl/pkg/pager/pager.go:151:			isTerminal			100.0%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:156:			getTerminalHeight		44.4%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:179:			getTerminalHeightStty		50.0%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:198:			WriteToWriter			0.0%
-total:									(statements)			27.9%
+total:									(statements)			27.6%
 ```
 
 ## Coverage Status
@@ -186,10 +190,13 @@ total:									(statements)			27.9%
 | github.com/georgetaylor/spotctl/cmd/serverclasses/list.go:13: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/serverclasses/list.go:30: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/serverclasses/serverclasses.go:6: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:12: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:33: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:14: | 100.0% | ✅ |
+| github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:35: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:62: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/spotnodepool/get.go:13: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/spotnodepool/get.go:42: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/spotnodepool/list.go:13: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/spotnodepool/list.go:39: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/spotnodepool/spotnodepool.go:6: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/version.go:27: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/main.go:9: | 0.0% | ❌ |
@@ -226,8 +233,9 @@ total:									(statements)			27.9%
 | github.com/georgetaylor/spotctl/pkg/client/client.go:398: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:440: | 86.7% | 🟡 |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:468: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:496: | 86.7% | 🟡 |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:524: | 17.6% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:496: | 84.6% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:521: | 86.7% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:549: | 17.6% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/config/config.go:36: | 100.0% | ✅ |
 | github.com/georgetaylor/spotctl/pkg/config/config.go:62: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/config/config.go:84: | 0.0% | ❌ |
@@ -280,8 +288,9 @@ total:									(statements)			27.9%
 | github.com/georgetaylor/spotctl/cmd/serverclasses/config.go:11: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/serverclasses/config.go:33: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/serverclasses/config.go:64: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:12: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:33: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:14: | 100.0% | ✅ |
+| github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:35: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:62: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/auth.go:46: | 100.0% | ✅ |
 | github.com/georgetaylor/spotctl/pkg/client/auth.go:55: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/auth.go:70: | 0.0% | ❌ |
@@ -315,8 +324,9 @@ total:									(statements)			27.9%
 | github.com/georgetaylor/spotctl/pkg/client/client.go:398: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:440: | 86.7% | 🟡 |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:468: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:496: | 86.7% | 🟡 |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:524: | 17.6% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:496: | 84.6% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:521: | 86.7% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:549: | 17.6% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/config/config.go:36: | 100.0% | ✅ |
 | github.com/georgetaylor/spotctl/pkg/config/config.go:62: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/config/config.go:84: | 0.0% | ❌ |
@@ -374,10 +384,13 @@ github.com/georgetaylor/spotctl/cmd/serverclasses/get.go:35:		runGet				0.0%
 github.com/georgetaylor/spotctl/cmd/serverclasses/list.go:13:		NewListCommand			0.0%
 github.com/georgetaylor/spotctl/cmd/serverclasses/list.go:30:		runList				0.0%
 github.com/georgetaylor/spotctl/cmd/serverclasses/serverclasses.go:6:	NewCommand			0.0%
-github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:12:		getSpotNodePoolTableConfig	100.0%
-github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:33:		outputSpotNodePool		0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:14:		getSpotNodePoolTableConfig	100.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:35:		outputSpotNodePool		0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:62:		outputSpotNodePools		0.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/get.go:13:		NewGetCommand			0.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/get.go:42:		runGet				0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/list.go:13:		NewListCommand			0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/list.go:39:		runList				0.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/spotnodepool.go:6:	NewCommand			0.0%
 github.com/georgetaylor/spotctl/cmd/version.go:27:			init				0.0%
 github.com/georgetaylor/spotctl/main.go:9:				main				0.0%
