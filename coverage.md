@@ -1,6 +1,6 @@
 # Test Coverage Report
 
-Generated on: Sun Jun  8 13:12:45 UTC 2025
+Generated on: Sun Jun  8 21:07:44 UTC 2025
 
 ## Coverage Summary
 
@@ -58,6 +58,10 @@ github.com/georgetaylor/spotctl/cmd/serverclasses/serverclasses.go:6:	NewCommand
 github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:14:		getSpotNodePoolTableConfig	100.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:35:		outputSpotNodePool		0.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:62:		outputSpotNodePools		0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:108:		outputCreatedSpotNodePool	0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/create.go:15:		NewCreateCommand		0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/create.go:52:		runCreate			0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/create.go:156:		loadSpecFromFile		0.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/get.go:13:		NewGetCommand			0.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/get.go:42:		runGet				0.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/list.go:13:		NewListCommand			0.0%
@@ -99,8 +103,9 @@ github.com/georgetaylor/spotctl/pkg/client/client.go:398:		DeleteCloudSpace		0.0
 github.com/georgetaylor/spotctl/pkg/client/client.go:440:		GetCloudSpace			86.7%
 github.com/georgetaylor/spotctl/pkg/client/client.go:468:		EditCloudSpace			0.0%
 github.com/georgetaylor/spotctl/pkg/client/client.go:496:		ListSpotNodePools		84.6%
-github.com/georgetaylor/spotctl/pkg/client/client.go:521:		GetSpotNodePool			86.7%
-github.com/georgetaylor/spotctl/pkg/client/client.go:549:		HandleAPIError			17.6%
+github.com/georgetaylor/spotctl/pkg/client/client.go:521:		CreateSpotNodePool		86.7%
+github.com/georgetaylor/spotctl/pkg/client/client.go:549:		GetSpotNodePool			86.7%
+github.com/georgetaylor/spotctl/pkg/client/client.go:577:		HandleAPIError			17.6%
 github.com/georgetaylor/spotctl/pkg/config/config.go:36:		ValidateConfig			100.0%
 github.com/georgetaylor/spotctl/pkg/config/config.go:62:		GetConfig			0.0%
 github.com/georgetaylor/spotctl/pkg/config/config.go:84:		SaveConfig			0.0%
@@ -133,7 +138,7 @@ github.com/georgetaylor/spotctl/pkg/pager/pager.go:151:			isTerminal			100.0%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:156:			getTerminalHeight		44.4%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:179:			getTerminalHeightStty		50.0%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:198:			WriteToWriter			0.0%
-total:									(statements)			27.6%
+total:									(statements)			26.5%
 ```
 
 ## Coverage Status
@@ -193,6 +198,10 @@ total:									(statements)			27.6%
 | github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:14: | 100.0% | ✅ |
 | github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:35: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:62: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:108: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/spotnodepool/create.go:15: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/spotnodepool/create.go:52: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/spotnodepool/create.go:156: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/spotnodepool/get.go:13: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/spotnodepool/get.go:42: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/spotnodepool/list.go:13: | 0.0% | ❌ |
@@ -235,7 +244,8 @@ total:									(statements)			27.6%
 | github.com/georgetaylor/spotctl/pkg/client/client.go:468: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:496: | 84.6% | 🟡 |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:521: | 86.7% | 🟡 |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:549: | 17.6% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:549: | 86.7% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:577: | 17.6% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/config/config.go:36: | 100.0% | ✅ |
 | github.com/georgetaylor/spotctl/pkg/config/config.go:62: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/config/config.go:84: | 0.0% | ❌ |
@@ -291,6 +301,7 @@ total:									(statements)			27.6%
 | github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:14: | 100.0% | ✅ |
 | github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:35: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:62: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:108: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/auth.go:46: | 100.0% | ✅ |
 | github.com/georgetaylor/spotctl/pkg/client/auth.go:55: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/auth.go:70: | 0.0% | ❌ |
@@ -326,7 +337,8 @@ total:									(statements)			27.6%
 | github.com/georgetaylor/spotctl/pkg/client/client.go:468: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:496: | 84.6% | 🟡 |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:521: | 86.7% | 🟡 |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:549: | 17.6% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:549: | 86.7% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:577: | 17.6% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/config/config.go:36: | 100.0% | ✅ |
 | github.com/georgetaylor/spotctl/pkg/config/config.go:62: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/config/config.go:84: | 0.0% | ❌ |
@@ -387,6 +399,10 @@ github.com/georgetaylor/spotctl/cmd/serverclasses/serverclasses.go:6:	NewCommand
 github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:14:		getSpotNodePoolTableConfig	100.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:35:		outputSpotNodePool		0.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:62:		outputSpotNodePools		0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/config.go:108:		outputCreatedSpotNodePool	0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/create.go:15:		NewCreateCommand		0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/create.go:52:		runCreate			0.0%
+github.com/georgetaylor/spotctl/cmd/spotnodepool/create.go:156:		loadSpecFromFile		0.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/get.go:13:		NewGetCommand			0.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/get.go:42:		runGet				0.0%
 github.com/georgetaylor/spotctl/cmd/spotnodepool/list.go:13:		NewListCommand			0.0%
