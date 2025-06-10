@@ -163,7 +163,7 @@ type CloudSpaceSpec struct {
 	HAControlPlane    bool                `json:"HAControlPlane,omitempty"`
 	BidRequests       []string            `json:"bidRequests,omitempty"`
 	ClusterRef        *ObjectReference    `json:"clusterRef,omitempty"`
-	Cloud             string              `json:"cloud,omitempty"` // API requires this to be set to "default"
+	Cloud             string              `json:"cloud,omitempty"`
 	CNI               string              `json:"cni,omitempty"`
 	DeploymentType    string              `json:"deploymentType,omitempty"`
 	KubernetesVersion string              `json:"kubernetesVersion,omitempty"`
