@@ -710,7 +710,7 @@ func TestCloudspacesEditCommand(t *testing.T) {
 				outputFormat, _ := cmd.Flags().GetString("output")
 
 				// Load the JSON patch operations from the file
-				patchOps, err := loadPatchOperations(file)
+				patchOps, err := client.LoadPatchOperations(file)
 				if err != nil {
 					return err
 				}
@@ -721,7 +721,7 @@ func TestCloudspacesEditCommand(t *testing.T) {
 				os.Stdout = w
 
 				// Display the patch operations that will be applied
-				displayPatchOperations(patchOps)
+				client.DisplayPatchOperations(patchOps)
 
 				// Restore stdout and capture the output
 				w.Close()
@@ -785,154 +785,3 @@ func TestCloudspacesEditCommand(t *testing.T) {
 	}
 }
 
-func TestLoadPatchOperations(t *testing.T) {
-	// Create a temporary directory for test files
-	tmpDir, err := os.MkdirTemp("", "patch-test-*")
-	if err != nil {
-		t.Fatalf("Failed to create temp dir: %v", err)
-	}
-	defer os.RemoveAll(tmpDir)
-
-	tests := []struct {
-		name        string
-		fileContent string
-		expectError bool
-		expectCount int
-	}{
-		{
-			name: "valid patch operations",
-			fileContent: `[
-				{
-					"op": "replace",
-					"path": "/spec/region",
-					"value": "uk-lon-1"
-				},
-				{
-					"op": "add",
-					"path": "/metadata/labels/env",
-					"value": "test"
-				}
-			]`,
-			expectError: false,
-			expectCount: 2,
-		},
-		{
-			name:        "empty array",
-			fileContent: `[]`,
-			expectError: false,
-			expectCount: 0,
-		},
-		{
-			name:        "invalid json",
-			fileContent: `invalid json`,
-			expectError: true,
-		},
-		{
-			name:        "valid json but wrong structure",
-			fileContent: `{"not": "an array"}`,
-			expectError: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Create test file
-			testFile := filepath.Join(tmpDir, tt.name+".json")
-			if err := os.WriteFile(testFile, []byte(tt.fileContent), 0644); err != nil {
-				t.Fatalf("Failed to create test file: %v", err)
-			}
-
-			// Test loadPatchOperations
-			ops, err := loadPatchOperations(testFile)
-
-			if tt.expectError {
-				if err == nil {
-					t.Errorf("Expected error but got none")
-				}
-			} else {
-				if err != nil {
-					t.Errorf("Unexpected error: %v", err)
-				}
-				if len(ops) != tt.expectCount {
-					t.Errorf("Expected %d operations, got %d", tt.expectCount, len(ops))
-				}
-			}
-		})
-	}
-
-	// Test nonexistent file
-	t.Run("nonexistent file", func(t *testing.T) {
-		_, err := loadPatchOperations("/nonexistent/file.json")
-		if err == nil {
-			t.Errorf("Expected error for nonexistent file but got none")
-		}
-	})
-}
-
-func TestDisplayPatchOperations(t *testing.T) {
-	tests := []struct {
-		name       string
-		operations []PatchOperation
-		expectOut  []string
-	}{
-		{
-			name: "multiple operations with different types",
-			operations: []PatchOperation{
-				{Op: "replace", Path: "/spec/region", Value: "uk-lon-1"},
-				{Op: "add", Path: "/metadata/labels/env", Value: "test"},
-				{Op: "remove", Path: "/spec/oldField"},
-				{Op: "replace", Path: "/spec/count", Value: float64(42)},
-				{Op: "replace", Path: "/spec/enabled", Value: true},
-			},
-			expectOut: []string{
-				"Applying 5 patch operation(s)",
-				"1. replace /spec/region = \"uk-lon-1\"",
-				"2. add /metadata/labels/env = \"test\"",
-				"3. remove /spec/oldField",
-				"4. replace /spec/count = 42",
-				"5. replace /spec/enabled = true",
-			},
-		},
-		{
-			name:       "empty operations",
-			operations: []PatchOperation{},
-			expectOut:  []string{"Applying 0 patch operation(s)"},
-		},
-		{
-			name: "operation with complex value",
-			operations: []PatchOperation{
-				{Op: "add", Path: "/spec/config", Value: map[string]interface{}{"key": "value", "nested": map[string]interface{}{"inner": "data"}}},
-			},
-			expectOut: []string{
-				"Applying 1 patch operation(s)",
-				"1. add /spec/config = {",
-			},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Capture output
-			old := os.Stdout
-			r, w, _ := os.Pipe()
-			os.Stdout = w
-
-			// Call function
-			displayPatchOperations(tt.operations)
-
-			// Restore stdout and read output
-			w.Close()
-			os.Stdout = old
-
-			output, _ := io.ReadAll(r)
-			outputStr := string(output)
-
-			// Check expected strings
-			for _, expected := range tt.expectOut {
-				if !strings.Contains(outputStr, expected) {
-					t.Errorf("Expected output to contain %q, but got: %s", expected, outputStr)
-				}
-			}
-		})
-	}
-}

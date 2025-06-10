@@ -244,367 +244,157 @@ func (c *Client) DeleteAuth(ctx context.Context, endpoint string) (*http.Respons
 
 // ListRegions retrieves a list of available regions
 func (c *Client) ListRegions(ctx context.Context) (*RegionList, error) {
-	resp, err := c.Get(ctx, "/regions")
-	if err != nil {
-		return nil, errors.NewAPIError(0, "failed to list regions", err)
-	}
-
-	var regions RegionList
-	if err := json.NewDecoder(resp.Body).Decode(&regions); err != nil {
-		return nil, errors.NewInternalError("failed to decode regions response", err)
-	}
-
-	return &regions, nil
+	return genericList[RegionList](c, ctx, "/regions", ListOptions{})
 }
 
 // GetRegion retrieves a specific region by name
 func (c *Client) GetRegion(ctx context.Context, name string) (*Region, error) {
-	if name == "" {
-		return nil, errors.NewValidationError("region name cannot be empty", nil)
+	if err := validateName(name); err != nil {
+		return nil, fmt.Errorf("region name cannot be empty")
 	}
 
-	resp, err := c.Get(ctx, fmt.Sprintf("/regions/%s", name))
-	if err != nil {
-		return nil, errors.NewAPIError(0, fmt.Sprintf("failed to get region %s", name), err)
-	}
-
-	var region Region
-	if err := json.NewDecoder(resp.Body).Decode(&region); err != nil {
-		return nil, errors.NewInternalError(fmt.Sprintf("failed to decode region %s response", name), err)
-	}
-
-	return &region, nil
+	return genericGet[Region](c, ctx, fmt.Sprintf("/regions/%s", name), GetOptions{Name: name})
 }
 
 // ListServerClasses retrieves all available server classes
 func (c *Client) ListServerClasses(ctx context.Context) (*ServerClassList, error) {
-	resp, err := c.Get(ctx, "/serverclasses")
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if err := c.HandleAPIError(resp); err != nil {
-		return nil, err
-	}
-
-	var serverClassList ServerClassList
-	if err := json.NewDecoder(resp.Body).Decode(&serverClassList); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return &serverClassList, nil
+	return genericList[ServerClassList](c, ctx, "/serverclasses", ListOptions{})
 }
 
 // GetServerClass retrieves a specific server class by name
 func (c *Client) GetServerClass(ctx context.Context, name string) (*ServerClass, error) {
-	if name == "" {
+	if err := validateName(name); err != nil {
 		return nil, fmt.Errorf("server class name is required")
 	}
 
-	resp, err := c.Get(ctx, fmt.Sprintf("/serverclasses/%s", name))
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if err := c.HandleAPIError(resp); err != nil {
-		return nil, err
-	}
-
-	var serverClass ServerClass
-	if err := json.NewDecoder(resp.Body).Decode(&serverClass); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return &serverClass, nil
+	return genericGet[ServerClass](c, ctx, fmt.Sprintf("/serverclasses/%s", name), GetOptions{Name: name})
 }
 
 // ListOrganizations retrieves all organizations for the authenticated user
 func (c *Client) ListOrganizations(ctx context.Context) (*OrganizationList, error) {
-	// Organizations API uses a different subdomain
-	resp, err := c.GetAuth(ctx, "/organizations")
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if err := c.HandleAPIError(resp); err != nil {
-		return nil, err
-	}
-
-	var orgList OrganizationList
-	if err := json.NewDecoder(resp.Body).Decode(&orgList); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return &orgList, nil
+	// Organizations API uses a different subdomain (auth API version)
+	return genericList[OrganizationList](c, ctx, "/organizations", ListOptions{APIVersion: APIVersionAuth})
 }
 
 // ListCloudSpaces retrieves all cloudspaces for a given namespace
 func (c *Client) ListCloudSpaces(ctx context.Context, namespace string) (*CloudSpaceList, error) {
-	if namespace == "" {
-		return nil, fmt.Errorf("namespace is required")
-	}
-
-	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces", namespace)
-	resp, err := c.Get(ctx, endpoint)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if err := c.HandleAPIError(resp); err != nil {
+	if err := validateNamespace(namespace); err != nil {
 		return nil, err
 	}
 
-	var cloudSpaceList CloudSpaceList
-	if err := json.NewDecoder(resp.Body).Decode(&cloudSpaceList); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return &cloudSpaceList, nil
+	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces", namespace)
+	return genericList[CloudSpaceList](c, ctx, endpoint, ListOptions{Namespace: namespace})
 }
 
 // CreateCloudSpace creates a new cloudspace in the specified namespace
 func (c *Client) CreateCloudSpace(ctx context.Context, namespace string, cloudSpace *CloudSpace) (*CloudSpace, error) {
-	if namespace == "" {
-		return nil, fmt.Errorf("namespace is required")
+	if err := validateNamespace(namespace); err != nil {
+		return nil, err
 	}
-	if cloudSpace == nil {
+	if err := validateCreateInput(cloudSpace); err != nil {
 		return nil, fmt.Errorf("cloudspace configuration is required")
 	}
 
 	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces", namespace)
-	resp, err := c.Post(ctx, endpoint, cloudSpace)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if err := c.HandleAPIError(resp); err != nil {
-		return nil, err
-	}
-
-	var createdCloudSpace CloudSpace
-	if err := json.NewDecoder(resp.Body).Decode(&createdCloudSpace); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return &createdCloudSpace, nil
+	return genericCreate[CloudSpace](c, ctx, endpoint, cloudSpace, CreateOptions{Namespace: namespace})
 }
 
 // DeleteCloudSpace deletes a cloudspace by name in the specified namespace
 func (c *Client) DeleteCloudSpace(ctx context.Context, namespace, name string) (*DeleteResponse, error) {
-	if namespace == "" {
-		return nil, fmt.Errorf("namespace is required")
+	if err := validateNamespace(namespace); err != nil {
+		return nil, err
 	}
-	if name == "" {
+	if err := validateName(name); err != nil {
 		return nil, fmt.Errorf("cloudspace name is required")
 	}
 
 	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces/%s", namespace, name)
-	resp, err := c.Delete(ctx, endpoint)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if err := c.HandleAPIError(resp); err != nil {
-		return nil, err
-	}
-
-	// For successful deletes, HTTP 200 or 202 means success according to API docs
-	// We'll return a simple success response instead of trying to parse the complex Kubernetes Status object
-	if resp.StatusCode == 200 || resp.StatusCode == 202 {
-		return &DeleteResponse{
-			Status:  "Success",
-			Message: "CloudSpace deleted successfully",
-		}, nil
-	}
-
-	// If we get here, try to parse the actual response for error details
-	var deleteResponse DeleteResponse
-	if err := json.NewDecoder(resp.Body).Decode(&deleteResponse); err != nil {
-		// If we can't parse the response but got a successful status code, assume success
-		return &DeleteResponse{
-			Status:  "Success",
-			Message: "CloudSpace deleted successfully",
-		}, nil
-	}
-
-	return &deleteResponse, nil
+	return genericDelete[DeleteResponse](c, ctx, endpoint, DeleteOptions{
+		Namespace:    namespace,
+		Name:         name,
+		ResourceType: "CloudSpace",
+	})
 }
 
 // GetCloudSpace retrieves a specific cloudspace by name in the specified namespace
 func (c *Client) GetCloudSpace(ctx context.Context, namespace, name string) (*CloudSpace, error) {
-	if namespace == "" {
-		return nil, fmt.Errorf("namespace is required")
+	if err := validateNamespace(namespace); err != nil {
+		return nil, err
 	}
-	if name == "" {
+	if err := validateName(name); err != nil {
 		return nil, fmt.Errorf("cloudspace name is required")
 	}
 
 	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces/%s", namespace, name)
-	resp, err := c.Get(ctx, endpoint)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if err := c.HandleAPIError(resp); err != nil {
-		return nil, err
-	}
-
-	var cloudSpace CloudSpace
-	if err := json.NewDecoder(resp.Body).Decode(&cloudSpace); err != nil {
-		return nil, fmt.Errorf("failed to parse response: %w", err)
-	}
-
-	return &cloudSpace, nil
+	return genericGet[CloudSpace](c, ctx, endpoint, GetOptions{Namespace: namespace, Name: name})
 }
 
 // EditCloudSpace edits a cloudspace using JSON patch operations
 func (c *Client) EditCloudSpace(ctx context.Context, namespace, name string, patchOps []PatchOperation) (*CloudSpace, error) {
-	if namespace == "" {
-		return nil, fmt.Errorf("namespace is required")
+	if err := validateNamespace(namespace); err != nil {
+		return nil, err
 	}
-	if name == "" {
+	if err := validateName(name); err != nil {
 		return nil, fmt.Errorf("cloudspace name is required")
 	}
-	if patchOps == nil {
-		return nil, fmt.Errorf("patch operations are required")
-	}
-
-	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces/%s", namespace, name)
-	resp, err := c.PatchWithContentType(ctx, endpoint, patchOps, "application/json-patch+json")
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if err := c.HandleAPIError(resp); err != nil {
+	if err := validatePatchOperations(patchOps); err != nil {
 		return nil, err
 	}
 
-	var updatedCloudSpace CloudSpace
-	if err := json.NewDecoder(resp.Body).Decode(&updatedCloudSpace); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return &updatedCloudSpace, nil
+	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces/%s", namespace, name)
+	return genericEdit[CloudSpace](c, ctx, endpoint, patchOps, EditOptions{Namespace: namespace, Name: name})
 }
 
 // ListSpotNodePools retrieves all spot node pools for a given namespace
 func (c *Client) ListSpotNodePools(ctx context.Context, namespace string) (*SpotNodePoolList, error) {
-	if namespace == "" {
-		return nil, fmt.Errorf("namespace is required")
-	}
-
-	endpoint := fmt.Sprintf("/namespaces/%s/spotnodepools", namespace)
-	resp, err := c.Get(ctx, endpoint)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if err := c.HandleAPIError(resp); err != nil {
+	if err := validateNamespace(namespace); err != nil {
 		return nil, err
 	}
 
-	var spotNodePoolList SpotNodePoolList
-	if err := json.NewDecoder(resp.Body).Decode(&spotNodePoolList); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return &spotNodePoolList, nil
+	endpoint := fmt.Sprintf("/namespaces/%s/spotnodepools", namespace)
+	return genericList[SpotNodePoolList](c, ctx, endpoint, ListOptions{Namespace: namespace})
 }
 
 // CreateSpotNodePool creates a new spot node pool in the specified namespace
 func (c *Client) CreateSpotNodePool(ctx context.Context, namespace string, spotNodePool *SpotNodePool) (*SpotNodePool, error) {
-	if namespace == "" {
-		return nil, fmt.Errorf("namespace is required")
+	if err := validateNamespace(namespace); err != nil {
+		return nil, err
 	}
-	if spotNodePool == nil {
+	if err := validateCreateInput(spotNodePool); err != nil {
 		return nil, fmt.Errorf("spot node pool configuration is required")
 	}
 
 	endpoint := fmt.Sprintf("/namespaces/%s/spotnodepools", namespace)
-	resp, err := c.Post(ctx, endpoint, spotNodePool)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if err := c.HandleAPIError(resp); err != nil {
-		return nil, err
-	}
-
-	var createdSpotNodePool SpotNodePool
-	if err := json.NewDecoder(resp.Body).Decode(&createdSpotNodePool); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return &createdSpotNodePool, nil
+	return genericCreate[SpotNodePool](c, ctx, endpoint, spotNodePool, CreateOptions{Namespace: namespace})
 }
 
 // EditSpotNodePool edits a spot node pool using JSON patch operations
 func (c *Client) EditSpotNodePool(ctx context.Context, namespace, name string, patchOps []PatchOperation) (*SpotNodePool, error) {
-	if namespace == "" {
-		return nil, fmt.Errorf("namespace is required")
+	if err := validateNamespace(namespace); err != nil {
+		return nil, err
 	}
-	if name == "" {
+	if err := validateName(name); err != nil {
 		return nil, fmt.Errorf("spot node pool name is required")
 	}
-	if patchOps == nil {
-		return nil, fmt.Errorf("patch operations are required")
-	}
-
-	endpoint := fmt.Sprintf("/namespaces/%s/spotnodepools/%s", namespace, name)
-	resp, err := c.PatchWithContentType(ctx, endpoint, patchOps, "application/json-patch+json")
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if err := c.HandleAPIError(resp); err != nil {
+	if err := validatePatchOperations(patchOps); err != nil {
 		return nil, err
 	}
 
-	var updatedSpotNodePool SpotNodePool
-	if err := json.NewDecoder(resp.Body).Decode(&updatedSpotNodePool); err != nil {
-		return nil, fmt.Errorf("failed to decode response: %w", err)
-	}
-
-	return &updatedSpotNodePool, nil
+	endpoint := fmt.Sprintf("/namespaces/%s/spotnodepools/%s", namespace, name)
+	return genericEdit[SpotNodePool](c, ctx, endpoint, patchOps, EditOptions{Namespace: namespace, Name: name})
 }
 
 // GetSpotNodePool retrieves a specific spot node pool by name in the specified namespace
 func (c *Client) GetSpotNodePool(ctx context.Context, namespace, name string) (*SpotNodePool, error) {
-	if namespace == "" {
-		return nil, fmt.Errorf("namespace is required")
+	if err := validateNamespace(namespace); err != nil {
+		return nil, err
 	}
-	if name == "" {
+	if err := validateName(name); err != nil {
 		return nil, fmt.Errorf("spot node pool name is required")
 	}
 
 	endpoint := fmt.Sprintf("/namespaces/%s/spotnodepools/%s", namespace, name)
-	resp, err := c.Get(ctx, endpoint)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if err := c.HandleAPIError(resp); err != nil {
-		return nil, err
-	}
-
-	var spotNodePool SpotNodePool
-	if err := json.NewDecoder(resp.Body).Decode(&spotNodePool); err != nil {
-		return nil, fmt.Errorf("failed to parse response: %w", err)
-	}
-
-	return &spotNodePool, nil
+	return genericGet[SpotNodePool](c, ctx, endpoint, GetOptions{Namespace: namespace, Name: name})
 }
 
 // HandleAPIError processes API error responses and returns appropriate error types
