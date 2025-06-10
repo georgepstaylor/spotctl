@@ -201,93 +201,116 @@ func (c *Client) MakeRequest(ctx context.Context, method, endpoint string, body 
 }
 
 // Convenience methods for common HTTP methods
-func (c *Client) Get(ctx context.Context, endpoint string) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodGet, endpoint, nil, APIVersionDefault)
+func (c *Client) Get(ctx context.Context, endpoint string, apiVersion ...APIVersion) (*http.Response, error) {
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
+	return c.MakeRequest(ctx, http.MethodGet, endpoint, nil, version)
 }
 
-func (c *Client) Post(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodPost, endpoint, body, APIVersionDefault)
+func (c *Client) Post(ctx context.Context, endpoint string, body interface{}, apiVersion ...APIVersion) (*http.Response, error) {
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
+	return c.MakeRequest(ctx, http.MethodPost, endpoint, body, version)
 }
 
-func (c *Client) Put(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodPut, endpoint, body, APIVersionDefault)
+func (c *Client) Put(ctx context.Context, endpoint string, body interface{}, apiVersion ...APIVersion) (*http.Response, error) {
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
+	return c.MakeRequest(ctx, http.MethodPut, endpoint, body, version)
 }
 
-func (c *Client) Delete(ctx context.Context, endpoint string) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodDelete, endpoint, nil, APIVersionDefault)
+func (c *Client) Delete(ctx context.Context, endpoint string, apiVersion ...APIVersion) (*http.Response, error) {
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
+	return c.MakeRequest(ctx, http.MethodDelete, endpoint, nil, version)
 }
 
-func (c *Client) Patch(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodPatch, endpoint, body, APIVersionDefault)
-}
-
-func (c *Client) PatchWithContentType(ctx context.Context, endpoint string, body interface{}, contentType string) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodPatch, endpoint, body, APIVersionDefault, contentType)
-}
-
-// Auth-specific convenience methods
-func (c *Client) GetAuth(ctx context.Context, endpoint string) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodGet, endpoint, nil, APIVersionAuth)
-}
-
-func (c *Client) PostAuth(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodPost, endpoint, body, APIVersionAuth)
-}
-
-func (c *Client) PutAuth(ctx context.Context, endpoint string, body interface{}) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodPut, endpoint, body, APIVersionAuth)
-}
-
-func (c *Client) DeleteAuth(ctx context.Context, endpoint string) (*http.Response, error) {
-	return c.MakeRequest(ctx, http.MethodDelete, endpoint, nil, APIVersionAuth)
+func (c *Client) Patch(ctx context.Context, endpoint string, body interface{}, apiVersion ...APIVersion) (*http.Response, error) {
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
+	return c.MakeRequest(ctx, http.MethodPatch, endpoint, body, version, "application/json")
 }
 
 // ListRegions retrieves a list of available regions
-func (c *Client) ListRegions(ctx context.Context) (*RegionList, error) {
-	return genericList[RegionList](c, ctx, "/regions", ListOptions{})
+func (c *Client) ListRegions(ctx context.Context, apiVersion ...APIVersion) (*RegionList, error) {
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
+	return genericList[RegionList](c, ctx, "/regions", ListOptions{APIVersion: version})
 }
 
 // GetRegion retrieves a specific region by name
-func (c *Client) GetRegion(ctx context.Context, name string) (*Region, error) {
+func (c *Client) GetRegion(ctx context.Context, name string, apiVersion ...APIVersion) (*Region, error) {
 	if err := validateName(name); err != nil {
 		return nil, fmt.Errorf("region name cannot be empty")
 	}
 
-	return genericGet[Region](c, ctx, fmt.Sprintf("/regions/%s", name), GetOptions{Name: name})
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
+	return genericGet[Region](c, ctx, fmt.Sprintf("/regions/%s", name), GetOptions{Name: name, APIVersion: version})
 }
 
 // ListServerClasses retrieves all available server classes
-func (c *Client) ListServerClasses(ctx context.Context) (*ServerClassList, error) {
-	return genericList[ServerClassList](c, ctx, "/serverclasses", ListOptions{})
+func (c *Client) ListServerClasses(ctx context.Context, apiVersion ...APIVersion) (*ServerClassList, error) {
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
+	return genericList[ServerClassList](c, ctx, "/serverclasses", ListOptions{APIVersion: version})
 }
 
 // GetServerClass retrieves a specific server class by name
-func (c *Client) GetServerClass(ctx context.Context, name string) (*ServerClass, error) {
+func (c *Client) GetServerClass(ctx context.Context, name string, apiVersion ...APIVersion) (*ServerClass, error) {
 	if err := validateName(name); err != nil {
 		return nil, fmt.Errorf("server class name is required")
 	}
 
-	return genericGet[ServerClass](c, ctx, fmt.Sprintf("/serverclasses/%s", name), GetOptions{Name: name})
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
+	return genericGet[ServerClass](c, ctx, fmt.Sprintf("/serverclasses/%s", name), GetOptions{Name: name, APIVersion: version})
 }
 
 // ListOrganizations retrieves all organizations for the authenticated user
-func (c *Client) ListOrganizations(ctx context.Context) (*OrganizationList, error) {
-	// Organizations API uses a different subdomain (auth API version)
-	return genericList[OrganizationList](c, ctx, "/organizations", ListOptions{APIVersion: APIVersionAuth})
+func (c *Client) ListOrganizations(ctx context.Context, apiVersion ...APIVersion) (*OrganizationList, error) {
+	// Organizations API defaults to auth version but can be overridden
+	version := APIVersionAuth
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
+	return genericList[OrganizationList](c, ctx, "/organizations", ListOptions{APIVersion: version})
 }
 
 // ListCloudSpaces retrieves all cloudspaces for a given namespace
-func (c *Client) ListCloudSpaces(ctx context.Context, namespace string) (*CloudSpaceList, error) {
+func (c *Client) ListCloudSpaces(ctx context.Context, namespace string, apiVersion ...APIVersion) (*CloudSpaceList, error) {
 	if err := validateNamespace(namespace); err != nil {
 		return nil, err
 	}
 
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
 	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces", namespace)
-	return genericList[CloudSpaceList](c, ctx, endpoint, ListOptions{Namespace: namespace})
+	return genericList[CloudSpaceList](c, ctx, endpoint, ListOptions{Namespace: namespace, APIVersion: version})
 }
 
 // CreateCloudSpace creates a new cloudspace in the specified namespace
-func (c *Client) CreateCloudSpace(ctx context.Context, namespace string, cloudSpace *CloudSpace) (*CloudSpace, error) {
+func (c *Client) CreateCloudSpace(ctx context.Context, namespace string, cloudSpace *CloudSpace, apiVersion ...APIVersion) (*CloudSpace, error) {
 	if err := validateNamespace(namespace); err != nil {
 		return nil, err
 	}
@@ -295,12 +318,16 @@ func (c *Client) CreateCloudSpace(ctx context.Context, namespace string, cloudSp
 		return nil, fmt.Errorf("cloudspace configuration is required")
 	}
 
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
 	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces", namespace)
-	return genericCreate[CloudSpace](c, ctx, endpoint, cloudSpace, CreateOptions{Namespace: namespace})
+	return genericCreate[CloudSpace](c, ctx, endpoint, cloudSpace, CreateOptions{Namespace: namespace, APIVersion: version})
 }
 
 // DeleteCloudSpace deletes a cloudspace by name in the specified namespace
-func (c *Client) DeleteCloudSpace(ctx context.Context, namespace, name string) (*DeleteResponse, error) {
+func (c *Client) DeleteCloudSpace(ctx context.Context, namespace, name string, apiVersion ...APIVersion) (*DeleteResponse, error) {
 	if err := validateNamespace(namespace); err != nil {
 		return nil, err
 	}
@@ -308,16 +335,21 @@ func (c *Client) DeleteCloudSpace(ctx context.Context, namespace, name string) (
 		return nil, fmt.Errorf("cloudspace name is required")
 	}
 
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
 	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces/%s", namespace, name)
 	return genericDelete[DeleteResponse](c, ctx, endpoint, DeleteOptions{
 		Namespace:    namespace,
 		Name:         name,
 		ResourceType: "CloudSpace",
+		APIVersion:   version,
 	})
 }
 
 // GetCloudSpace retrieves a specific cloudspace by name in the specified namespace
-func (c *Client) GetCloudSpace(ctx context.Context, namespace, name string) (*CloudSpace, error) {
+func (c *Client) GetCloudSpace(ctx context.Context, namespace, name string, apiVersion ...APIVersion) (*CloudSpace, error) {
 	if err := validateNamespace(namespace); err != nil {
 		return nil, err
 	}
@@ -325,12 +357,16 @@ func (c *Client) GetCloudSpace(ctx context.Context, namespace, name string) (*Cl
 		return nil, fmt.Errorf("cloudspace name is required")
 	}
 
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
 	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces/%s", namespace, name)
-	return genericGet[CloudSpace](c, ctx, endpoint, GetOptions{Namespace: namespace, Name: name})
+	return genericGet[CloudSpace](c, ctx, endpoint, GetOptions{Namespace: namespace, Name: name, APIVersion: version})
 }
 
 // EditCloudSpace edits a cloudspace using JSON patch operations
-func (c *Client) EditCloudSpace(ctx context.Context, namespace, name string, patchOps []PatchOperation) (*CloudSpace, error) {
+func (c *Client) EditCloudSpace(ctx context.Context, namespace, name string, patchOps []PatchOperation, apiVersion ...APIVersion) (*CloudSpace, error) {
 	if err := validateNamespace(namespace); err != nil {
 		return nil, err
 	}
@@ -341,22 +377,30 @@ func (c *Client) EditCloudSpace(ctx context.Context, namespace, name string, pat
 		return nil, err
 	}
 
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
 	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces/%s", namespace, name)
-	return genericEdit[CloudSpace](c, ctx, endpoint, patchOps, EditOptions{Namespace: namespace, Name: name})
+	return genericEdit[CloudSpace](c, ctx, endpoint, patchOps, EditOptions{Namespace: namespace, Name: name, APIVersion: version})
 }
 
 // ListSpotNodePools retrieves all spot node pools for a given namespace
-func (c *Client) ListSpotNodePools(ctx context.Context, namespace string) (*SpotNodePoolList, error) {
+func (c *Client) ListSpotNodePools(ctx context.Context, namespace string, apiVersion ...APIVersion) (*SpotNodePoolList, error) {
 	if err := validateNamespace(namespace); err != nil {
 		return nil, err
 	}
 
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
 	endpoint := fmt.Sprintf("/namespaces/%s/spotnodepools", namespace)
-	return genericList[SpotNodePoolList](c, ctx, endpoint, ListOptions{Namespace: namespace})
+	return genericList[SpotNodePoolList](c, ctx, endpoint, ListOptions{Namespace: namespace, APIVersion: version})
 }
 
 // CreateSpotNodePool creates a new spot node pool in the specified namespace
-func (c *Client) CreateSpotNodePool(ctx context.Context, namespace string, spotNodePool *SpotNodePool) (*SpotNodePool, error) {
+func (c *Client) CreateSpotNodePool(ctx context.Context, namespace string, spotNodePool *SpotNodePool, apiVersion ...APIVersion) (*SpotNodePool, error) {
 	if err := validateNamespace(namespace); err != nil {
 		return nil, err
 	}
@@ -364,12 +408,16 @@ func (c *Client) CreateSpotNodePool(ctx context.Context, namespace string, spotN
 		return nil, fmt.Errorf("spot node pool configuration is required")
 	}
 
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
 	endpoint := fmt.Sprintf("/namespaces/%s/spotnodepools", namespace)
-	return genericCreate[SpotNodePool](c, ctx, endpoint, spotNodePool, CreateOptions{Namespace: namespace})
+	return genericCreate[SpotNodePool](c, ctx, endpoint, spotNodePool, CreateOptions{Namespace: namespace, APIVersion: version})
 }
 
 // EditSpotNodePool edits a spot node pool using JSON patch operations
-func (c *Client) EditSpotNodePool(ctx context.Context, namespace, name string, patchOps []PatchOperation) (*SpotNodePool, error) {
+func (c *Client) EditSpotNodePool(ctx context.Context, namespace, name string, patchOps []PatchOperation, apiVersion ...APIVersion) (*SpotNodePool, error) {
 	if err := validateNamespace(namespace); err != nil {
 		return nil, err
 	}
@@ -380,12 +428,16 @@ func (c *Client) EditSpotNodePool(ctx context.Context, namespace, name string, p
 		return nil, err
 	}
 
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
 	endpoint := fmt.Sprintf("/namespaces/%s/spotnodepools/%s", namespace, name)
-	return genericEdit[SpotNodePool](c, ctx, endpoint, patchOps, EditOptions{Namespace: namespace, Name: name})
+	return genericEdit[SpotNodePool](c, ctx, endpoint, patchOps, EditOptions{Namespace: namespace, Name: name, APIVersion: version})
 }
 
 // GetSpotNodePool retrieves a specific spot node pool by name in the specified namespace
-func (c *Client) GetSpotNodePool(ctx context.Context, namespace, name string) (*SpotNodePool, error) {
+func (c *Client) GetSpotNodePool(ctx context.Context, namespace, name string, apiVersion ...APIVersion) (*SpotNodePool, error) {
 	if err := validateNamespace(namespace); err != nil {
 		return nil, err
 	}
@@ -393,8 +445,12 @@ func (c *Client) GetSpotNodePool(ctx context.Context, namespace, name string) (*
 		return nil, fmt.Errorf("spot node pool name is required")
 	}
 
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
 	endpoint := fmt.Sprintf("/namespaces/%s/spotnodepools/%s", namespace, name)
-	return genericGet[SpotNodePool](c, ctx, endpoint, GetOptions{Namespace: namespace, Name: name})
+	return genericGet[SpotNodePool](c, ctx, endpoint, GetOptions{Namespace: namespace, Name: name, APIVersion: version})
 }
 
 // HandleAPIError processes API error responses and returns appropriate error types
