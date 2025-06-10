@@ -1,4 +1,4 @@
-package cloudspaces
+package spotnodepool
 
 import (
 	"context"
@@ -9,47 +9,52 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// NewEditCommand returns the cloudspaces edit command
+// NewEditCommand returns the spotnodepool edit command
 func NewEditCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "edit <cloudspace-name>",
-		Short: "Edit a cloudspace",
-		Long: `Edit a cloudspace in the specified namespace using JSON patch operations.
+		Use:   "edit <spotnodepool-name>",
+		Short: "Edit a spot node pool",
+		Long: `Edit a spot node pool in the specified namespace using JSON patch operations.
 
 The patch operations should be provided in a JSON file with the following format:
 [
   {
     "op": "replace",
-    "path": "/spec/someSpec1",
-    "value": "anotherValue"
+    "path": "/spec/desired",
+    "value": 5
+  },
+  {
+    "op": "replace",
+    "path": "/spec/autoscaling/enabled", 
+    "value": true
   },
   {
     "op": "add",
-    "path": "/spec/someSpec2", 
-    "value": "newValue"
+    "path": "/spec/autoscaling/maxNodes",
+    "value": 10
   }
 ]
 
 Supported operations are: add, remove, replace, move, copy, test.
 
 Examples:
-  # Edit a cloudspace and show the result in table format
-  spotctl cloudspaces edit my-cloudspace --namespace org-abc123 --file patch.json
+  # Edit a spot node pool and show the result in table format
+  spotctl spotnodepool edit my-nodepool --namespace org-abc123 --file patch.json
 
   # Edit with detailed information output
-  spotctl cloudspaces edit my-cloudspace --namespace org-abc123 --file patch.json -o wide
+  spotctl spotnodepool edit my-nodepool --namespace org-abc123 --file patch.json -o wide
 
   # Edit and output the result as JSON
-  spotctl cloudspaces edit my-cloudspace --namespace org-abc123 --file patch.json --output json
+  spotctl spotnodepool edit my-nodepool --namespace org-abc123 --file patch.json --output json
 
   # Edit and output the result as YAML (skip confirmation)
-  spotctl cloudspaces edit my-cloudspace --namespace org-abc123 --file patch.json --output yaml --confirm`,
+  spotctl spotnodepool edit my-nodepool --namespace org-abc123 --file patch.json --output yaml --confirm`,
 		Args: cobra.ExactArgs(1),
 		RunE: runEdit,
 	}
 
-	// Add flags for cloudspaces edit command
-	cmd.Flags().StringP("namespace", "n", "", "Namespace of the cloudspace (required)")
+	// Add flags for spotnodepool edit command
+	cmd.Flags().StringP("namespace", "n", "", "Namespace of the spot node pool (required)")
 	cmd.Flags().StringP("file", "f", "", "Path to the JSON file containing patch operations (required)")
 	cmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml, wide)")
 	cmd.Flags().Bool("confirm", false, "Skip confirmation prompt")
@@ -85,7 +90,7 @@ func runEdit(cmd *cobra.Command, args []string) error {
 	// Prompt for confirmation if the --confirm flag is not set
 	skipConfirmation, _ := cmd.Flags().GetBool("confirm")
 	if !skipConfirmation {
-		confirmed, err := client.PromptForConfirmation(fmt.Sprintf("cloudspace '%s'", args[0]))
+		confirmed, err := client.PromptForConfirmation(fmt.Sprintf("spot node pool '%s'", args[0]))
 		if err != nil {
 			return err
 		}
@@ -96,11 +101,11 @@ func runEdit(cmd *cobra.Command, args []string) error {
 	}
 
 	// Apply the patch operations
-	updatedCloudSpace, err := apiClient.EditCloudSpace(context.Background(), namespace, args[0], patchOps)
+	updatedSpotNodePool, err := apiClient.EditSpotNodePool(context.Background(), namespace, args[0], patchOps)
 	if err != nil {
-		return fmt.Errorf("failed to edit cloudspace: %w", err)
+		return fmt.Errorf("failed to edit spot node pool: %w", err)
 	}
 
-	// Output the updated cloudspace using the same formatting as the get command
-	return outputCloudSpace(updatedCloudSpace, outputFormat)
+	// Output the updated spot node pool using the same formatting as the get command
+	return outputSpotNodePool(updatedSpotNodePool, outputFormat)
 }

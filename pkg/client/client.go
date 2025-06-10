@@ -464,19 +464,22 @@ func (c *Client) GetCloudSpace(ctx context.Context, namespace, name string) (*Cl
 	return &cloudSpace, nil
 }
 
-// EditCloudSpace applies JSON patch operations to update a cloudspace
-func (c *Client) EditCloudSpace(ctx context.Context, namespace, name string, patchOps interface{}) (*CloudSpace, error) {
+// EditCloudSpace edits a cloudspace using JSON patch operations
+func (c *Client) EditCloudSpace(ctx context.Context, namespace, name string, patchOps []PatchOperation) (*CloudSpace, error) {
 	if namespace == "" {
 		return nil, fmt.Errorf("namespace is required")
 	}
 	if name == "" {
 		return nil, fmt.Errorf("cloudspace name is required")
 	}
+	if patchOps == nil {
+		return nil, fmt.Errorf("patch operations are required")
+	}
 
 	endpoint := fmt.Sprintf("/namespaces/%s/cloudspaces/%s", namespace, name)
 	resp, err := c.PatchWithContentType(ctx, endpoint, patchOps, "application/json-patch+json")
 	if err != nil {
-		return nil, fmt.Errorf("failed to make patch request: %w", err)
+		return nil, fmt.Errorf("failed to make request: %w", err)
 	}
 	defer resp.Body.Close()
 
@@ -484,12 +487,12 @@ func (c *Client) EditCloudSpace(ctx context.Context, namespace, name string, pat
 		return nil, err
 	}
 
-	var cloudSpace CloudSpace
-	if err := json.NewDecoder(resp.Body).Decode(&cloudSpace); err != nil {
-		return nil, fmt.Errorf("failed to parse response: %w", err)
+	var updatedCloudSpace CloudSpace
+	if err := json.NewDecoder(resp.Body).Decode(&updatedCloudSpace); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
 	}
 
-	return &cloudSpace, nil
+	return &updatedCloudSpace, nil
 }
 
 // ListSpotNodePools retrieves all spot node pools for a given namespace
@@ -543,6 +546,37 @@ func (c *Client) CreateSpotNodePool(ctx context.Context, namespace string, spotN
 	}
 
 	return &createdSpotNodePool, nil
+}
+
+// EditSpotNodePool edits a spot node pool using JSON patch operations
+func (c *Client) EditSpotNodePool(ctx context.Context, namespace, name string, patchOps []PatchOperation) (*SpotNodePool, error) {
+	if namespace == "" {
+		return nil, fmt.Errorf("namespace is required")
+	}
+	if name == "" {
+		return nil, fmt.Errorf("spot node pool name is required")
+	}
+	if patchOps == nil {
+		return nil, fmt.Errorf("patch operations are required")
+	}
+
+	endpoint := fmt.Sprintf("/namespaces/%s/spotnodepools/%s", namespace, name)
+	resp, err := c.PatchWithContentType(ctx, endpoint, patchOps, "application/json-patch+json")
+	if err != nil {
+		return nil, fmt.Errorf("failed to make request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if err := c.HandleAPIError(resp); err != nil {
+		return nil, err
+	}
+
+	var updatedSpotNodePool SpotNodePool
+	if err := json.NewDecoder(resp.Body).Decode(&updatedSpotNodePool); err != nil {
+		return nil, fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return &updatedSpotNodePool, nil
 }
 
 // GetSpotNodePool retrieves a specific spot node pool by name in the specified namespace
