@@ -1,6 +1,6 @@
 # Test Coverage Report
 
-Generated on: Sun Jun  8 21:07:44 UTC 2025
+Generated on: Tue Jun 10 12:53:57 UTC 2025
 
 ## Coverage Summary
 
@@ -10,8 +10,9 @@ github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:14:		getCloudSpacesTab
 github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:33:		outputCloudSpaces		0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:79:		outputCreatedCloudSpace		0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:106:		outputCloudSpace		0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:13:		NewCreateCommand		0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:44:		runCreate			0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:15:		NewCreateCommand		0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:57:		runCreate			0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:145:		loadCloudSpaceSpecFromFile	0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:13:		NewDeleteCommand		0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:36:		runDelete			0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/edit.go:22:		loadPatchOperations		100.0%
@@ -138,7 +139,7 @@ github.com/georgetaylor/spotctl/pkg/pager/pager.go:151:			isTerminal			100.0%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:156:			getTerminalHeight		44.4%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:179:			getTerminalHeightStty		50.0%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:198:			WriteToWriter			0.0%
-total:									(statements)			26.5%
+total:									(statements)			26.1%
 ```
 
 ## Coverage Status
@@ -150,8 +151,9 @@ total:									(statements)			26.5%
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:33: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:79: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:106: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:13: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:44: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:15: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:57: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:145: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:13: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:36: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/edit.go:22: | 100.0% | ✅ |
@@ -352,8 +354,9 @@ github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:14:		getCloudSpacesTab
 github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:33:		outputCloudSpaces		0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:79:		outputCreatedCloudSpace		0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:106:		outputCloudSpace		0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:13:		NewCreateCommand		0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:44:		runCreate			0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:15:		NewCreateCommand		0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:57:		runCreate			0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:145:		loadCloudSpaceSpecFromFile	0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:13:		NewDeleteCommand		0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:36:		runDelete			0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/edit.go:22:		loadPatchOperations		100.0%
