@@ -1,6 +1,6 @@
 # Test Coverage Report
 
-Generated on: Tue Jun 10 23:36:33 UTC 2025
+Generated on: Tue Jun 10 23:51:59 UTC 2025
 
 ## Coverage Summary
 
@@ -83,33 +83,28 @@ github.com/georgetaylor/spotctl/pkg/client/client.go:102:		prepareRequest			77.3
 github.com/georgetaylor/spotctl/pkg/client/client.go:142:		doRequest			80.0%
 github.com/georgetaylor/spotctl/pkg/client/client.go:182:		MakeRequest			71.4%
 github.com/georgetaylor/spotctl/pkg/client/client.go:204:		Get				0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:208:		Post				0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:212:		Put				0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:216:		Delete				0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:220:		Patch				0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:224:		PatchWithContentType		0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:229:		GetAuth				0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:233:		PostAuth			0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:237:		PutAuth				0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:241:		DeleteAuth			0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:246:		ListRegions			100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:251:		GetRegion			0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:260:		ListServerClasses		100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:265:		GetServerClass			66.7%
-github.com/georgetaylor/spotctl/pkg/client/client.go:274:		ListOrganizations		100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:280:		ListCloudSpaces			100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:290:		CreateCloudSpace		100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:303:		DeleteCloudSpace		0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:320:		GetCloudSpace			100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:333:		EditCloudSpace			0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:349:		ListSpotNodePools		100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:359:		CreateSpotNodePool		100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:372:		EditSpotNodePool		0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:388:		GetSpotNodePool			100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:401:		HandleAPIError			17.6%
-github.com/georgetaylor/spotctl/pkg/client/generic.go:48:		genericList			92.3%
-github.com/georgetaylor/spotctl/pkg/client/generic.go:74:		genericGet			92.3%
-github.com/georgetaylor/spotctl/pkg/client/generic.go:100:		genericCreate			84.6%
+github.com/georgetaylor/spotctl/pkg/client/client.go:212:		Post				0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:220:		Put				0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:228:		Delete				0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:236:		Patch				0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:245:		ListRegions			75.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:254:		GetRegion			0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:267:		ListServerClasses		75.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:276:		GetServerClass			66.7%
+github.com/georgetaylor/spotctl/pkg/client/client.go:289:		ListOrganizations		75.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:299:		ListCloudSpaces			85.7%
+github.com/georgetaylor/spotctl/pkg/client/client.go:313:		CreateCloudSpace		88.9%
+github.com/georgetaylor/spotctl/pkg/client/client.go:330:		DeleteCloudSpace		0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:352:		GetCloudSpace			88.9%
+github.com/georgetaylor/spotctl/pkg/client/client.go:369:		EditCloudSpace			0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:389:		ListSpotNodePools		85.7%
+github.com/georgetaylor/spotctl/pkg/client/client.go:403:		CreateSpotNodePool		88.9%
+github.com/georgetaylor/spotctl/pkg/client/client.go:420:		EditSpotNodePool		0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:440:		GetSpotNodePool			88.9%
+github.com/georgetaylor/spotctl/pkg/client/client.go:457:		HandleAPIError			17.6%
+github.com/georgetaylor/spotctl/pkg/client/generic.go:48:		genericList			84.6%
+github.com/georgetaylor/spotctl/pkg/client/generic.go:74:		genericGet			84.6%
+github.com/georgetaylor/spotctl/pkg/client/generic.go:100:		genericCreate			76.9%
 github.com/georgetaylor/spotctl/pkg/client/generic.go:126:		genericEdit			0.0%
 github.com/georgetaylor/spotctl/pkg/client/generic.go:152:		genericDelete			0.0%
 github.com/georgetaylor/spotctl/pkg/client/generic.go:208:		validateNamespace		100.0%
@@ -151,7 +146,7 @@ github.com/georgetaylor/spotctl/pkg/pager/pager.go:151:			isTerminal			100.0%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:156:			getTerminalHeight		44.4%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:179:			getTerminalHeightStty		50.0%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:198:			WriteToWriter			0.0%
-total:									(statements)			21.5%
+total:									(statements)			21.9%
 ```
 
 ## Coverage Status
@@ -236,33 +231,28 @@ total:									(statements)			21.5%
 | github.com/georgetaylor/spotctl/pkg/client/client.go:142: | 80.0% | 🟡 |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:182: | 71.4% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:204: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:208: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:212: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:216: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:220: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:224: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:229: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:233: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:237: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:241: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:246: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:251: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:260: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:265: | 66.7% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:274: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:280: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:290: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:303: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:320: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:333: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:349: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:359: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:372: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:388: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:401: | 17.6% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/generic.go:48: | 92.3% | 🟡 |
-| github.com/georgetaylor/spotctl/pkg/client/generic.go:74: | 92.3% | 🟡 |
-| github.com/georgetaylor/spotctl/pkg/client/generic.go:100: | 84.6% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:228: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:236: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:245: | 75.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:254: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:267: | 75.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:276: | 66.7% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:289: | 75.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:299: | 85.7% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:313: | 88.9% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:330: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:352: | 88.9% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:369: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:389: | 85.7% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:403: | 88.9% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:420: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:440: | 88.9% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:457: | 17.6% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/generic.go:48: | 84.6% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/generic.go:74: | 84.6% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/generic.go:100: | 76.9% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/generic.go:126: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/generic.go:152: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/generic.go:208: | 100.0% | ✅ |
@@ -342,33 +332,28 @@ total:									(statements)			21.5%
 | github.com/georgetaylor/spotctl/pkg/client/client.go:142: | 80.0% | 🟡 |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:182: | 71.4% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:204: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:208: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:212: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:216: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/client.go:220: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:224: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:229: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:233: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:237: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:241: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:246: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:251: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:260: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:265: | 66.7% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:274: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:280: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:290: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:303: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:320: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:333: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:349: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:359: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:372: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:388: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/client/client.go:401: | 17.6% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/client/generic.go:48: | 92.3% | 🟡 |
-| github.com/georgetaylor/spotctl/pkg/client/generic.go:74: | 92.3% | 🟡 |
-| github.com/georgetaylor/spotctl/pkg/client/generic.go:100: | 84.6% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:228: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:236: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:245: | 75.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:254: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:267: | 75.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:276: | 66.7% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:289: | 75.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:299: | 85.7% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:313: | 88.9% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:330: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:352: | 88.9% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:369: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:389: | 85.7% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:403: | 88.9% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:420: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:440: | 88.9% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/client.go:457: | 17.6% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/client/generic.go:48: | 84.6% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/generic.go:74: | 84.6% | 🟡 |
+| github.com/georgetaylor/spotctl/pkg/client/generic.go:100: | 76.9% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/generic.go:126: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/generic.go:152: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/generic.go:208: | 100.0% | ✅ |
@@ -462,28 +447,14 @@ github.com/georgetaylor/spotctl/pkg/client/client.go:70:		Error				100.0%
 github.com/georgetaylor/spotctl/pkg/client/client.go:78:		NewClient			100.0%
 github.com/georgetaylor/spotctl/pkg/client/client.go:142:		doRequest			80.0%
 github.com/georgetaylor/spotctl/pkg/client/client.go:204:		Get				0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:208:		Post				0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:212:		Put				0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:216:		Delete				0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:220:		Patch				0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:224:		PatchWithContentType		0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:229:		GetAuth				0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:233:		PostAuth			0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:237:		PutAuth				0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:241:		DeleteAuth			0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:246:		ListRegions			100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:251:		GetRegion			0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:260:		ListServerClasses		100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:274:		ListOrganizations		100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:280:		ListCloudSpaces			100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:290:		CreateCloudSpace		100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:303:		DeleteCloudSpace		0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:320:		GetCloudSpace			100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:333:		EditCloudSpace			0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:349:		ListSpotNodePools		100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:359:		CreateSpotNodePool		100.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:372:		EditSpotNodePool		0.0%
-github.com/georgetaylor/spotctl/pkg/client/client.go:388:		GetSpotNodePool			100.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:212:		Post				0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:220:		Put				0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:228:		Delete				0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:236:		Patch				0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:254:		GetRegion			0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:330:		DeleteCloudSpace		0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:369:		EditCloudSpace			0.0%
+github.com/georgetaylor/spotctl/pkg/client/client.go:420:		EditSpotNodePool		0.0%
 github.com/georgetaylor/spotctl/pkg/client/generic.go:126:		genericEdit			0.0%
 github.com/georgetaylor/spotctl/pkg/client/generic.go:152:		genericDelete			0.0%
 github.com/georgetaylor/spotctl/pkg/client/generic.go:208:		validateNamespace		100.0%
