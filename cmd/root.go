@@ -40,12 +40,14 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.spot/config.yaml)")
 	rootCmd.PersistentFlags().String("refresh-token", "", "Rackspace Spot refresh token")
 	rootCmd.PersistentFlags().String("region", "", "Rackspace region")
+	rootCmd.PersistentFlags().StringP("namespace", "n", "", "Default namespace for operations")
 	rootCmd.PersistentFlags().Bool("debug", false, "Enable debug output")
 	rootCmd.PersistentFlags().Bool("no-pager", false, "Disable pager for long output")
 
 	// Bind flags to viper
 	viper.BindPFlag("refresh-token", rootCmd.PersistentFlags().Lookup("refresh-token"))
 	viper.BindPFlag("region", rootCmd.PersistentFlags().Lookup("region"))
+	viper.BindPFlag("namespace", rootCmd.PersistentFlags().Lookup("namespace"))
 	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
 	viper.BindPFlag("no-pager", rootCmd.PersistentFlags().Lookup("no-pager"))
 
@@ -79,6 +81,7 @@ func initConfig() {
 
 	// Explicitly bind environment variables to handle hyphenated keys
 	viper.BindEnv("refresh-token", "SPOTCTL_REFRESH_TOKEN")
+	viper.BindEnv("namespace", "SPOTCTL_NAMESPACE")
 	viper.BindEnv("base-url", "SPOTCTL_BASE_URL")
 	viper.BindEnv("no-pager", "SPOTCTL_NO_PAGER")
 

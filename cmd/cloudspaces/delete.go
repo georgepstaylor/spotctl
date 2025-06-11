@@ -16,18 +16,26 @@ func NewDeleteCommand() *cobra.Command {
 		Short: "Delete a cloudspace",
 		Long: `Delete a cloudspace by name in the specified namespace.
 
+The namespace can be specified via:
+- The --namespace/-n flag
+- The 'namespace' field in your config file
+- The SPOTCTL_NAMESPACE environment variable
+
 Examples:
-  # Delete a cloudspace
+  # Delete a cloudspace using namespace from config
+  spotctl cloudspaces delete my-cloudspace
+
+  # Delete a cloudspace with specific namespace (overrides config)
   spotctl cloudspaces delete my-cloudspace --namespace org-abc123
 
   # Delete with confirmation
-  spotctl cloudspaces delete my-cloudspace --namespace org-abc123 --confirm`,
+  spotctl cloudspaces delete my-cloudspace --confirm`,
 		Args: cobra.ExactArgs(1),
 		RunE: runDelete,
 	}
 
 	// Add flags for cloudspaces delete command
-	cmd.Flags().StringP("namespace", "n", "", "Namespace of the cloudspace (required)")
+	cmd.Flags().StringP("namespace", "n", "", "Namespace of the cloudspace (overrides config)")
 	cmd.Flags().Bool("confirm", false, "Skip confirmation prompt")
 
 	return cmd
@@ -36,13 +44,12 @@ Examples:
 func runDelete(cmd *cobra.Command, args []string) error {
 	cloudspaceName := args[0] // Get name from positional argument
 
-	// Get flag values
-	namespace, _ := cmd.Flags().GetString("namespace")
-	confirm, _ := cmd.Flags().GetBool("confirm")
-
-	if namespace == "" {
-		return fmt.Errorf("namespace is required")
+	namespace, err := getNamespace(cmd)
+	if err != nil {
+		return err
 	}
+
+	confirm, _ := cmd.Flags().GetBool("confirm")
 
 	// Ask for confirmation unless --confirm flag is used
 	if !confirm {

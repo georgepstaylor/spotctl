@@ -15,17 +15,20 @@ var Defaults = struct {
 	Timeout      int
 	Debug        bool
 	OutputFormat string
+	Namespace    string
 }{
 	BaseURL:      "https://spot.rackspace.com/apis",
 	Timeout:      30,
 	Debug:        false,
 	OutputFormat: "table",
+	Namespace:    "", // Empty default - not required
 }
 
 // Config represents the application configuration
 type Config struct {
 	RefreshToken string `mapstructure:"refresh-token"`
 	Region       string `mapstructure:"region"`
+	Namespace    string `mapstructure:"namespace"`
 	BaseURL      string `mapstructure:"base-url"`
 	Debug        bool   `mapstructure:"debug"`
 	Timeout      int    `mapstructure:"timeout"`
@@ -67,6 +70,7 @@ func GetConfig() (*Config, error) {
 	viper.SetDefault("timeout", Defaults.Timeout)
 	viper.SetDefault("debug", Defaults.Debug)
 	viper.SetDefault("output-format", Defaults.OutputFormat)
+	viper.SetDefault("namespace", Defaults.Namespace)
 
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, errors.NewConfigError("failed to unmarshal config", err)
@@ -90,19 +94,21 @@ func SaveConfig(cfg *Config) error {
 	// Set values in viper
 	viper.Set("refresh-token", cfg.RefreshToken)
 	viper.Set("region", cfg.Region)
+	viper.Set("namespace", cfg.Namespace)
 	viper.Set("base-url", cfg.BaseURL)
 	viper.Set("debug", cfg.Debug)
 	viper.Set("timeout", cfg.Timeout)
 	viper.Set("output-format", cfg.OutputFormat)
 
-	// Get config path
+	// Get config path - use same logic as root.go
 	configPath := os.Getenv("SPOTCTL_CONFIG")
 	if configPath == "" {
 		home, err := os.UserHomeDir()
 		if err != nil {
 			return errors.NewConfigError("failed to get user home directory", err)
 		}
-		configPath = filepath.Join(home, ".config", "spotctl", "config.yaml")
+		configPath = filepath.Join(home, ".spot", "config.yaml") // Changed from .config/spotctl to .spot
+
 	}
 
 	// Ensure directory exists
@@ -136,6 +142,7 @@ func InitConfig() error {
 	// Bind environment variables
 	viper.BindEnv("refresh-token", "SPOTCTL_REFRESH_TOKEN")
 	viper.BindEnv("region", "SPOTCTL_REGION")
+	viper.BindEnv("namespace", "SPOTCTL_NAMESPACE")
 	viper.BindEnv("base-url", "SPOTCTL_BASE_URL")
 	viper.BindEnv("debug", "SPOTCTL_DEBUG")
 	viper.BindEnv("timeout", "SPOTCTL_TIMEOUT")

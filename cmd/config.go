@@ -39,6 +39,7 @@ var configShowCmd = &cobra.Command{
 		}
 
 		fmt.Printf("  region: %s\n", viper.GetString("region"))
+		fmt.Printf("  namespace: %s\n", viper.GetString("namespace"))
 		fmt.Printf("  base-url: %s\n", viper.GetString("base-url"))
 		fmt.Printf("  debug: %t\n", viper.GetBool("debug"))
 		fmt.Printf("  timeout: %d\n", viper.GetInt("timeout"))
@@ -62,25 +63,58 @@ var configSetCmd = &cobra.Command{
 		value := args[1]
 
 		// Validate the key
-		validKeys := []string{"refresh-token", "region", "base-url", "debug", "timeout"}
+		validKeys := []string{"refresh-token", "region", "namespace", "base-url", "debug", "timeout"}
 		if !contains(validKeys, key) {
 			CheckError(fmt.Errorf("invalid configuration key '%s'. Valid keys are: %v", key, validKeys))
 		}
 
-		// Set the value in viper
+		// Load existing config first to preserve other values
+		existingCfg, err := config.GetConfig()
+		if err != nil {
+			// If config doesn't exist or is invalid, start with defaults
+			existingCfg = &config.Config{
+				RefreshToken: viper.GetString("refresh-token"),
+				Region:       viper.GetString("region"),
+				Namespace:    viper.GetString("namespace"),
+				BaseURL:      viper.GetString("base-url"),
+				Debug:        viper.GetBool("debug"),
+				Timeout:      viper.GetInt("timeout"),
+				OutputFormat: viper.GetString("output-format"),
+			}
+		}
+
+		// Set the new value in viper
 		viper.Set(key, value)
 
-		// Create a config object to save
+		// Create a config object with the updated value
 		cfg := &config.Config{
-			RefreshToken: viper.GetString("refresh-token"),
-			Region:       viper.GetString("region"),
-			BaseURL:      viper.GetString("base-url"),
-			Debug:        viper.GetBool("debug"),
-			Timeout:      viper.GetInt("timeout"),
+			RefreshToken: existingCfg.RefreshToken,
+			Region:       existingCfg.Region,
+			Namespace:    existingCfg.Namespace,
+			BaseURL:      existingCfg.BaseURL,
+			Debug:        existingCfg.Debug,
+			Timeout:      existingCfg.Timeout,
+			OutputFormat: existingCfg.OutputFormat,
+		}
+
+		// Update the specific field that was changed
+		switch key {
+		case "refresh-token":
+			cfg.RefreshToken = value
+		case "region":
+			cfg.Region = value
+		case "namespace":
+			cfg.Namespace = value
+		case "base-url":
+			cfg.BaseURL = value
+		case "debug":
+			cfg.Debug = viper.GetBool("debug")
+		case "timeout":
+			cfg.Timeout = viper.GetInt("timeout")
 		}
 
 		// Save the configuration
-		err := config.SaveConfig(cfg)
+		err = config.SaveConfig(cfg)
 		CheckError(err)
 
 		fmt.Printf("Configuration saved: %s = %s\n", key, value)
@@ -117,6 +151,7 @@ var configInitCmd = &cobra.Command{
 		// Set values
 		viper.Set("refresh-token", refreshToken)
 		viper.Set("region", region)
+		viper.Set("namespace", "") // Default to empty namespace
 		viper.Set("base-url", config.Defaults.BaseURL)
 		viper.Set("debug", config.Defaults.Debug)
 		viper.Set("timeout", config.Defaults.Timeout)
@@ -125,9 +160,11 @@ var configInitCmd = &cobra.Command{
 		cfg := &config.Config{
 			RefreshToken: refreshToken,
 			Region:       region,
+			Namespace:    "", // Default to empty namespace
 			BaseURL:      config.Defaults.BaseURL,
 			Debug:        config.Defaults.Debug,
 			Timeout:      config.Defaults.Timeout,
+			OutputFormat: config.Defaults.OutputFormat,
 		}
 
 		// Save the configuration

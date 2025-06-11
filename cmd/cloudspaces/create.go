@@ -18,31 +18,39 @@ func NewCreateCommand() *cobra.Command {
 		Short: "Create a new cloudspace",
 		Long: `Create a new cloudspace in the specified namespace.
 
+The namespace can be specified via:
+- The --namespace/-n flag
+- The 'namespace' field in your config file
+- The SPOTCTL_NAMESPACE environment variable
+
 Examples:
-  # Create a cloudspace with required parameters
+  # Create a cloudspace using namespace from config
+  spotctl cloudspaces create my-cloudspace --region uk-lon-1 --kubernetes-version 1.31.1
+
+  # Create a cloudspace with specific namespace (overrides config)
   spotctl cloudspaces create my-cloudspace --namespace org-abc123 --region uk-lon-1 --kubernetes-version 1.31.1
 
   # Create a cloudspace with webhook
-  spotctl cloudspaces create my-cloudspace --namespace org-abc123 --region uk-lon-1 --kubernetes-version 1.31.1 --webhook https://hooks.slack.com/services/...
+  spotctl cloudspaces create my-cloudspace --region uk-lon-1 --kubernetes-version 1.31.1 --webhook https://hooks.slack.com/services/...
 
   # Create a cloudspace with HA control plane
-  spotctl cloudspaces create my-cloudspace --namespace org-abc123 --region uk-lon-1 --kubernetes-version 1.31.1 --ha-control-plane
+  spotctl cloudspaces create my-cloudspace --region uk-lon-1 --kubernetes-version 1.31.1 --ha-control-plane
 
   # Create a cloudspace with custom cloud provider
-  spotctl cloudspaces create my-cloudspace --namespace org-abc123 --region uk-lon-1 --kubernetes-version 1.31.1 --cloud custom
+  spotctl cloudspaces create my-cloudspace --region uk-lon-1 --kubernetes-version 1.31.1 --cloud custom
 
   # Create a cloudspace from a spec file
-  spotctl cloudspaces create my-cloudspace --namespace org-abc123 --file spec.json
+  spotctl cloudspaces create my-cloudspace --file spec.json
 
   # Create a cloudspace from a file but override the cloud provider
-  spotctl cloudspaces create my-cloudspace --namespace org-abc123 --file spec.json --cloud custom`,
+  spotctl cloudspaces create my-cloudspace --file spec.json --cloud custom`,
 		Args: cobra.ExactArgs(1),
 		RunE: runCreate,
 	}
 
 	// Add flags for cloudspaces create command
 	cmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml)")
-	cmd.Flags().StringP("namespace", "n", "", "Namespace to create the cloudspace in (required)")
+	cmd.Flags().StringP("namespace", "n", "", "Namespace to create the cloudspace in (overrides config)")
 	cmd.Flags().StringP("file", "f", "", "Path to JSON file containing cloudspace spec")
 	cmd.Flags().StringP("region", "r", "", "Region to deploy the cloudspace in (required unless using --file)")
 	cmd.Flags().String("kubernetes-version", "", "Kubernetes version for the cloudspace (required unless using --file)")
@@ -57,8 +65,12 @@ Examples:
 func runCreate(cmd *cobra.Command, args []string) error {
 	cloudspaceName := args[0] // Get name from positional argument
 
-	// Get flag values
-	namespace, _ := cmd.Flags().GetString("namespace")
+	namespace, err := getNamespace(cmd)
+	if err != nil {
+		return err
+	}
+
+	// Get other flag values
 	file, _ := cmd.Flags().GetString("file")
 	region, _ := cmd.Flags().GetString("region")
 	kubernetesVersion, _ := cmd.Flags().GetString("kubernetes-version")
@@ -71,9 +83,6 @@ func runCreate(cmd *cobra.Command, args []string) error {
 	// Validate required fields
 	if cloudspaceName == "" {
 		return fmt.Errorf("cloudspace name is required (use positional argument)")
-	}
-	if namespace == "" {
-		return fmt.Errorf("namespace is required (use --namespace flag)")
 	}
 
 	cfg, err := config.GetConfig()
@@ -105,7 +114,7 @@ func runCreate(cmd *cobra.Command, args []string) error {
 		// Override file values with flags (flag has default "default")
 		cloudSpace.Spec.Cloud = cloud
 	} else {
-		// Build from flags
+		// Build from flags - validate required fields
 		if region == "" {
 			return fmt.Errorf("region is required (use --region flag or --file)")
 		}

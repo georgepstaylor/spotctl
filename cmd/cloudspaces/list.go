@@ -16,8 +16,16 @@ func NewListCommand() *cobra.Command {
 		Short: "List cloudspaces in a namespace",
 		Long: `List all cloudspaces in the specified namespace.
 
+The namespace can be specified via:
+- The --namespace/-n flag
+- The 'namespace' field in your config file
+- The SPOTCTL_NAMESPACE environment variable
+
 Examples:
-  # List cloudspaces in a specific namespace
+  # List cloudspaces using namespace from config
+  spotctl cloudspaces list
+
+  # List cloudspaces in a specific namespace (overrides config)
   spotctl cloudspaces list --namespace my-namespace
 
   # List cloudspaces with detailed output
@@ -31,15 +39,15 @@ Examples:
 
 	// Add flags for cloudspaces list command
 	cmd.Flags().StringP("output", "o", "table", "Output format (table, json, yaml, wide)")
-	cmd.Flags().StringP("namespace", "n", "", "Namespace to list cloudspaces from (required)")
+	cmd.Flags().StringP("namespace", "n", "", "Namespace to list cloudspaces from (overrides config)")
 
 	return cmd
 }
 
 func runList(cmd *cobra.Command, args []string) error {
-	namespace, _ := cmd.Flags().GetString("namespace")
-	if namespace == "" {
-		return fmt.Errorf("namespace is required")
+	namespace, err := getNamespace(cmd)
+	if err != nil {
+		return err
 	}
 
 	cfg, err := config.GetConfig()
