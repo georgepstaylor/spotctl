@@ -1,33 +1,34 @@
 # Test Coverage Report
 
-Generated on: Tue Jun 10 23:51:59 UTC 2025
+Generated on: Wed Jun 11 00:11:32 UTC 2025
 
 ## Coverage Summary
 
 ```
 github.com/georgetaylor/spotctl/cmd/cloudspaces/cloudspaces.go:6:	NewCommand			0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:14:		getCloudSpacesTableConfig	100.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:33:		outputCloudSpaces		0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:79:		outputCreatedCloudSpace		0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:106:		outputCloudSpace		0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:16:		getCloudSpacesTableConfig	100.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:35:		outputCloudSpaces		0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:81:		outputCreatedCloudSpace		0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:108:		outputCloudSpace		0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:135:		getNamespace			0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:15:		NewCreateCommand		0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:57:		runCreate			0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:145:		loadCloudSpaceSpecFromFile	0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:65:		runCreate			0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:154:		loadCloudSpaceSpecFromFile	0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:13:		NewDeleteCommand		0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:36:		runDelete			0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:44:		runDelete			0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/edit.go:13:		NewEditCommand			100.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/edit.go:64:		runEdit				0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/edit.go:71:		runEdit				0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/get.go:13:		NewGetCommand			0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/get.go:42:		runGet				0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/get.go:50:		runGet				0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/list.go:13:		NewListCommand			0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/list.go:39:		runList				0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/list.go:47:		runList				0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:13:			AddOutputFlag			0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:18:			GetOutputFormat			0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:24:			ConfirmAction			0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:32:			CheckError			0.0%
-github.com/georgetaylor/spotctl/cmd/config.go:143:			init				0.0%
-github.com/georgetaylor/spotctl/cmd/config.go:154:			contains			0.0%
-github.com/georgetaylor/spotctl/cmd/config.go:164:			min				0.0%
+github.com/georgetaylor/spotctl/cmd/config.go:180:			init				0.0%
+github.com/georgetaylor/spotctl/cmd/config.go:191:			contains			0.0%
+github.com/georgetaylor/spotctl/cmd/config.go:201:			min				0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/config.go:11:		getOrganizationsTableConfig	0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/config.go:25:		outputOrganizations		0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/list.go:13:		NewListCommand			0.0%
@@ -44,7 +45,7 @@ github.com/georgetaylor/spotctl/cmd/regions/list.go:31:			runList				0.0%
 github.com/georgetaylor/spotctl/cmd/regions/regions.go:6:		NewCommand			0.0%
 github.com/georgetaylor/spotctl/cmd/root.go:32:				Execute				0.0%
 github.com/georgetaylor/spotctl/cmd/root.go:36:				init				0.0%
-github.com/georgetaylor/spotctl/cmd/root.go:61:				initConfig			0.0%
+github.com/georgetaylor/spotctl/cmd/root.go:63:				initConfig			0.0%
 github.com/georgetaylor/spotctl/cmd/serverclasses/config.go:11:		getServerClassesTableConfig	0.0%
 github.com/georgetaylor/spotctl/cmd/serverclasses/config.go:33:		outputServerClasses		0.0%
 github.com/georgetaylor/spotctl/cmd/serverclasses/config.go:64:		outputServerClass		0.0%
@@ -114,10 +115,10 @@ github.com/georgetaylor/spotctl/pkg/client/generic.go:236:		validatePatchOperati
 github.com/georgetaylor/spotctl/pkg/client/patch.go:17:			LoadPatchOperations		0.0%
 github.com/georgetaylor/spotctl/pkg/client/patch.go:32:			DisplayPatchOperations		0.0%
 github.com/georgetaylor/spotctl/pkg/client/patch.go:62:			PromptForConfirmation		0.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:36:		ValidateConfig			100.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:62:		GetConfig			0.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:84:		SaveConfig			0.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:123:		InitConfig			0.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:39:		ValidateConfig			100.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:65:		GetConfig			0.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:88:		SaveConfig			0.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:129:		InitConfig			0.0%
 github.com/georgetaylor/spotctl/pkg/errors/errors.go:30:		Error				0.0%
 github.com/georgetaylor/spotctl/pkg/errors/errors.go:37:		Unwrap				0.0%
 github.com/georgetaylor/spotctl/pkg/errors/errors.go:42:		NewAPIError			0.0%
@@ -146,7 +147,7 @@ github.com/georgetaylor/spotctl/pkg/pager/pager.go:151:			isTerminal			100.0%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:156:			getTerminalHeight		44.4%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:179:			getTerminalHeightStty		50.0%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:198:			WriteToWriter			0.0%
-total:									(statements)			21.9%
+total:									(statements)			21.6%
 ```
 
 ## Coverage Status
@@ -154,28 +155,29 @@ total:									(statements)			21.9%
 | Package | Coverage | Status |
 |---------|----------|--------|
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/cloudspaces.go:6: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:14: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:33: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:79: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:106: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:16: | 100.0% | ✅ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:35: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:81: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:108: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:135: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:15: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:57: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:145: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:65: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:154: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:13: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:36: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:44: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/edit.go:13: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/edit.go:64: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/edit.go:71: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/get.go:13: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/get.go:42: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/get.go:50: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/list.go:13: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/list.go:39: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/list.go:47: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/common.go:13: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/common.go:18: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/common.go:24: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/common.go:32: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/config.go:143: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/config.go:154: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/config.go:164: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/config.go:180: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/config.go:191: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/config.go:201: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/config.go:11: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/config.go:25: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/list.go:13: | 0.0% | ❌ |
@@ -192,7 +194,7 @@ total:									(statements)			21.9%
 | github.com/georgetaylor/spotctl/cmd/regions/regions.go:6: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/root.go:32: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/root.go:36: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/root.go:61: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/root.go:63: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/serverclasses/config.go:11: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/serverclasses/config.go:33: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/serverclasses/config.go:64: | 0.0% | ❌ |
@@ -262,10 +264,10 @@ total:									(statements)			21.9%
 | github.com/georgetaylor/spotctl/pkg/client/patch.go:17: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/patch.go:32: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/patch.go:62: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:36: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:62: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:84: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:123: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:39: | 100.0% | ✅ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:65: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:88: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:129: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/errors/errors.go:30: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/errors/errors.go:37: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/errors/errors.go:42: | 0.0% | ❌ |
@@ -299,13 +301,14 @@ total:									(statements)			21.9%
 
 | File | Coverage | Status |
 |------|----------|--------|
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:14: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:33: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:79: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:106: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/config.go:143: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/config.go:154: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/config.go:164: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:16: | 100.0% | ✅ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:35: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:81: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:108: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:135: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/config.go:180: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/config.go:191: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/config.go:201: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/config.go:11: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/config.go:25: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/regions/config.go:11: | 0.0% | ❌ |
@@ -363,37 +366,38 @@ total:									(statements)			21.9%
 | github.com/georgetaylor/spotctl/pkg/client/patch.go:17: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/patch.go:32: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/patch.go:62: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:36: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:62: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:84: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:123: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:39: | 100.0% | ✅ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:65: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:88: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:129: | 0.0% | ❌ |
 
 ## Untested Files
 
 ```
 github.com/georgetaylor/spotctl/cmd/cloudspaces/cloudspaces.go:6:	NewCommand			0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:14:		getCloudSpacesTableConfig	100.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:33:		outputCloudSpaces		0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:79:		outputCreatedCloudSpace		0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:106:		outputCloudSpace		0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:16:		getCloudSpacesTableConfig	100.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:35:		outputCloudSpaces		0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:81:		outputCreatedCloudSpace		0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:108:		outputCloudSpace		0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:135:		getNamespace			0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:15:		NewCreateCommand		0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:57:		runCreate			0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:145:		loadCloudSpaceSpecFromFile	0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:65:		runCreate			0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/create.go:154:		loadCloudSpaceSpecFromFile	0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:13:		NewDeleteCommand		0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:36:		runDelete			0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/delete.go:44:		runDelete			0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/edit.go:13:		NewEditCommand			100.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/edit.go:64:		runEdit				0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/edit.go:71:		runEdit				0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/get.go:13:		NewGetCommand			0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/get.go:42:		runGet				0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/get.go:50:		runGet				0.0%
 github.com/georgetaylor/spotctl/cmd/cloudspaces/list.go:13:		NewListCommand			0.0%
-github.com/georgetaylor/spotctl/cmd/cloudspaces/list.go:39:		runList				0.0%
+github.com/georgetaylor/spotctl/cmd/cloudspaces/list.go:47:		runList				0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:13:			AddOutputFlag			0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:18:			GetOutputFormat			0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:24:			ConfirmAction			0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:32:			CheckError			0.0%
-github.com/georgetaylor/spotctl/cmd/config.go:143:			init				0.0%
-github.com/georgetaylor/spotctl/cmd/config.go:154:			contains			0.0%
-github.com/georgetaylor/spotctl/cmd/config.go:164:			min				0.0%
+github.com/georgetaylor/spotctl/cmd/config.go:180:			init				0.0%
+github.com/georgetaylor/spotctl/cmd/config.go:191:			contains			0.0%
+github.com/georgetaylor/spotctl/cmd/config.go:201:			min				0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/config.go:11:		getOrganizationsTableConfig	0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/config.go:25:		outputOrganizations		0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/list.go:13:		NewListCommand			0.0%
@@ -410,7 +414,7 @@ github.com/georgetaylor/spotctl/cmd/regions/list.go:31:			runList				0.0%
 github.com/georgetaylor/spotctl/cmd/regions/regions.go:6:		NewCommand			0.0%
 github.com/georgetaylor/spotctl/cmd/root.go:32:				Execute				0.0%
 github.com/georgetaylor/spotctl/cmd/root.go:36:				init				0.0%
-github.com/georgetaylor/spotctl/cmd/root.go:61:				initConfig			0.0%
+github.com/georgetaylor/spotctl/cmd/root.go:63:				initConfig			0.0%
 github.com/georgetaylor/spotctl/cmd/serverclasses/config.go:11:		getServerClassesTableConfig	0.0%
 github.com/georgetaylor/spotctl/cmd/serverclasses/config.go:33:		outputServerClasses		0.0%
 github.com/georgetaylor/spotctl/cmd/serverclasses/config.go:64:		outputServerClass		0.0%
@@ -464,10 +468,10 @@ github.com/georgetaylor/spotctl/pkg/client/generic.go:236:		validatePatchOperati
 github.com/georgetaylor/spotctl/pkg/client/patch.go:17:			LoadPatchOperations		0.0%
 github.com/georgetaylor/spotctl/pkg/client/patch.go:32:			DisplayPatchOperations		0.0%
 github.com/georgetaylor/spotctl/pkg/client/patch.go:62:			PromptForConfirmation		0.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:36:		ValidateConfig			100.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:62:		GetConfig			0.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:84:		SaveConfig			0.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:123:		InitConfig			0.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:39:		ValidateConfig			100.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:65:		GetConfig			0.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:88:		SaveConfig			0.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:129:		InitConfig			0.0%
 github.com/georgetaylor/spotctl/pkg/errors/errors.go:30:		Error				0.0%
 github.com/georgetaylor/spotctl/pkg/errors/errors.go:37:		Unwrap				0.0%
 github.com/georgetaylor/spotctl/pkg/errors/errors.go:42:		NewAPIError			0.0%
