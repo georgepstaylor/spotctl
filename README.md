@@ -1,13 +1,6 @@
 # 🚀 spotctl
 
-A modern CLI for managing Rackspace Spot resources with style and simplicity.
-
-## ✨ Features
-
-- 🎯 **Resource Management** - Organizations, regions, server classes, and cloudspaces
-- ⚙️ **Smart Configuration** - Interactive setup with multiple auth methods
-- 📊 **Flexible Output** - Table, JSON, and YAML formats with intelligent paging
-- 🌍 **Cross-Platform** - Linux, macOS, and Windows support
+A CLI for managing Rackspace Spot resources.
 
 ## 📦 Installation
 
@@ -45,7 +38,7 @@ spotctl config set refresh-token your-token-here
 spotctl config set region uk-lon-1
 ```
 
-### Alternative Methods
+#### Alternative Methods
 
 ```bash
 # Environment variables
@@ -56,9 +49,14 @@ export SPOTCTL_REGION=uk-lon-1
 spotctl --refresh-token your-token --region uk-lon-1 regions list
 ```
 
+#### ~/.spot/config.yaml
+You can manually configure this file (rather than using `spotctl config` to create it.
+
+See [example](config.example.yaml).
+
 ## 🎮 Usage
 
-### Quick Commands
+### Command examples
 
 ```bash
 # List available regions
@@ -70,11 +68,11 @@ spotctl organizations list
 # List server classes with details
 spotctl serverclasses list --details
 
+# Get specific server class info
+spotctl serverclasses get <spot class>
+
 # List cloudspaces in a namespace
 spotctl cloudspaces list my-namespace
-
-# Get specific server class info
-spotctl serverclasses get standard-2-4-80
 ```
 
 ### Output Formats
@@ -90,24 +88,23 @@ spotctl regions list --output json
 spotctl regions list --output yaml
 
 # Detailed view with extra columns
-spotctl regions list --details
+spotctl regions list -o wide
 ```
 
 ### Global Options
 
-| Flag           | Description                            |
-| -------------- | -------------------------------------- |
-| `--output, -o` | Output format: `table`, `json`, `yaml` |
-| `--details`    | Show additional columns                |
-| `--no-pager`   | Disable automatic paging               |
-| `--debug`      | Enable debug output                    |
+| Flag           | Description                                    |
+| -------------- | ---------------------------------------------- |
+| `--output, -o` | Output format: `table`, `wide`, `json`, `yaml` |
+| `--no-pager`   | Disable automatic paging                       |
+| `--debug`      | Enable debug output                            |
 
 ## 🛠️ Development
 
 ### Prerequisites
 
 - Go 1.24+
-- Make (optional)
+- Make
 
 ### Commands
 
@@ -121,14 +118,15 @@ make dev        # Format, lint, test, build
 
 ```
 spotctl/
-├── cmd/          # CLI commands
-├── pkg/          # Public packages
-│   ├── client/   # API client
-│   ├── config/   # Configuration
-│   ├── output/   # Formatters
-│   └── pager/    # Output paging
-├── internal/     # Private utilities
-└── main.go       # Entry point
+├── cmd/           # CLI commands
+│   ├── <cmd name> # eg region, cloudspace
+├── pkg/           # Public packages
+│   ├── client/    # API client
+│   ├── config/    # Configuration
+│   ├── output/    # Formatters
+│   └── pager/     # Output paging
+├── internal/      # Private utilities
+└── main.go        # Entry point
 ```
 
 ## 🤝 Contributing
