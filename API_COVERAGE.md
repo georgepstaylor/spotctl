@@ -47,5 +47,5 @@ Legend:
 
 ## Implementation Summary
 
-**Implemented:** 15/24 endpoints (62.5%)
-**Remaining:** 9/24 endpoints (37.5%)
+**Implemented:** 16/25 endpoints (64.0%)
+**Remaining:** 9/25 endpoints (36.0%)
