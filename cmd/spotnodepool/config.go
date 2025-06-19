@@ -4,8 +4,10 @@ import (
 	"fmt"
 
 	"github.com/georgetaylor/spotctl/pkg/client"
+	"github.com/georgetaylor/spotctl/pkg/config"
 	"github.com/georgetaylor/spotctl/pkg/output"
 	"github.com/georgetaylor/spotctl/pkg/pager"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -129,4 +131,26 @@ func outputCreatedSpotNodePool(spotNodePool *client.SpotNodePool, format string)
 	// Use standard table config for created spot node pools
 	tableConfig := getSpotNodePoolTableConfig()
 	return formatter.Output(spotNodePool, tableConfig)
+}
+
+// getNamespace resolves the namespace to use, with flag taking precedence over config
+func getNamespace(cmd *cobra.Command) (string, error) {
+	// Check if namespace was provided via flag
+	namespace, _ := cmd.Flags().GetString("namespace")
+	if namespace != "" {
+		return namespace, nil
+	}
+
+	// Fall back to config namespace
+	cfg, err := config.GetConfig()
+	if err != nil {
+		return "", fmt.Errorf("failed to load config: %w", err)
+	}
+
+	if cfg.Namespace != "" {
+		return cfg.Namespace, nil
+	}
+
+	// No namespace configured
+	return "", fmt.Errorf("namespace is required: set it via --namespace flag, config file, or SPOTCTL_NAMESPACE environment variable")
 }

@@ -550,3 +550,128 @@ func TestCreateSpotNodePool(t *testing.T) {
 		})
 	}
 }
+
+func TestDeleteAllSpotNodePools(t *testing.T) {
+	tests := []struct {
+		name             string
+		namespace        string
+		mockResponse     string
+		mockStatus       int
+		expectError      bool
+		expectedErrorMsg string
+	}{
+		{
+			name:      "successful delete all spotnodepools",
+			namespace: "test-namespace",
+			mockResponse: `{
+				"apiVersion": "v1",
+				"kind": "Status",
+				"status": "Success",
+				"message": "All spot node pools deleted successfully"
+			}`,
+			mockStatus:  200,
+			expectError: false,
+		},
+		{
+			name:             "missing namespace",
+			namespace:        "",
+			expectError:      true,
+			expectedErrorMsg: "namespace is required",
+		},
+		{
+			name:             "404 error",
+			namespace:        "test-namespace",
+			mockResponse:     `{"error": "namespace not found"}`,
+			mockStatus:       404,
+			expectError:      true,
+			expectedErrorMsg: "API error 404",
+		},
+		{
+			name:             "unauthorized error",
+			namespace:        "test-namespace",
+			mockResponse:     `{"error": "unauthorized"}`,
+			mockStatus:       401,
+			expectError:      true,
+			expectedErrorMsg: "API error 401",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Skip server setup for namespace validation test
+			if tt.namespace == "" {
+				client := &Client{}
+				_, err := client.DeleteAllSpotNodePools(context.Background(), tt.namespace)
+				if !tt.expectError {
+					t.Errorf("expected error but got none")
+					return
+				}
+				if err == nil || err.Error() != tt.expectedErrorMsg {
+					t.Errorf("expected error message %q, got %q", tt.expectedErrorMsg, err.Error())
+				}
+				return
+			}
+
+			// Create mock server
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				expectedPath := "/ngpc.rxt.io/v1/namespaces/" + tt.namespace + "/spotnodepools"
+				if r.URL.Path != expectedPath {
+					t.Errorf("expected path %s, got %s", expectedPath, r.URL.Path)
+				}
+
+				if r.Method != "DELETE" {
+					t.Errorf("expected DELETE method, got %s", r.Method)
+				}
+
+				w.WriteHeader(tt.mockStatus)
+				w.Write([]byte(tt.mockResponse))
+			}))
+			defer server.Close()
+
+			// Create client with mock server
+			cfg := &config.Config{
+				RefreshToken: "test-token",
+				BaseURL:      server.URL,
+				Debug:        false,
+				Timeout:      30,
+			}
+
+			// Create client with mock token manager
+			client := NewClient(cfg)
+			client.tokenManager = &MockTokenManager{
+				accessToken: "mock-access-token",
+			}
+
+			// Call the method
+			deleteResponse, err := client.DeleteAllSpotNodePools(context.Background(), tt.namespace)
+
+			// Check error expectation
+			if tt.expectError && err == nil {
+				t.Errorf("expected error but got none")
+				return
+			}
+
+			if !tt.expectError && err != nil {
+				t.Errorf("expected no error but got: %v", err)
+				return
+			}
+
+			if tt.expectError {
+				if !strings.Contains(err.Error(), tt.expectedErrorMsg) {
+					t.Errorf("expected error message to contain %q, got %q", tt.expectedErrorMsg, err.Error())
+				}
+				return
+			}
+
+			// Check success cases
+			if deleteResponse == nil {
+				t.Errorf("expected delete response but got nil")
+				return
+			}
+
+			if deleteResponse.Status != "Success" {
+				t.Errorf("expected status Success, got %s", deleteResponse.Status)
+			}
+		})
+	}
+}

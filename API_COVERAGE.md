@@ -24,7 +24,7 @@ This document tracks the implementation status of the Rackspace Spot Public API 
 | **Spot Node Pools**              |
 | GET /spotnodepools               | `spotctl spotnodepool list`            | ✅     |
 | POST /spotnodepools              | `spotctl spotnodepools create`         | ✅     |
-| DELETE /spotnodepools            | `spotctl spotnodepools delete-all`     | ❌     |
+| DELETE /spotnodepools            | `spotctl spotnodepools delete-all`     | ✅     |
 | GET /spotnodepools/{name}        | `spotctl spotnodepool get <name>`      | ✅     |
 | DELETE /spotnodepools/{name}     | `spotctl spotnodepools delete`         | ❌     |
 | PATCH /spotnodepools/{name}      | `spotctl spotnodepools edit`           | ✅     |
@@ -48,5 +48,5 @@ Legend:
 
 ## Implementation Summary
 
-**Implemented:** 13/24 endpoints (54.2%)
-**Remaining:** 11/24 endpoints (45.8%)
+**Implemented:** 14/24 endpoints (58.3%)
+**Remaining:** 10/24 endpoints (41.7%)
