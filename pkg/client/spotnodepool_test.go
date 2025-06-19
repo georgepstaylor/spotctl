@@ -551,6 +551,143 @@ func TestCreateSpotNodePool(t *testing.T) {
 	}
 }
 
+func TestDeleteSpotNodePool(t *testing.T) {
+	tests := []struct {
+		name             string
+		namespace        string
+		spotNodePoolName string
+		mockResponse     string
+		mockStatus       int
+		expectError      bool
+		expectedErrorMsg string
+	}{
+		{
+			name:             "successful delete spotnodepool",
+			namespace:        "test-namespace",
+			spotNodePoolName: "test-spotnodepool",
+			mockResponse: `{
+				"apiVersion": "v1",
+				"kind": "Status",
+				"status": "Success",
+				"message": "Spot node pool deleted successfully"
+			}`,
+			mockStatus:  200,
+			expectError: false,
+		},
+		{
+			name:             "missing namespace",
+			namespace:        "",
+			spotNodePoolName: "test-spotnodepool",
+			expectError:      true,
+			expectedErrorMsg: "namespace is required",
+		},
+		{
+			name:             "missing spotnodepool name",
+			namespace:        "test-namespace",
+			spotNodePoolName: "",
+			expectError:      true,
+			expectedErrorMsg: "spot node pool name is required",
+		},
+		{
+			name:             "404 error",
+			namespace:        "test-namespace",
+			spotNodePoolName: "test-spotnodepool",
+			mockResponse:     `{"error": "spot node pool not found"}`,
+			mockStatus:       404,
+			expectError:      true,
+			expectedErrorMsg: "API error 404",
+		},
+		{
+			name:             "unauthorized error",
+			namespace:        "test-namespace",
+			spotNodePoolName: "test-spotnodepool",
+			mockResponse:     `{"error": "unauthorized"}`,
+			mockStatus:       401,
+			expectError:      true,
+			expectedErrorMsg: "API error 401",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Skip server setup for validation tests
+			if tt.namespace == "" || tt.spotNodePoolName == "" {
+				client := &Client{}
+				_, err := client.DeleteSpotNodePool(context.Background(), tt.namespace, tt.spotNodePoolName)
+				if !tt.expectError {
+					t.Errorf("expected error but got none")
+					return
+				}
+				if err == nil || !strings.Contains(err.Error(), tt.expectedErrorMsg) {
+					t.Errorf("expected error message to contain %q, got %q", tt.expectedErrorMsg, err.Error())
+				}
+				return
+			}
+
+			// Create mock server
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				expectedPath := "/ngpc.rxt.io/v1/namespaces/" + tt.namespace + "/spotnodepools/" + tt.spotNodePoolName
+				if r.URL.Path != expectedPath {
+					t.Errorf("expected path %s, got %s", expectedPath, r.URL.Path)
+				}
+
+				if r.Method != "DELETE" {
+					t.Errorf("expected DELETE method, got %s", r.Method)
+				}
+
+				w.WriteHeader(tt.mockStatus)
+				w.Write([]byte(tt.mockResponse))
+			}))
+			defer server.Close()
+
+			// Create client with mock server
+			cfg := &config.Config{
+				RefreshToken: "test-token",
+				BaseURL:      server.URL,
+				Debug:        false,
+				Timeout:      30,
+			}
+
+			// Create client with mock token manager
+			client := NewClient(cfg)
+			client.tokenManager = &MockTokenManager{
+				accessToken: "mock-access-token",
+			}
+
+			// Call the method
+			deleteResponse, err := client.DeleteSpotNodePool(context.Background(), tt.namespace, tt.spotNodePoolName)
+
+			// Check error expectation
+			if tt.expectError && err == nil {
+				t.Errorf("expected error but got none")
+				return
+			}
+
+			if !tt.expectError && err != nil {
+				t.Errorf("expected no error but got: %v", err)
+				return
+			}
+
+			if tt.expectError {
+				if !strings.Contains(err.Error(), tt.expectedErrorMsg) {
+					t.Errorf("expected error message to contain %q, got %q", tt.expectedErrorMsg, err.Error())
+				}
+				return
+			}
+
+			// Check success cases
+			if deleteResponse == nil {
+				t.Errorf("expected delete response but got nil")
+				return
+			}
+
+			if deleteResponse.Status != "Success" {
+				t.Errorf("expected status Success, got %s", deleteResponse.Status)
+			}
+		})
+	}
+}
+
 func TestDeleteAllSpotNodePools(t *testing.T) {
 	tests := []struct {
 		name             string

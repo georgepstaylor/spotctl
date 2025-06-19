@@ -453,6 +453,28 @@ func (c *Client) GetSpotNodePool(ctx context.Context, namespace, name string, ap
 	return genericGet[SpotNodePool](c, ctx, endpoint, GetOptions{Namespace: namespace, Name: name, APIVersion: version})
 }
 
+// DeleteSpotNodePool deletes a spot node pool by name in the specified namespace
+func (c *Client) DeleteSpotNodePool(ctx context.Context, namespace, name string, apiVersion ...APIVersion) (*DeleteResponse, error) {
+	if err := validateNamespace(namespace); err != nil {
+		return nil, err
+	}
+	if err := validateName(name); err != nil {
+		return nil, fmt.Errorf("spot node pool name is required")
+	}
+
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
+	endpoint := fmt.Sprintf("/namespaces/%s/spotnodepools/%s", namespace, name)
+	return genericDelete[DeleteResponse](c, ctx, endpoint, DeleteOptions{
+		Namespace:    namespace,
+		Name:         name,
+		ResourceType: "SpotNodePool",
+		APIVersion:   version,
+	})
+}
+
 // DeleteAllSpotNodePools deletes all spot node pools in the specified namespace
 func (c *Client) DeleteAllSpotNodePools(ctx context.Context, namespace string, apiVersion ...APIVersion) (*DeleteResponse, error) {
 	if err := validateNamespace(namespace); err != nil {
