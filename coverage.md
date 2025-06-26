@@ -1,6 +1,6 @@
 # Test Coverage Report
 
-Generated on: Thu Jun 19 21:27:26 UTC 2025
+Generated on: Thu Jun 26 21:13:21 UTC 2025
 
 ## Coverage Summary
 
@@ -26,9 +26,9 @@ github.com/georgetaylor/spotctl/cmd/common.go:13:			AddOutputFlag			0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:18:			GetOutputFormat			0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:24:			ConfirmAction			0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:32:			CheckError			0.0%
-github.com/georgetaylor/spotctl/cmd/config.go:180:			init				0.0%
-github.com/georgetaylor/spotctl/cmd/config.go:191:			contains			0.0%
-github.com/georgetaylor/spotctl/cmd/config.go:201:			min				0.0%
+github.com/georgetaylor/spotctl/cmd/config.go:164:			init				0.0%
+github.com/georgetaylor/spotctl/cmd/config.go:175:			contains			0.0%
+github.com/georgetaylor/spotctl/cmd/config.go:185:			min				0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/config.go:11:		getOrganizationsTableConfig	0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/config.go:25:		outputOrganizations		0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/list.go:13:		NewListCommand			0.0%
@@ -121,10 +121,10 @@ github.com/georgetaylor/spotctl/pkg/client/generic.go:236:		validatePatchOperati
 github.com/georgetaylor/spotctl/pkg/client/patch.go:17:			LoadPatchOperations		0.0%
 github.com/georgetaylor/spotctl/pkg/client/patch.go:32:			DisplayPatchOperations		0.0%
 github.com/georgetaylor/spotctl/pkg/client/patch.go:62:			PromptForConfirmation		0.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:39:		ValidateConfig			100.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:65:		GetConfig			0.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:88:		SaveConfig			0.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:129:		InitConfig			0.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:38:		ValidateConfig			100.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:57:		GetConfig			0.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:80:		SaveConfig			0.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:120:		InitConfig			0.0%
 github.com/georgetaylor/spotctl/pkg/errors/errors.go:30:		Error				0.0%
 github.com/georgetaylor/spotctl/pkg/errors/errors.go:37:		Unwrap				0.0%
 github.com/georgetaylor/spotctl/pkg/errors/errors.go:42:		NewAPIError			0.0%
@@ -153,7 +153,7 @@ github.com/georgetaylor/spotctl/pkg/pager/pager.go:151:			isTerminal			100.0%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:156:			getTerminalHeight		44.4%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:179:			getTerminalHeightStty		50.0%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:198:			WriteToWriter			0.0%
-total:									(statements)			22.0%
+total:									(statements)			21.9%
 ```
 
 ## Coverage Status
@@ -181,9 +181,9 @@ total:									(statements)			22.0%
 | github.com/georgetaylor/spotctl/cmd/common.go:18: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/common.go:24: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/common.go:32: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/config.go:180: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/config.go:191: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/config.go:201: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/config.go:164: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/config.go:175: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/config.go:185: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/config.go:11: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/config.go:25: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/list.go:13: | 0.0% | ❌ |
@@ -276,10 +276,10 @@ total:									(statements)			22.0%
 | github.com/georgetaylor/spotctl/pkg/client/patch.go:17: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/patch.go:32: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/patch.go:62: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:39: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:65: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:88: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:129: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:38: | 100.0% | ✅ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:57: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:80: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:120: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/errors/errors.go:30: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/errors/errors.go:37: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/errors/errors.go:42: | 0.0% | ❌ |
@@ -318,9 +318,9 @@ total:									(statements)			22.0%
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:81: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:108: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:135: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/config.go:180: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/config.go:191: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/config.go:201: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/config.go:164: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/config.go:175: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/cmd/config.go:185: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/config.go:11: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/config.go:25: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/regions/config.go:11: | 0.0% | ❌ |
@@ -381,10 +381,10 @@ total:									(statements)			22.0%
 | github.com/georgetaylor/spotctl/pkg/client/patch.go:17: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/patch.go:32: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/pkg/client/patch.go:62: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:39: | 100.0% | ✅ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:65: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:88: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/pkg/config/config.go:129: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:38: | 100.0% | ✅ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:57: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:80: | 0.0% | ❌ |
+| github.com/georgetaylor/spotctl/pkg/config/config.go:120: | 0.0% | ❌ |
 
 ## Untested Files
 
@@ -410,9 +410,9 @@ github.com/georgetaylor/spotctl/cmd/common.go:13:			AddOutputFlag			0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:18:			GetOutputFormat			0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:24:			ConfirmAction			0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:32:			CheckError			0.0%
-github.com/georgetaylor/spotctl/cmd/config.go:180:			init				0.0%
-github.com/georgetaylor/spotctl/cmd/config.go:191:			contains			0.0%
-github.com/georgetaylor/spotctl/cmd/config.go:201:			min				0.0%
+github.com/georgetaylor/spotctl/cmd/config.go:164:			init				0.0%
+github.com/georgetaylor/spotctl/cmd/config.go:175:			contains			0.0%
+github.com/georgetaylor/spotctl/cmd/config.go:185:			min				0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/config.go:11:		getOrganizationsTableConfig	0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/config.go:25:		outputOrganizations		0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/list.go:13:		NewListCommand			0.0%
@@ -486,10 +486,10 @@ github.com/georgetaylor/spotctl/pkg/client/generic.go:236:		validatePatchOperati
 github.com/georgetaylor/spotctl/pkg/client/patch.go:17:			LoadPatchOperations		0.0%
 github.com/georgetaylor/spotctl/pkg/client/patch.go:32:			DisplayPatchOperations		0.0%
 github.com/georgetaylor/spotctl/pkg/client/patch.go:62:			PromptForConfirmation		0.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:39:		ValidateConfig			100.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:65:		GetConfig			0.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:88:		SaveConfig			0.0%
-github.com/georgetaylor/spotctl/pkg/config/config.go:129:		InitConfig			0.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:38:		ValidateConfig			100.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:57:		GetConfig			0.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:80:		SaveConfig			0.0%
+github.com/georgetaylor/spotctl/pkg/config/config.go:120:		InitConfig			0.0%
 github.com/georgetaylor/spotctl/pkg/errors/errors.go:30:		Error				0.0%
 github.com/georgetaylor/spotctl/pkg/errors/errors.go:37:		Unwrap				0.0%
 github.com/georgetaylor/spotctl/pkg/errors/errors.go:42:		NewAPIError			0.0%
