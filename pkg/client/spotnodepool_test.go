@@ -688,6 +688,157 @@ func TestDeleteSpotNodePool(t *testing.T) {
 	}
 }
 
+func TestGetOnDemandNodePool(t *testing.T) {
+	tests := []struct {
+		name                 string
+		namespace            string
+		onDemandNodePoolName string
+		mockResponse         string
+		mockStatus           int
+		expectError          bool
+		expectedErrorMsg     string
+	}{
+		{
+			name:                 "successful ondemandnodepool get",
+			namespace:            "test-namespace",
+			onDemandNodePoolName: "test-ondemandnodepool",
+			mockResponse: `{
+				"apiVersion": "v1",
+				"kind": "OnDemandNodePool", 
+				"metadata": {
+					"name": "test-ondemandnodepool",
+					"namespace": "test-namespace"
+				},
+				"spec": {
+					"serverClass": "gp.vs1.large-lon",
+					"desired": 3,
+					"cloudSpace": "test-cloudspace"
+				},
+				"status": {
+					"reservedCount": 3,
+					"reservedStatus": "Active"
+				}
+			}`,
+			mockStatus:  200,
+			expectError: false,
+		},
+		{
+			name:                 "ondemandnodepool not found",
+			namespace:            "test-namespace",
+			onDemandNodePoolName: "nonexistent-ondemandnodepool",
+			mockResponse:         `{"error": "ondemandnodepool not found"}`,
+			mockStatus:           404,
+			expectError:          true,
+			expectedErrorMsg:     "API error 404",
+		},
+		{
+			name:                 "missing namespace",
+			namespace:            "",
+			onDemandNodePoolName: "test-ondemandnodepool",
+			expectError:          true,
+			expectedErrorMsg:     "namespace is required",
+		},
+		{
+			name:                 "missing ondemandnodepool name",
+			namespace:            "test-namespace",
+			onDemandNodePoolName: "",
+			expectError:          true,
+			expectedErrorMsg:     "on demand node pool name is required",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Skip server setup for validation tests
+			if tt.namespace == "" || tt.onDemandNodePoolName == "" {
+				client := &Client{}
+				_, err := client.GetOnDemandNodePool(context.Background(), tt.namespace, tt.onDemandNodePoolName)
+				if !tt.expectError {
+					t.Errorf("expected error but got none")
+					return
+				}
+				if err == nil || !strings.Contains(err.Error(), tt.expectedErrorMsg) {
+					t.Errorf("expected error message to contain %q, got %q", tt.expectedErrorMsg, err.Error())
+				}
+				return
+			}
+
+			// Create mock server
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				expectedPath := "/ngpc.rxt.io/v1/namespaces/" + tt.namespace + "/ondemandnodepools/" + tt.onDemandNodePoolName
+				if r.URL.Path != expectedPath {
+					t.Errorf("expected path %s, got %s", expectedPath, r.URL.Path)
+				}
+
+				if r.Method != "GET" {
+					t.Errorf("expected GET method, got %s", r.Method)
+				}
+
+				w.WriteHeader(tt.mockStatus)
+				w.Write([]byte(tt.mockResponse))
+			}))
+			defer server.Close()
+
+			// Create client with mock server
+			cfg := &config.Config{
+				RefreshToken: "test-token",
+				BaseURL:      server.URL,
+				Debug:        false,
+				Timeout:      30,
+			}
+
+			// Create client with mock token manager
+			client := NewClient(cfg)
+			client.tokenManager = &MockTokenManager{
+				accessToken: "mock-access-token",
+			}
+
+			// Call the method
+			onDemandNodePool, err := client.GetOnDemandNodePool(context.Background(), tt.namespace, tt.onDemandNodePoolName)
+
+			// Check error expectation
+			if tt.expectError && err == nil {
+				t.Errorf("expected error but got none")
+				return
+			}
+
+			if !tt.expectError && err != nil {
+				t.Errorf("expected no error but got: %v", err)
+				return
+			}
+
+			if tt.expectError {
+				if !strings.Contains(err.Error(), tt.expectedErrorMsg) {
+					t.Errorf("expected error message to contain %q, got %q", tt.expectedErrorMsg, err.Error())
+				}
+				return
+			}
+
+			// Check success cases
+			if onDemandNodePool == nil {
+				t.Errorf("expected ondemandnodepool but got nil")
+				return
+			}
+
+			if onDemandNodePool.Metadata.Name != "test-ondemandnodepool" {
+				t.Errorf("expected name %q, got %q", "test-ondemandnodepool", onDemandNodePool.Metadata.Name)
+			}
+
+			if onDemandNodePool.Metadata.Namespace != "test-namespace" {
+				t.Errorf("expected namespace %q, got %q", "test-namespace", onDemandNodePool.Metadata.Namespace)
+			}
+
+			if onDemandNodePool.Spec.ServerClass != "gp.vs1.large-lon" {
+				t.Errorf("expected server class %q, got %q", "gp.vs1.large-lon", onDemandNodePool.Spec.ServerClass)
+			}
+
+			if onDemandNodePool.Status.ReservedStatus != "Active" {
+				t.Errorf("expected reserved status %q, got %q", "Active", onDemandNodePool.Status.ReservedStatus)
+			}
+		})
+	}
+}
+
 func TestDeleteAllSpotNodePools(t *testing.T) {
 	tests := []struct {
 		name             string

@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/georgetaylor/spotctl/cmd/cloudspaces"
+	ondemandnodepools "github.com/georgetaylor/spotctl/cmd/ondemandnodepool"
 	"github.com/georgetaylor/spotctl/cmd/organizations"
 	"github.com/georgetaylor/spotctl/cmd/regions"
 	"github.com/georgetaylor/spotctl/cmd/serverclasses"
@@ -53,6 +54,7 @@ func init() {
 
 	// Register commands
 	rootCmd.AddCommand(cloudspaces.NewCommand())
+	rootCmd.AddCommand(ondemandnodepools.NewCommand())
 	rootCmd.AddCommand(organizations.NewCommand())
 	rootCmd.AddCommand(regions.NewCommand())
 	rootCmd.AddCommand(serverclasses.NewCommand())

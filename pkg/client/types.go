@@ -271,6 +271,15 @@ type SpotNodePool struct {
 	Status     SpotNodePoolStatus `json:"status,omitempty"`
 }
 
+// OnDemandNodePool represents a Rackspace On Demand node pool
+type OnDemandNodePool struct {
+	APIVersion string                 `json:"apiVersion,omitempty"`
+	Kind       string                 `json:"kind,omitempty"`
+	Metadata   ObjectMeta             `json:"metadata,omitempty"`
+	Spec       OnDemandNodePoolSpec   `json:"spec,omitempty"`
+	Status     OnDemandNodePoolStatus `json:"status,omitempty"`
+}
+
 type SpotNodePoolSpec struct {
 	Autoscaling       *SpotNodePoolAutoscaling `json:"autoscaling,omitempty"`
 	BidPrice          string                   `json:"bidPrice,omitempty"`
@@ -305,6 +314,42 @@ type SpotNodePoolMetadataStatus struct {
 	Annotations []string `json:"annotations,omitempty"`
 	Labels      []string `json:"labels,omitempty"`
 	Taints      []string `json:"taints,omitempty"`
+}
+
+type OnDemandNodePoolSpec struct {
+	CloudSpace        string                  `json:"cloudSpace,omitempty"`
+	CustomAnnotations map[string]string       `json:"customAnnotations,omitempty"`
+	CustomLabels      map[string]string       `json:"customLabels,omitempty"`
+	CustomTaints      []OnDemandNodePoolTaint `json:"customTaints,omitempty"`
+	Desired           *int                    `json:"desired,omitempty"`
+	ServerClass       string                  `json:"serverClass,omitempty"`
+}
+
+type OnDemandNodePoolTaint struct {
+	Effect    string     `json:"effect,omitempty"`
+	Key       string     `json:"key,omitempty"`
+	TimeAdded *time.Time `json:"timeAdded,omitempty"`
+	Value     string     `json:"value,omitempty"`
+}
+
+type OnDemandNodePoolStatus struct {
+	CustomMetadataStatus *OnDemandNodePoolMetadataStatus `json:"customMetadataStatus,omitempty"`
+	ReservedCount        *int                            `json:"reservedCount,omitempty"`
+	ReservedStatus       string                          `json:"reservedStatus,omitempty"`
+}
+
+type OnDemandNodePoolMetadataStatus struct {
+	Annotations []string `json:"annotations,omitempty"`
+	Labels      []string `json:"labels,omitempty"`
+	Taints      []string `json:"taints,omitempty"`
+}
+
+// OnDemandNodePoolList represents a list of on demand node pools
+type OnDemandNodePoolList struct {
+	APIVersion string             `json:"apiVersion,omitempty"`
+	Items      []OnDemandNodePool `json:"items"`
+	Kind       string             `json:"kind,omitempty"`
+	Metadata   ListMeta           `json:"metadata,omitempty"`
 }
 
 // SpotNodePoolList represents a list of spot node pools

@@ -32,7 +32,7 @@ This document tracks the implementation status of the Rackspace Spot Public API 
 | GET /ondemandnodepools           | `spotctl ondemandnodepools list`       | ❌     |
 | POST /ondemandnodepools          | `spotctl ondemandnodepools create`     | ❌     |
 | DELETE /ondemandnodepools        | `spotctl ondemandnodepools delete-all` | ❌     |
-| GET /ondemandnodepools/{name}    | `spotctl ondemandnodepools get <name>` | ❌     |
+| GET /ondemandnodepools/{name}    | `spotctl ondemandnodepool get <name>`  | ✅     |
 | DELETE /ondemandnodepools/{name} | `spotctl ondemandnodepools delete`     | ❌     |
 | PATCH /ondemandnodepools/{name}  | `spotctl ondemandnodepools edit`       | ❌     |
 | **Price Information**            |
@@ -47,5 +47,5 @@ Legend:
 
 ## Implementation Summary
 
-**Implemented:** 16/25 endpoints (64.0%)
-**Remaining:** 9/25 endpoints (36.0%)
+**Implemented:** 17/25 endpoints (68.0%)
+**Remaining:** 8/25 endpoints (32.0%)

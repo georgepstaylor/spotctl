@@ -493,6 +493,23 @@ func (c *Client) DeleteAllSpotNodePools(ctx context.Context, namespace string, a
 	})
 }
 
+// GetOnDemandNodePool retrieves a specific on demand node pool by name in the specified namespace
+func (c *Client) GetOnDemandNodePool(ctx context.Context, namespace, name string, apiVersion ...APIVersion) (*OnDemandNodePool, error) {
+	if err := validateNamespace(namespace); err != nil {
+		return nil, err
+	}
+	if err := validateName(name); err != nil {
+		return nil, fmt.Errorf("on demand node pool name is required")
+	}
+
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
+	endpoint := fmt.Sprintf("/namespaces/%s/ondemandnodepools/%s", namespace, name)
+	return genericGet[OnDemandNodePool](c, ctx, endpoint, GetOptions{Namespace: namespace, Name: name, APIVersion: version})
+}
+
 // HandleAPIError processes API error responses and returns appropriate error types
 func (c *Client) HandleAPIError(resp *http.Response) error {
 	if resp == nil {
