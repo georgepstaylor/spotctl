@@ -15,8 +15,8 @@ On demand node pools represent groups of worker nodes deployed through Rackspace
 
 	// Add implemented subcommands
 	cmd.AddCommand(NewGetCommand())
+	cmd.AddCommand(NewListCommand())
 	// TODO: Add other commands as they are implemented
-	// cmd.AddCommand(NewListCommand())
 	// cmd.AddCommand(NewCreateCommand())
 	// cmd.AddCommand(NewEditCommand())
 	// cmd.AddCommand(NewDeleteCommand())

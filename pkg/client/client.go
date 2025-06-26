@@ -510,6 +510,20 @@ func (c *Client) GetOnDemandNodePool(ctx context.Context, namespace, name string
 	return genericGet[OnDemandNodePool](c, ctx, endpoint, GetOptions{Namespace: namespace, Name: name, APIVersion: version})
 }
 
+// ListOnDemandNodePools retrieves all on demand node pools for a given namespace
+func (c *Client) ListOnDemandNodePools(ctx context.Context, namespace string, apiVersion ...APIVersion) (*OnDemandNodePoolList, error) {
+	if err := validateNamespace(namespace); err != nil {
+		return nil, err
+	}
+
+	version := APIVersionDefault
+	if len(apiVersion) > 0 {
+		version = apiVersion[0]
+	}
+	endpoint := fmt.Sprintf("/namespaces/%s/ondemandnodepools", namespace)
+	return genericList[OnDemandNodePoolList](c, ctx, endpoint, ListOptions{Namespace: namespace, APIVersion: version})
+}
+
 // HandleAPIError processes API error responses and returns appropriate error types
 func (c *Client) HandleAPIError(resp *http.Response) error {
 	if resp == nil {

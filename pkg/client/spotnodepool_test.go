@@ -839,6 +839,192 @@ func TestGetOnDemandNodePool(t *testing.T) {
 	}
 }
 
+func TestListOnDemandNodePools(t *testing.T) {
+	tests := []struct {
+		name             string
+		namespace        string
+		mockResponse     string
+		mockStatus       int
+		expectError      bool
+		expectedErrorMsg string
+	}{
+		{
+			name:      "successful ondemandnodepools list",
+			namespace: "test-namespace",
+			mockResponse: `{
+				"apiVersion": "v1",
+				"kind": "OnDemandNodePoolList",
+				"items": [
+					{
+						"apiVersion": "v1",
+						"kind": "OnDemandNodePool",
+						"metadata": {
+							"name": "test-ondemandnodepool-1",
+							"namespace": "test-namespace"
+						},
+						"spec": {
+							"serverClass": "gp.vs1.large-lon",
+							"desired": 3,
+							"cloudSpace": "test-cloudspace"
+						},
+						"status": {
+							"reservedCount": 3,
+							"reservedStatus": "Active"
+						}
+					},
+					{
+						"apiVersion": "v1",
+						"kind": "OnDemandNodePool",
+						"metadata": {
+							"name": "test-ondemandnodepool-2",
+							"namespace": "test-namespace"
+						},
+						"spec": {
+							"serverClass": "gp.vs1.medium-lon",
+							"desired": 1,
+							"cloudSpace": "test-cloudspace"
+						},
+						"status": {
+							"reservedCount": 1,
+							"reservedStatus": "Active"
+						}
+					}
+				]
+			}`,
+			mockStatus:  200,
+			expectError: false,
+		},
+		{
+			name:      "empty ondemandnodepools list",
+			namespace: "test-namespace",
+			mockResponse: `{
+				"apiVersion": "v1",
+				"kind": "OnDemandNodePoolList",
+				"items": []
+			}`,
+			mockStatus:  200,
+			expectError: false,
+		},
+		{
+			name:             "missing namespace",
+			namespace:        "",
+			expectError:      true,
+			expectedErrorMsg: "namespace is required",
+		},
+		{
+			name:             "404 error",
+			namespace:        "test-namespace",
+			mockResponse:     `{"error": "namespace not found"}`,
+			mockStatus:       404,
+			expectError:      true,
+			expectedErrorMsg: "API error 404",
+		},
+		{
+			name:             "unauthorized error",
+			namespace:        "test-namespace",
+			mockResponse:     `{"error": "unauthorized"}`,
+			mockStatus:       401,
+			expectError:      true,
+			expectedErrorMsg: "API error 401",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Skip server setup for namespace validation test
+			if tt.namespace == "" {
+				client := &Client{}
+				_, err := client.ListOnDemandNodePools(context.Background(), tt.namespace)
+				if !tt.expectError {
+					t.Errorf("expected error but got none")
+					return
+				}
+				if err == nil || !strings.Contains(err.Error(), tt.expectedErrorMsg) {
+					t.Errorf("expected error message to contain %q, got %q", tt.expectedErrorMsg, err.Error())
+				}
+				return
+			}
+
+			// Create mock server
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				expectedPath := "/ngpc.rxt.io/v1/namespaces/" + tt.namespace + "/ondemandnodepools"
+				if r.URL.Path != expectedPath {
+					t.Errorf("expected path %s, got %s", expectedPath, r.URL.Path)
+				}
+
+				if r.Method != "GET" {
+					t.Errorf("expected GET method, got %s", r.Method)
+				}
+
+				w.WriteHeader(tt.mockStatus)
+				w.Write([]byte(tt.mockResponse))
+			}))
+			defer server.Close()
+
+			// Create client with mock server
+			cfg := &config.Config{
+				RefreshToken: "test-token",
+				BaseURL:      server.URL,
+				Debug:        false,
+				Timeout:      30,
+			}
+
+			// Create client with mock token manager
+			client := NewClient(cfg)
+			client.tokenManager = &MockTokenManager{
+				accessToken: "mock-access-token",
+			}
+
+			// Call the method
+			onDemandNodePoolList, err := client.ListOnDemandNodePools(context.Background(), tt.namespace)
+
+			// Check error expectation
+			if tt.expectError && err == nil {
+				t.Errorf("expected error but got none")
+				return
+			}
+
+			if !tt.expectError && err != nil {
+				t.Errorf("expected no error but got: %v", err)
+				return
+			}
+
+			if tt.expectError {
+				if !strings.Contains(err.Error(), tt.expectedErrorMsg) {
+					t.Errorf("expected error message to contain %q, got %q", tt.expectedErrorMsg, err.Error())
+				}
+				return
+			}
+
+			// Check success cases
+			if onDemandNodePoolList == nil {
+				t.Errorf("expected ondemandnodepool list but got nil")
+				return
+			}
+
+			if tt.name == "successful ondemandnodepools list" {
+				if len(onDemandNodePoolList.Items) != 2 {
+					t.Errorf("expected 2 ondemandnodepools, got %d", len(onDemandNodePoolList.Items))
+				}
+
+				if onDemandNodePoolList.Items[0].Metadata.Name != "test-ondemandnodepool-1" {
+					t.Errorf("expected name %q, got %q", "test-ondemandnodepool-1", onDemandNodePoolList.Items[0].Metadata.Name)
+				}
+
+				if onDemandNodePoolList.Items[1].Metadata.Name != "test-ondemandnodepool-2" {
+					t.Errorf("expected name %q, got %q", "test-ondemandnodepool-2", onDemandNodePoolList.Items[1].Metadata.Name)
+				}
+			}
+
+			if tt.name == "empty ondemandnodepools list" {
+				if len(onDemandNodePoolList.Items) != 0 {
+					t.Errorf("expected empty list, got %d items", len(onDemandNodePoolList.Items))
+				}
+			}
+		})
+	}
+}
+
 func TestDeleteAllSpotNodePools(t *testing.T) {
 	tests := []struct {
 		name             string
