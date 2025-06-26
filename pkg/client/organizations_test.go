@@ -99,7 +99,6 @@ func TestClient_ListOrganizations(t *testing.T) {
 			cfg := &config.Config{
 				RefreshToken: "test-token",
 				BaseURL:      server.URL,
-				Region:       "uk-lon-1",
 				Debug:        false,
 				Timeout:      30,
 			}
@@ -168,7 +167,6 @@ func TestClient_ListOrganizations_InvalidJSON(t *testing.T) {
 	cfg := &config.Config{
 		RefreshToken: "test-token",
 		BaseURL:      server.URL + "/apis/ngpc.rxt.io/v1",
-		Region:       "uk-lon-1",
 		Debug:        false,
 		Timeout:      30,
 	}

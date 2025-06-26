@@ -27,7 +27,6 @@ var Defaults = struct {
 // Config represents the application configuration
 type Config struct {
 	RefreshToken string `mapstructure:"refresh-token"`
-	Region       string `mapstructure:"region"`
 	Namespace    string `mapstructure:"namespace"`
 	BaseURL      string `mapstructure:"base-url"`
 	Debug        bool   `mapstructure:"debug"`
@@ -40,13 +39,6 @@ func ValidateConfig(cfg *Config) error {
 	if cfg.RefreshToken == "" {
 		return errors.NewValidationError(
 			"refresh token is required. Set it via --refresh-token flag, config file, or SPOTCTL_REFRESH_TOKEN environment variable",
-			nil,
-		)
-	}
-
-	if cfg.Region == "" {
-		return errors.NewValidationError(
-			"region is required. Set it via --region flag or in your config file",
 			nil,
 		)
 	}
@@ -93,7 +85,6 @@ func SaveConfig(cfg *Config) error {
 
 	// Set values in viper
 	viper.Set("refresh-token", cfg.RefreshToken)
-	viper.Set("region", cfg.Region)
 	viper.Set("namespace", cfg.Namespace)
 	viper.Set("base-url", cfg.BaseURL)
 	viper.Set("debug", cfg.Debug)
@@ -141,7 +132,6 @@ func InitConfig() error {
 
 	// Bind environment variables
 	viper.BindEnv("refresh-token", "SPOTCTL_REFRESH_TOKEN")
-	viper.BindEnv("region", "SPOTCTL_REGION")
 	viper.BindEnv("namespace", "SPOTCTL_NAMESPACE")
 	viper.BindEnv("base-url", "SPOTCTL_BASE_URL")
 	viper.BindEnv("debug", "SPOTCTL_DEBUG")

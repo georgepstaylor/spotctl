@@ -5,9 +5,6 @@
 # Get this from the Rackspace Spot Console: API Access > Terraform > Get New Token
 refresh-token: "your-refresh-token-here"
 
-# Default region to use
-region: "uk-lon-1"
-
 # Default namespace for operations (optional)
 # If set, you won't need to specify --namespace on every command
 namespace: "my-default-namespace"

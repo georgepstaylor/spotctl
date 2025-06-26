@@ -96,7 +96,7 @@ func genericGet[T any](c *Client, ctx context.Context, endpoint string, opts Get
 	return &result, nil
 }
 
-// genericCreate performs a generic create operation
+// genericCreate performs a create operation
 func genericCreate[T any](c *Client, ctx context.Context, endpoint string, body interface{}, opts CreateOptions) (*T, error) {
 	// Use default API version if not specified
 	apiVersion := opts.APIVersion
@@ -122,7 +122,7 @@ func genericCreate[T any](c *Client, ctx context.Context, endpoint string, body 
 	return &result, nil
 }
 
-// genericEdit performs a generic edit operation using JSON patch
+// genericEdit performs an edit operation using JSON patch
 func genericEdit[T any](c *Client, ctx context.Context, endpoint string, patchOps []PatchOperation, opts EditOptions) (*T, error) {
 	// Use default API version if not specified
 	apiVersion := opts.APIVersion
@@ -148,7 +148,7 @@ func genericEdit[T any](c *Client, ctx context.Context, endpoint string, patchOp
 	return &result, nil
 }
 
-// genericDelete performs a generic delete operation
+// genericDelete performs a delete operation
 func genericDelete[T any](c *Client, ctx context.Context, endpoint string, opts DeleteOptions) (*T, error) {
 	// Use default API version if not specified
 	apiVersion := opts.APIVersion

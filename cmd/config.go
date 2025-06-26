@@ -38,7 +38,6 @@ var configShowCmd = &cobra.Command{
 			fmt.Printf("  refresh-token: <not set>\n")
 		}
 
-		fmt.Printf("  region: %s\n", viper.GetString("region"))
 		fmt.Printf("  namespace: %s\n", viper.GetString("namespace"))
 		fmt.Printf("  base-url: %s\n", viper.GetString("base-url"))
 		fmt.Printf("  debug: %t\n", viper.GetBool("debug"))
@@ -63,7 +62,7 @@ var configSetCmd = &cobra.Command{
 		value := args[1]
 
 		// Validate the key
-		validKeys := []string{"refresh-token", "region", "namespace", "base-url", "debug", "timeout"}
+		validKeys := []string{"refresh-token", "namespace", "base-url", "debug", "timeout"}
 		if !contains(validKeys, key) {
 			CheckError(fmt.Errorf("invalid configuration key '%s'. Valid keys are: %v", key, validKeys))
 		}
@@ -74,7 +73,6 @@ var configSetCmd = &cobra.Command{
 			// If config doesn't exist or is invalid, start with defaults
 			existingCfg = &config.Config{
 				RefreshToken: viper.GetString("refresh-token"),
-				Region:       viper.GetString("region"),
 				Namespace:    viper.GetString("namespace"),
 				BaseURL:      viper.GetString("base-url"),
 				Debug:        viper.GetBool("debug"),
@@ -89,7 +87,6 @@ var configSetCmd = &cobra.Command{
 		// Create a config object with the updated value
 		cfg := &config.Config{
 			RefreshToken: existingCfg.RefreshToken,
-			Region:       existingCfg.Region,
 			Namespace:    existingCfg.Namespace,
 			BaseURL:      existingCfg.BaseURL,
 			Debug:        existingCfg.Debug,
@@ -101,8 +98,6 @@ var configSetCmd = &cobra.Command{
 		switch key {
 		case "refresh-token":
 			cfg.RefreshToken = value
-		case "region":
-			cfg.Region = value
 		case "namespace":
 			cfg.Namespace = value
 		case "base-url":
@@ -139,18 +134,8 @@ var configInitCmd = &cobra.Command{
 			CheckError(fmt.Errorf("refresh token is required"))
 		}
 
-		// Prompt for region (required)
-		fmt.Print("Enter your default region (e.g., uk-lon-1, aus-syd-1): ")
-		var region string
-		fmt.Scanln(&region)
-
-		if region == "" {
-			CheckError(fmt.Errorf("region is required"))
-		}
-
 		// Set values
 		viper.Set("refresh-token", refreshToken)
-		viper.Set("region", region)
 		viper.Set("namespace", "") // Default to empty namespace
 		viper.Set("base-url", config.Defaults.BaseURL)
 		viper.Set("debug", config.Defaults.Debug)
@@ -159,7 +144,6 @@ var configInitCmd = &cobra.Command{
 		// Create config object
 		cfg := &config.Config{
 			RefreshToken: refreshToken,
-			Region:       region,
 			Namespace:    "", // Default to empty namespace
 			BaseURL:      config.Defaults.BaseURL,
 			Debug:        config.Defaults.Debug,

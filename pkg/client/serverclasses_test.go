@@ -99,7 +99,6 @@ func TestClient_ListServerClasses(t *testing.T) {
 			cfg := &config.Config{
 				RefreshToken: "test-token",
 				BaseURL:      server.URL,
-				Region:       "uk-lon-1",
 				Debug:        false,
 				Timeout:      30,
 			}
@@ -173,7 +172,6 @@ func TestClient_ListServerClasses_InvalidJSON(t *testing.T) {
 	cfg := &config.Config{
 		RefreshToken: "test-token",
 		BaseURL:      server.URL,
-		Region:       "uk-lon-1",
 		Debug:        false,
 		Timeout:      30,
 	}
@@ -276,7 +274,6 @@ func TestClient_GetServerClass(t *testing.T) {
 			cfg := &config.Config{
 				RefreshToken: "test-token",
 				BaseURL:      server.URL,
-				Region:       "uk-lon-1",
 				Debug:        false,
 				Timeout:      30,
 			}
@@ -328,7 +325,6 @@ func TestClient_GetServerClass_InvalidJSON(t *testing.T) {
 	cfg := &config.Config{
 		RefreshToken: "test-token",
 		BaseURL:      server.URL,
-		Region:       "uk-lon-1",
 		Debug:        false,
 		Timeout:      30,
 	}

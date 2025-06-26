@@ -106,7 +106,6 @@ func TestClient_ListRegions(t *testing.T) {
 	cfg := &config.Config{
 		RefreshToken: "test-token",
 		BaseURL:      server.URL,
-		Region:       "uk-lon-1",
 		Debug:        false,
 		Timeout:      30,
 	}
@@ -162,7 +161,6 @@ func TestClient_ListRegions_APIError(t *testing.T) {
 	cfg := &config.Config{
 		RefreshToken: "test-token",
 		BaseURL:      server.URL,
-		Region:       "uk-lon-1",
 		Debug:        false,
 		Timeout:      30,
 	}

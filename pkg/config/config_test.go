@@ -14,7 +14,6 @@ func TestValidateConfig(t *testing.T) {
 			name: "valid config",
 			config: &Config{
 				RefreshToken: "test-token",
-				Region:       "uk-lon-1",
 				BaseURL:      "https://api.test.com",
 			},
 			wantErr: false,
@@ -22,16 +21,7 @@ func TestValidateConfig(t *testing.T) {
 		{
 			name: "missing refresh token",
 			config: &Config{
-				Region:  "uk-lon-1",
 				BaseURL: "https://api.test.com",
-			},
-			wantErr: true,
-		},
-		{
-			name: "missing region",
-			config: &Config{
-				RefreshToken: "test-token",
-				BaseURL:      "https://api.test.com",
 			},
 			wantErr: true,
 		},
@@ -39,7 +29,6 @@ func TestValidateConfig(t *testing.T) {
 			name: "missing base URL",
 			config: &Config{
 				RefreshToken: "test-token",
-				Region:       "uk-lon-1",
 			},
 			wantErr: true,
 		},
