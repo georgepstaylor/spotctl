@@ -1,6 +1,6 @@
 # Test Coverage Report
 
-Generated on: Thu Jun 26 21:13:21 UTC 2025
+Generated on: Thu Jun 26 22:18:43 UTC 2025
 
 ## Coverage Summary
 
@@ -28,7 +28,6 @@ github.com/georgetaylor/spotctl/cmd/common.go:24:			ConfirmAction			0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:32:			CheckError			0.0%
 github.com/georgetaylor/spotctl/cmd/config.go:164:			init				0.0%
 github.com/georgetaylor/spotctl/cmd/config.go:175:			contains			0.0%
-github.com/georgetaylor/spotctl/cmd/config.go:185:			min				0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/config.go:11:		getOrganizationsTableConfig	0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/config.go:25:		outputOrganizations		0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/list.go:13:		NewListCommand			0.0%
@@ -153,7 +152,7 @@ github.com/georgetaylor/spotctl/pkg/pager/pager.go:151:			isTerminal			100.0%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:156:			getTerminalHeight		44.4%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:179:			getTerminalHeightStty		50.0%
 github.com/georgetaylor/spotctl/pkg/pager/pager.go:198:			WriteToWriter			0.0%
-total:									(statements)			21.9%
+total:									(statements)			22.0%
 ```
 
 ## Coverage Status
@@ -183,7 +182,6 @@ total:									(statements)			21.9%
 | github.com/georgetaylor/spotctl/cmd/common.go:32: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/config.go:164: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/config.go:175: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/config.go:185: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/config.go:11: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/config.go:25: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/list.go:13: | 0.0% | ❌ |
@@ -320,7 +318,6 @@ total:									(statements)			21.9%
 | github.com/georgetaylor/spotctl/cmd/cloudspaces/config.go:135: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/config.go:164: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/config.go:175: | 0.0% | ❌ |
-| github.com/georgetaylor/spotctl/cmd/config.go:185: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/config.go:11: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/organizations/config.go:25: | 0.0% | ❌ |
 | github.com/georgetaylor/spotctl/cmd/regions/config.go:11: | 0.0% | ❌ |
@@ -412,7 +409,6 @@ github.com/georgetaylor/spotctl/cmd/common.go:24:			ConfirmAction			0.0%
 github.com/georgetaylor/spotctl/cmd/common.go:32:			CheckError			0.0%
 github.com/georgetaylor/spotctl/cmd/config.go:164:			init				0.0%
 github.com/georgetaylor/spotctl/cmd/config.go:175:			contains			0.0%
-github.com/georgetaylor/spotctl/cmd/config.go:185:			min				0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/config.go:11:		getOrganizationsTableConfig	0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/config.go:25:		outputOrganizations		0.0%
 github.com/georgetaylor/spotctl/cmd/organizations/list.go:13:		NewListCommand			0.0%
