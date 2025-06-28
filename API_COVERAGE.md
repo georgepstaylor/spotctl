@@ -28,7 +28,6 @@ This document tracks the implementation status of the Rackspace Spot Public API 
 | GET /spotnodepools/{name}        | `spotctl spotnodepool get <name>`     | ✅     |
 | DELETE /spotnodepools/{name}     | `spotctl spotnodepool delete`         | ✅     |
 | PATCH /spotnodepools/{name}      | `spotctl spotnodepools edit`          | ✅     |
-| PUT /spotnodepools/{name}        | `spotctl spotnodepools edit`          | ❌     |
 | **On-Demand Node Pools**         |
 | GET /ondemandnodepools           | `spotctl ondemandnodepool list`       | ✅     |
 | POST /ondemandnodepools          | `spotctl ondemandnodepool create`     | ❌     |
