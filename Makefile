@@ -5,7 +5,7 @@ BINARY_NAME=spotctl
 VERSION?=dev
 COMMIT?=$(shell git rev-parse --short HEAD)
 DATE?=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-LDFLAGS=-ldflags "-X github.com/georgetaylor/spotctl/cmd.version=${VERSION} -X github.com/georgetaylor/spotctl/cmd.commit=${COMMIT} -X github.com/georgetaylor/spotctl/cmd.date=${DATE}"
+LDFLAGS=-ldflags "-X github.com/georgetaylor/spotctl/pkg/version.Version=${VERSION} -X github.com/georgetaylor/spotctl/pkg/version.Commit=${COMMIT} -X github.com/georgetaylor/spotctl/pkg/version.Date=${DATE}"
 
 # Coverage thresholds
 COVERAGE_THRESHOLD := 80

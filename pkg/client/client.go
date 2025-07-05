@@ -11,6 +11,7 @@ import (
 
 	"github.com/georgetaylor/spotctl/pkg/config"
 	"github.com/georgetaylor/spotctl/pkg/errors"
+	"github.com/georgetaylor/spotctl/pkg/version"
 )
 
 // APIVersion represents the different API versions available
@@ -129,7 +130,7 @@ func (c *Client) prepareRequest(ctx context.Context, opts requestOptions) (*http
 
 	req.Header.Set("Content-Type", contentType)
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
-	req.Header.Set("User-Agent", "spotctl/0.0.1")
+	req.Header.Set("User-Agent", version.GetUserAgent())
 
 	if c.config.Debug {
 		fmt.Printf("Making %s request to %s (API: %s)\n", opts.method, url, opts.apiVersion)
