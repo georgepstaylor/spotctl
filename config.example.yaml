@@ -7,6 +7,7 @@ refresh-token: "your-refresh-token-here"
 
 # Default namespace for operations (optional)
 # If set, you won't need to specify --namespace on every command
+#todo: In the future, namespace profiles should be supported to allow switching between namespaces without having to change this value
 namespace: "my-default-namespace"
 
 # API base URL (default should work for most users)

@@ -35,7 +35,6 @@ spotctl config init
 
 # Or set values directly
 spotctl config set refresh-token your-token-here
-spotctl config set region uk-lon-1
 ```
 
 #### Alternative Methods
@@ -43,14 +42,13 @@ spotctl config set region uk-lon-1
 ```bash
 # Environment variables
 export SPOTCTL_REFRESH_TOKEN=your-token
-export SPOTCTL_REGION=uk-lon-1
-
 # Command flags
-spotctl --refresh-token your-token --region uk-lon-1 regions list
+spotctl --refresh-token your-token regions list
 ```
 
 #### ~/.spot/config.yaml
-You can manually configure this file (rather than using `spotctl config` to create it.
+
+You can manually configure this file (rather than using `spotctl config` to create it).
 
 See [example](config.example.yaml).
 
@@ -81,14 +79,15 @@ spotctl cloudspaces list my-namespace
 # Default table view
 spotctl regions list
 
+# Detailed view with extra columns
+spotctl regions list -o wide
+
 # JSON output for automation
 spotctl regions list --output json
 
 # YAML for configuration
 spotctl regions list --output yaml
 
-# Detailed view with extra columns
-spotctl regions list -o wide
 ```
 
 ### Global Options
