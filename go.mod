@@ -5,7 +5,7 @@ go 1.24.3
 require (
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/viper v1.21.0
-	golang.org/x/term v0.33.0
+	golang.org/x/term v0.35.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -23,6 +23,6 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/sys v0.34.0 // indirect
+	golang.org/x/sys v0.36.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
 )
